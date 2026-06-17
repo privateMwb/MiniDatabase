@@ -154,13 +154,13 @@ Status Table::rebuildIndex() {
 
 // Serialization 
 std::string Table::serialize() const {
-    Json envelope;
+    Json envelope(Json::ObjectType{});
     envelope["__table_id___"]  = static_cast<int>(id);
     envelope["__name__"]       = name;
     
     Json schemaArr = Json(Json::ArrayType{});
     for (const ColumnDef& col : schema) {
-        Json colJson;
+        Json colJson(Json::ObjectType{});
         colJson["name"]      = col.name;
         colJson["type"]      = static_cast<int>(col.type);
         colJson["nullable"]  = col.nullable;

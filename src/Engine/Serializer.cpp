@@ -66,7 +66,7 @@ Status Serializer::importTableFromFile(Table& table, const std::string& path) {
 
 // Database-wide Export/Import 
 Status Serializer::exportDatabaseToJson(const Database& db, const std::string& path) {
-    Json envelope;
+    Json envelope(Json::ObjectType{});
     
     for (const Table* t : db.getTables()) {
         Json tableArr = Json(Json::ArrayType{});

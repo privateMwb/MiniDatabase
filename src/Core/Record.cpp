@@ -69,8 +69,8 @@ Status Record::validate(const VectorPro<ColumnDef>& schema) const {
 
 // Serialization
 std::string Record::serialize() const {
-    Json envelope;
-    envelope["__id___"] = static_cast<int>(id);
+    Json envelope(Json::ObjectType{});
+    envelope["__id__"] = static_cast<int>(id);
     envelope["__deleted__"] = deleted;
     envelope["data"] = data;
     return envelope.dump();

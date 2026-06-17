@@ -101,7 +101,7 @@ bool Database::hasTable(const std::string& name) const noexcept {
 
 // Database Operations
 Status Database::save(const std::string& path) const {
-    Json envelope;
+    Json envelope(Json::ObjectType{});
     envelope["__db_name__"] = name;;
     
     Json tableArr = Json(Json::ArrayType{});

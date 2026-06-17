@@ -110,7 +110,7 @@ Status Page::compact() {
 
 // Serialization 
 std::string Page::serialize() const {
-    Json envelope;
+    Json envelope(Json::ObjectType{});
     envelope["__page_id__"] = static_cast<int>(id);
     
     Json arr = Json(Json::ArrayType{});

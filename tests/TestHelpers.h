@@ -21,7 +21,7 @@ inline Table makeEmployeeTable() {
 
 // Builds a simple test record for an employee
 inline Record makeEmployeeRecord(RecordID id, const std::string& name, double salary) {
-    Json data;
+    Json data(Json::ObjectType{});
     data["name"]   = name;
     data["salary"] = salary;
     return Record(id, data);
