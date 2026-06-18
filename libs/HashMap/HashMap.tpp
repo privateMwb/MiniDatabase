@@ -124,18 +124,20 @@ std::size_t HashMap<K, V, Hash>::bucketIndex(const K& key) const {
 template<typename K,
          typename V,
          typename Hash>
-typename HashMap<K, V, Hash>::findNode(const K& key) {
-	std::size_t index = bucketIndex(key);
+typename HashMap<K, V, Hash>::node*
+HashMap<K, V, Hash>::findNode(const K& key) {
+    std::size_t index = bucketIndex(key);
 
-	node* current = buckets[index];
+    node* current = buckets[index];
 
-	while(current) {
-		if(current->key == key) return current;
+    while (current) {
+        if (current->key == key)
+            return current;
 
-		current = current->next;
-	}
+        current = current->next;
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 template<typename K,
@@ -174,18 +176,20 @@ void HashMap<K, V, Hash>::rehash(std::size_t newBucketCount) {
 template<typename K,
          typename V,
          typename Hash>
-const typename HashMap<K, V, Hash>::node* HashMap<K, V, Hash>::findNode(const K& key) const {
-	std::size_t index = bucketIndex(key);
+const typename HashMap<K, V, Hash>::node*
+HashMap<K, V, Hash>::findNode(const K& key) const {
+    std::size_t index = bucketIndex(key);
 
-	node* current = buckets[index];
+    const node* current = buckets[index];
 
-	while(current) {
-		if(current->key == key) return current;
+    while (current) {
+        if (current->key == key)
+            return current;
 
-		current = current->next;
-	}
+        current = current->next;
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 
