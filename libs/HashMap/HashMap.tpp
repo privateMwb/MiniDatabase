@@ -124,7 +124,7 @@ std::size_t HashMap<K, V, Hash>::bucketIndex(const K& key) const {
 template<typename K,
          typename V,
          typename Hash>
-node* HashMap<K, V, Hash>::findNode(const K& key) {
+typename HashMap<K, V, Hash>::findNode(const K& key) {
 	std::size_t index = bucketIndex(key);
 
 	node* current = buckets[index];
@@ -174,7 +174,7 @@ void HashMap<K, V, Hash>::rehash(std::size_t newBucketCount) {
 template<typename K,
          typename V,
          typename Hash>
-const node* HashMap<K, V, Hash>::findNode(const K& key) const {
+const typename HashMap<K, V, Hash>::node* HashMap<K, V, Hash>::findNode(const K& key) const {
 	std::size_t index = bucketIndex(key);
 
 	node* current = buckets[index];

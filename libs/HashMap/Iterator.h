@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstddef>
-#include <type_traits>
 #include <iterator>
+#include <type_traits>
 
 #include "Node.h"
 
@@ -10,171 +10,166 @@ template<
     typename K,
     typename V,
     bool IsConst = false
-    >
+>
 class Iterator {
 private:
-
-	// Type Aliases
-	using node = hashmap::Node<K, V>;
+    // Type Aliases
+    using node = hashmap::Node<K, V>;
 
 public:
+    // Iterator Traits
+    using value_type = node;
+    using difference_type = std::ptrdiff_t;
 
-	// Iterator Traits
-	using value_type = node;
-	using difference_type = std::ptrdiff_t;
-	using pointer = std::conditional_t<
-	                IsConst,
-	                const node*,
-	                node*
-	                >;
+    using pointer = std::conditional_t<
+        IsConst,
+        const node*,
+        node*
+    >;
 
-	using reference = std::conditional_t<
-	                  IsConst,
-	                  const node&,
-	                  node&
-	                  >;
-	using iterator_category = std::bidirectional_iterator_tag;
-	using BucketPointer = std::conditional_t<
-	                      IsConst,
-	                      node* const*,
-	                      node**
-	                      >;
+    using reference = std::conditional_t<
+        IsConst,
+        const node&,
+        node&
+    >;
+
+    using iterator_category = std::bidirectional_iterator_tag;
+
+    using BucketPointer = std::conditional_t<
+        IsConst,
+        node* const*,
+        node**
+    >;
+
 private:
-
-	// Core State
-	pointer current = nullptr;
-	BucketPointer buckets = nullptr;
-	std::size_t bucketIndex = 0;
-	std::size_t bucketCount = 0;
+    // Core State
+    pointer current = nullptr;
+    BucketPointer buckets = nullptr;
+    std::size_t bucketIndex = 0;
+    std::size_t bucketCount = 0;
 
 public:
+    // Lifecycle
+    Iterator() = default;
 
-	// Lifecycle
-	Iterator() = default;
+    Iterator(pointer nodePtr,
+             BucketPointer bucketPtr,
+             std::size_t index,
+             std::size_t count)
+        : current(nodePtr)
+        , buckets(bucketPtr)
+        , bucketIndex(index)
+        , bucketCount(count)
+    {}
 
-	Iterator(pointer node,
-	         BucketPointer buckets,
-	         std::size_t index,
-	         std::size_t bucketCount)
-		: current(node)
-		, buckets(buckets)
-		, bucketIndex(index)
-		, bucketCount(bucketCount)
-	{}
+    // Dereferencing
+    [[nodiscard]] reference operator*() const {
+        return *current;
+    }
 
-	// Dereferencing
-	[[nodiscard]] reference operator*() const {
-		return *current;
-	}
+    [[nodiscard]] pointer operator->() const {
+        return current;
+    }
 
-	[[nodiscard]] pointer operator->() const {
-		return current;
-	}
+    // Forward Iteration
+    Iterator& operator++() {
+        if (current && current->next) {
+            current = current->next;
+            return *this;
+        }
 
-	// Forward Iteration
-	Iterator& operator++() {
-		if(current && current->next) {
-			current = current->next;
-			return *this;
-		}
+        ++bucketIndex;
 
-		++bucketIndex;
+        while (bucketIndex < bucketCount) {
+            if (buckets[bucketIndex]) {
+                current = buckets[bucketIndex];
+                return *this;
+            }
 
-		while(bucketIndex < bucketCount) {
-			if(buckets[bucketIndex] != nullptr) {
-				current = buckets[bucketIndex];
+            ++bucketIndex;
+        }
 
-				return *this;
-			}
+        current = nullptr;
+        return *this;
+    }
 
-			++bucketIndex;
-		}
+    Iterator operator++(int) {
+        Iterator temp(*this);
+        ++(*this);
+        return temp;
+    }
 
-		current = nullptr;
-		return *this;
-	}
+    // Reverse Iteration
+    Iterator& operator--() {
+        if (current == nullptr) {
+            for (std::size_t i = bucketCount; i > 0; --i) {
+                node* last = buckets[i - 1];
 
-	Iterator operator++(int) {
-		Iterator temp = *this;
-		++(*this);
+                if (!last)
+                    continue;
 
-		return temp;
-	}
+                while (last->next)
+                    last = last->next;
 
-	// Reverse Iteration
-	Iterator& operator--() {
-		if (current == nullptr) {
-			for (std::size_t i = bucketCount; i > 0; --i) {
-				node* node = buckets[i - 1];
+                current = last;
+                bucketIndex = i - 1;
+                return *this;
+            }
 
-				if (!node) continue;
+            return *this;
+        }
 
-				while (node->next) {
-					node = node->next;
-				}
+        node* first = buckets[bucketIndex];
 
-				current = node;
-				bucketIndex = i - 1;
-				return *this;
-			}
+        if (first != current) {
+            while (first->next != current)
+                first = first->next;
 
-			return *this;
-		}
+            current = first;
+            return *this;
+        }
 
-		node* node = buckets[bucketIndex];
+        for (std::size_t i = bucketIndex; i > 0; --i) {
+            node* last = buckets[i - 1];
 
-		if (node != current) {
-			while (node->next != current) {
-				node = node->next;
-			}
+            if (!last)
+                continue;
 
-			current = node;
-			return *this;
-		}
+            while (last->next)
+                last = last->next;
 
-		for (std::size_t i = bucketIndex; i > 0; --i) {
-			node* prevBucket = buckets[i - 1];
+            current = last;
+            bucketIndex = i - 1;
+            return *this;
+        }
 
-			if (!prevBucket) continue;
+        current = nullptr;
+        bucketIndex = 0;
+        return *this;
+    }
 
-			while (prevBucket->next) {
-				prevBucket = prevBucket->next;
-			}
+    Iterator operator--(int) {
+        Iterator temp(*this);
+        --(*this);
+        return temp;
+    }
 
-			current = prevBucket;
-			bucketIndex = i - 1;
-			return *this;
-		}
+    // Comparison
+    [[nodiscard]] bool operator==(const Iterator& other) const {
+        return current == other.current;
+    }
 
-		current = nullptr;
-		bucketIndex = 0;
+    [[nodiscard]] bool operator!=(const Iterator& other) const {
+        return !(*this == other);
+    }
 
-		return *this;
-	}
-	
-	Iterator operator--(int) {
-		Iterator temp = *this;
-		--(*this);
-
-		return temp;
-	}
-
-	// Comparison
-	[[nodiscard]] bool operator==(const Iterator& other) const {
-		return current == other.current;
-	}
-
-	[[nodiscard]] bool operator!=(const Iterator& other) const {
-		return !(*this == other);
-	}
-
-	// Const Conversion
-	operator Iterator<K, V, true>() const {
-		return Iterator<K, V, true>(
-			current,
-        	buckets,
-        	bucketIndex,
-        	bucketCount
-		);
-	}
+    // Const Conversion
+    operator Iterator<K, V, true>() const {
+        return Iterator<K, V, true>(
+            current,
+            buckets,
+            bucketIndex,
+            bucketCount
+        );
+    }
 };
