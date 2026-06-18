@@ -15,7 +15,7 @@ class Iterator {
 private:
 
 	// Type Aliases
-	using NodeType = Node<K, V>;
+	using NodeType = node;
 
 public:
 
@@ -36,8 +36,8 @@ public:
 	using iterator_category = std::bidirectional_iterator_tag;
 	using BucketPointer = std::conditional_t<
 	                      IsConst,
-	                      Node<K, V>* const*,
-	                      Node<K, V>**
+	                      node* const*,
+	                      node**
 	                      >;
 private:
 
@@ -105,7 +105,7 @@ public:
 	Iterator& operator--() {
 		if (current == nullptr) {
 			for (std::size_t i = bucketCount; i > 0; --i) {
-				Node<K, V>* node = buckets[i - 1];
+				node* node = buckets[i - 1];
 
 				if (!node) continue;
 
@@ -121,7 +121,7 @@ public:
 			return *this;
 		}
 
-		Node<K, V>* node = buckets[bucketIndex];
+		node* node = buckets[bucketIndex];
 
 		if (node != current) {
 			while (node->next != current) {
@@ -133,7 +133,7 @@ public:
 		}
 
 		for (std::size_t i = bucketIndex; i > 0; --i) {
-			Node<K, V>* prevBucket = buckets[i - 1];
+			node* prevBucket = buckets[i - 1];
 
 			if (!prevBucket) continue;
 
