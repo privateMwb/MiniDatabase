@@ -21,7 +21,7 @@ public:
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
 	// Node
-	using node = hashmap::node;
+	using node = hashmap::Node<K, V>;
 
 private:
     

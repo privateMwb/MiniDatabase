@@ -15,7 +15,7 @@ class Iterator {
 private:
 
 	// Type Aliases
-	using NodeType = node;
+	using NodeType = hashmap::Node<K, V>;
 
 public:
 
