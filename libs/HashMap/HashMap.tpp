@@ -268,10 +268,10 @@ void HashMap<K, V, Hash>::insert(const K& key, const V& value) {
 
 	std::size_t index = bucketIndex(key);
 
-	node* node = new node(key, value);
+	node* newNode = new node(key, value);
 
-	node->next = buckets[index];
-	buckets[index] = node;
+	newNode->next = buckets[index];
+	buckets[index] = newNode;
 
 	++elementCount;
 
