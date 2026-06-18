@@ -169,12 +169,12 @@ public:
 	}
 
 	// Const Conversion
-	operator Iterator<const K, const V, true>() const {
-		return Iterator<const K, const V, true>(
-		           current,
-		           buckets,
-		           bucketIndex,
-		           bucketCount
-		       );
+	operator Iterator<K, V, true>() const {
+		return Iterator<K, V, true>(
+			current,
+        	buckets,
+        	bucketIndex,
+        	bucketCount
+		);
 	}
 };
