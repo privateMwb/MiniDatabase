@@ -15,23 +15,23 @@ class Iterator {
 private:
 
 	// Type Aliases
-	using NodeType = hashmap::Node<K, V>;
+	using node = hashmap::Node<K, V>;
 
 public:
 
 	// Iterator Traits
-	using value_type = NodeType;
+	using value_type = node;
 	using difference_type = std::ptrdiff_t;
 	using pointer = std::conditional_t<
 	                IsConst,
-	                const NodeType*,
-	                NodeType*
+	                const node*,
+	                node*
 	                >;
 
 	using reference = std::conditional_t<
 	                  IsConst,
-	                  const NodeType&,
-	                  NodeType&
+	                  const node&,
+	                  node&
 	                  >;
 	using iterator_category = std::bidirectional_iterator_tag;
 	using BucketPointer = std::conditional_t<
