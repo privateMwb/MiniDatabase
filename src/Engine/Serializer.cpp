@@ -9,7 +9,7 @@ std::string Serializer::exportTableToJson(const Table& table) {
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             
             Json entry = r->data;
@@ -72,7 +72,7 @@ Status Serializer::exportDatabaseToJson(const Database& db, const std::string& p
         Json tableArr = Json(Json::ArrayType{});
         for (const Page* page : t->getPages()) {
             for (std::size_t i = 0; i < page->recordCount(); ++i) {
-                const Record* r = page->getRecord(i);
+                const Record* r = page->getRecordAt(i);
                 if (!r || r->isDeleted()) continue;
                 
                 Json entry = r->data;

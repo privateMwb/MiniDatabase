@@ -11,7 +11,7 @@ HashMap<K, V, Hash>::HashMap(std::size_t bucketCount)
 	, elementCount(0)
 	, buckets(nullptr)
 	, hasher(Hash()) {
-	buckets = new Node<K, V>*[bucketCount];
+	buckets = new node*[bucketCount];
 
 	for(std::size_t i = 0; i < bucketCount; ++i) {
 		buckets[i] = nullptr;
@@ -29,7 +29,7 @@ template<typename K,
          typename V,
          typename Hash>
 HashMap<K, V, Hash>::HashMap(const HashMap<K, V, Hash>& other)
-	: buckets(new Node<K, V>*[other.bucketCount])
+	: buckets(new node*[other.bucketCount])
 	, bucketCount(other.bucketCount)
 	, elementCount(0)
 	, hasher(other.hasher)
@@ -39,7 +39,7 @@ HashMap<K, V, Hash>::HashMap(const HashMap<K, V, Hash>& other)
 	}
 
 	for(std::size_t i = 0; i < other.bucketCount; ++i) {
-		Node<K, V>* current = other.buckets[i];
+		node* current = other.buckets[i];
 
 		while(current) {
 			insert(current->key, current->value);
@@ -59,14 +59,14 @@ HashMap<K, V, Hash>& HashMap<K, V, Hash>::operator=(const HashMap<K, V, Hash>& o
 		bucketCount = other.bucketCount;
 		elementCount = 0;
 		hasher = other.hasher;
-		buckets = new Node<K, V>*[bucketCount];
+		buckets = new node*[bucketCount];
 
 		for(std::size_t i = 0; i < other.bucketCount; ++i) {
 			buckets[i] = nullptr;
 		}
 
 		for(std::size_t i = 0; i < other.bucketCount; ++i) {
-			Node<K, V>* current = other.buckets[i];
+			node* current = other.buckets[i];
 
 			while(current) {
 				insert(current->key, current->value);
@@ -124,10 +124,10 @@ std::size_t HashMap<K, V, Hash>::bucketIndex(const K& key) const {
 template<typename K,
          typename V,
          typename Hash>
-Node<K, V>* HashMap<K, V, Hash>::findNode(const K& key) {
+node* HashMap<K, V, Hash>::findNode(const K& key) {
 	std::size_t index = bucketIndex(key);
 
-	Node<K, V>* current = buckets[index];
+	node* current = buckets[index];
 
 	while(current) {
 		if(current->key == key) return current;
@@ -144,17 +144,17 @@ template<typename K,
 void HashMap<K, V, Hash>::rehash(std::size_t newBucketCount) {
 	if(newBucketCount <= bucketCount) return;
 
-	Node<K, V>** newBuckets = new Node<K, V>*[newBucketCount];
+	node** newBuckets = new node*[newBucketCount];
 
 	for(std::size_t i = 0; i < newBucketCount; ++i) {
 		newBuckets[i] = nullptr;
 	}
 
 	for(std::size_t i = 0; i < bucketCount; ++i) {
-		Node<K, V>* current = buckets[i];
+		node* current = buckets[i];
 
 		while(current) {
-			Node<K, V>* next = current->next;
+			node* next = current->next;
 
 			std::size_t index = hasher(current->key) % newBucketCount;
 
@@ -174,10 +174,10 @@ void HashMap<K, V, Hash>::rehash(std::size_t newBucketCount) {
 template<typename K,
          typename V,
          typename Hash>
-const Node<K, V>* HashMap<K, V, Hash>::findNode(const K& key) const {
+const node* HashMap<K, V, Hash>::findNode(const K& key) const {
 	std::size_t index = bucketIndex(key);
 
-	Node<K, V>* current = buckets[index];
+	node* current = buckets[index];
 
 	while(current) {
 		if(current->key == key) return current;
@@ -198,10 +198,10 @@ void HashMap<K, V, Hash>::release() noexcept {
 	}
 
 	for(std::size_t i = 0; i < bucketCount; ++i) {
-		Node<K, V>* current = buckets[i];
+		node* current = buckets[i];
 
 		while(current) {
-			Node<K, V>* next = current->next;
+			node* next = current->next;
 
 			delete current;
 
@@ -221,7 +221,7 @@ template<typename K,
          typename V,
          typename Hash>
 V& HashMap<K, V, Hash>::operator[](const K& key) {
-	Node<K, V>* node = findNode(key);
+	node* node = findNode(key);
 
 	if(node == nullptr) {
 		insert(key, V{});
@@ -235,7 +235,7 @@ template<typename K,
          typename V,
          typename Hash>
 V& HashMap<K, V, Hash>::at(const K& key) {
-	Node<K, V>* node = findNode(key);
+	node* node = findNode(key);
 
 	if(node == nullptr)
 		throw std::out_of_range("HashMap::at: key not found");
@@ -247,7 +247,7 @@ template<typename K,
          typename V,
          typename Hash>
 const V& HashMap<K, V, Hash>::at(const K& key) const {
-	const Node<K, V>* node = findNode(key);
+	const node* node = findNode(key);
 
 	if(node == nullptr)
 		throw std::out_of_range("HashMap::at: key not found");
@@ -264,7 +264,7 @@ void HashMap<K, V, Hash>::insert(const K& key, const V& value) {
 
 	std::size_t index = bucketIndex(key);
 
-	Node<K, V>* node = new Node<K, V>(key, value);
+	node* node = new node(key, value);
 
 	node->next = buckets[index];
 	buckets[index] = node;
@@ -280,7 +280,7 @@ template<typename K,
          typename V,
          typename Hash>
 bool HashMap<K, V, Hash>::update(const K& key, const V& value) {
-	Node<K, V>* node = findNode(key);
+	node* node = findNode(key);
 
 	if(node == nullptr) return false;
 
@@ -294,8 +294,8 @@ template<typename K,
 bool HashMap<K, V, Hash>::erase(const K& key) {
 	std::size_t index = bucketIndex(key);
 
-	Node<K, V>* current = buckets[index];
-	Node<K, V>* prev = nullptr;
+	node* current = buckets[index];
+	node* prev = nullptr;
 
 	while(current) {
 		if(current->key == key) {
@@ -323,10 +323,10 @@ template<typename K,
          typename Hash>
 void HashMap<K, V, Hash>::clear() {
 	for(std::size_t i = 0; i < bucketCount; ++i) {
-		Node<K, V>* current = buckets[i];
+		node* current = buckets[i];
 
 		while(current) {
-			Node<K, V>* next = current->next;
+			node* next = current->next;
 
 			delete current;
 
@@ -344,7 +344,7 @@ template<typename K,
          typename V,
          typename Hash>
 typename HashMap<K, V, Hash>::iterator HashMap<K, V, Hash>::find(const K& key) {
-	Node<K, V>* node = findNode(key);
+	node* node = findNode(key);
 
 	if(node == nullptr) {
 		return end();
@@ -362,7 +362,7 @@ template<typename K,
          typename V,
          typename Hash>
 typename HashMap<K, V, Hash>::const_iterator HashMap<K, V, Hash>::find(const K& key) const {
-	const Node<K, V>* node = findNode(key);
+	const node* node = findNode(key);
 
 	if(node == nullptr) {
 		return end();

@@ -37,6 +37,8 @@ class Page {
     [[nodiscard]] Status         addRecord(const Record& record);
     [[nodiscard]] Record*        getRecord(RecordID id);
     [[nodiscard]] const Record*  getRecord(RecordID id) const;
+    [[nodiscard]] Record*        getRecordAt(std::size_t index);
+    [[nodiscard]] const Record*  getRecordAt(std::size_t index) const;
     [[nodiscard]] Status         updateRecord(const Record& record);
     [[nodiscard]] Status         deleteRecord(RecordID id);
     

@@ -18,7 +18,7 @@ QueryResult QueryEngine::select(
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             if (!evaluateAll(*r, predicates)) continue;
             
@@ -72,7 +72,7 @@ std::size_t QueryEngine::count(
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             if (evaluateAll(*r, predicates)) total++;
         }
@@ -90,7 +90,7 @@ double QueryEngine::sum(
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             if (!evaluateAll(*r, predicates)) continue;
             if (!r->hasField(field)) continue;
@@ -113,7 +113,7 @@ double QueryEngine::avg(
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             if (!evaluateAll(*r, predicates)) continue;
             if (!r->hasField(field)) continue;
@@ -139,7 +139,7 @@ double QueryEngine::max(
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             if (!evaluateAll(*r, predicates)) continue;
             if (!r->hasField(field)) continue;
@@ -168,7 +168,7 @@ double QueryEngine::min(
     
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
-            const Record* r = page->getRecord(i);
+            const Record* r = page->getRecordAt(i);
             if (!r || r->isDeleted()) continue;
             if (!evaluateAll(*r, predicates)) continue;
             if (!r->hasField(field)) continue;

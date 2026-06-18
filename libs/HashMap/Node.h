@@ -1,5 +1,5 @@
 #pragma once
-
+namespace hashmap {
 template<typename K, typename V>
 struct Node {
 	const K key;
@@ -12,3 +12,4 @@ struct Node {
 		, value(value)
 	{}
 };
+}

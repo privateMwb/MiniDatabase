@@ -20,13 +20,16 @@ public:
 	using reverse_iterator = std::reverse_iterator<iterator>;
 	using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
+	// Node
+	using node = hashmap::node;
+
 private:
     
     // Configuration
     static constexpr double MAX_LOAD_FACTOR = 0.75;
     
     // Core Storage
-    Node<K, V>** buckets;
+    node** buckets;
     
 	std::size_t bucketCount;
 	std::size_t elementCount;
@@ -36,8 +39,8 @@ private:
 	// Private Helper
 	[[nodiscard]] std::size_t bucketIndex(const K& key) const;
 	
-	[[nodiscard]] Node<K, V>* findNode(const K& key);
-	[[nodiscard]] const Node<K, V>* findNode(const K& key) const;
+	[[nodiscard]] node* findNode(const K& key);
+	[[nodiscard]] const node* findNode(const K& key) const;
     
     void rehash(std::size_t newBucketCount);
     

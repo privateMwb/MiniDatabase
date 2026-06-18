@@ -63,6 +63,16 @@ Record* Page::getRecord(RecordID id) {
     return nullptr;
 }
 
+Record* Page::getRecordAt(std::size_t index) {
+    if (index >= records.size()) return nullptr;
+    return records[index];
+}
+
+const Record* Page::getRecordAt(std::size_t index) const {
+    if (index >= records.size()) return nullptr;
+    return records[index];
+}
+
 const Record* Page::getRecord(RecordID id) const {
     for (Record* r : records) {
         if (!r->isDeleted() && r->getID() == id) return r;

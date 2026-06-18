@@ -142,7 +142,7 @@ Status Table::rebuildIndex() {
     
     for (Page* p : pages) {
         for (std::size_t i = 0; i < p->recordCount(); ++i) {
-            const Record* r = p->getRecord(i);
+            const Record* r = p->getRecordAt(i);
             if (r && !r->isDeleted()) {
                 index.insert(r->getID(), p->getID());
             }
