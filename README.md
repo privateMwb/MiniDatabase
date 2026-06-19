@@ -499,4 +499,5 @@ g++ -std=c++23 -O2 \
 
 ## License
 
-MIT License. See `LICENSE` for details.
+[MIT](LICENSE) — free to use, modify, and distribute for educational and personal purposes.
+
