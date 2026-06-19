@@ -419,9 +419,8 @@ MiniDatabase/
 │   ├── products.cpp
 │   └── exported/
 │
-├── data/
-│
-└── README.md
+├── README.md
+└── LICENSE
 ```
 
 ---
