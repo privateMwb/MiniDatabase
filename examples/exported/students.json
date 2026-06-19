@@ -1,37 +1,37 @@
 [
   {
-    "course": "Computer Science",
-    "id": 1,
-    "age": 20,
     "grade": 88,
-    "name": "Frank"
+    "course": "Computer Science",
+    "age": 20,
+    "name": "Frank",
+    "id": 1
   },
   {
-    "course": "Computer Science",
-    "id": 2,
-    "age": 22,
     "grade": 95,
-    "name": "Grace"
-  },
-  {
-    "course": "Mathematics",
-    "id": 3,
-    "age": 19,
-    "grade": 76,
-    "name": "Henry"
-  },
-  {
-    "course": "Mathematics",
-    "id": 4,
-    "age": 21,
-    "grade": 91,
-    "name": "Ivy"
-  },
-  {
     "course": "Computer Science",
-    "id": 5,
-    "age": 23,
+    "age": 22,
+    "name": "Grace",
+    "id": 2
+  },
+  {
+    "grade": 76,
+    "course": "Mathematics",
+    "age": 19,
+    "name": "Henry",
+    "id": 3
+  },
+  {
+    "grade": 91,
+    "course": "Mathematics",
+    "age": 21,
+    "name": "Ivy",
+    "id": 4
+  },
+  {
     "grade": 67,
-    "name": "Jack"
+    "course": "Computer Science",
+    "age": 23,
+    "name": "Jack",
+    "id": 5
   }
 ]

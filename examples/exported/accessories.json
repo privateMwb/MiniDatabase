@@ -1,0 +1,20 @@
+[
+  {
+    "stock": 80,
+    "price": 25,
+    "id": 1,
+    "name": "Mouse"
+  },
+  {
+    "stock": 3,
+    "price": 45,
+    "id": 2,
+    "name": "Keyboard"
+  },
+  {
+    "stock": 200,
+    "price": 8,
+    "id": 3,
+    "name": "USB Cable"
+  }
+]
