@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../include/Core/Table.h"
-#include "../../include/Core/Record.h"
-#include "../../libs/VectorPro/VectorPro.h"
-#include "../../include/Common/Type.h"
+#include "../include/Core/Table.h"
+#include "../include/Core/Record.h"
+#include "../libs/VectorPro/VectorPro.h"
+#include "../include/Common/Type.h"
 
 // Builds a simple "employees" table schema for use across tests
 inline VectorPro<ColumnDef> makeEmployeeSchema() {

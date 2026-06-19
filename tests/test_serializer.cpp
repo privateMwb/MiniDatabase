@@ -13,7 +13,7 @@
 // success message when completed.
 
 #include "TestHelpers.h"
-#include "../../include/Engine/Serializer.h"
+#include "../include/Engine/Serializer.h"
 
 #include <cassert>
 #include <iostream>

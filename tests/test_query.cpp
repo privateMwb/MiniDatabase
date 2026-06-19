@@ -14,8 +14,8 @@
 // success message when completed.
 
 #include "TestHelpers.h"
-#include "../../include/Engine/QueryEngine.h"
-#include "../../libs/CustomAllocators/ArenaAllocator/ArenaAllocator.h"
+#include "../include/Engine/QueryEngine.h"
+#include "../libs/CustomAllocators/ArenaAllocator/ArenaAllocator.h"
 
 #include <cassert>
 #include <iostream>

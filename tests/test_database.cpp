@@ -15,7 +15,7 @@
 // success message when completed.
 
 #include "TestHelpers.h"
-#include "../../include/Core/Database.h"
+#include "../include/Core/Database.h"
 
 #include <cassert>
 #include <iostream>

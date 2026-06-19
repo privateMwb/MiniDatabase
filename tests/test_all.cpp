@@ -6,7 +6,8 @@ void run_table_tests();
 void run_database_tests();
 void run_query_tests();
 void run_storage_tests();
-// void run_serializer_tests();
+void run_serializer_tests();
+void run_concurrency_tests();
 
 int main() {
     run_record_tests();
@@ -15,6 +16,8 @@ int main() {
     run_database_tests();
     run_query_tests();
     run_storage_tests();
+    run_serializer_tests();
+    run_concurrency_tests();
     
     std::cout << "\nAll tests completed.\n";
     return 0;
