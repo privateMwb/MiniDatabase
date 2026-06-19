@@ -1,0 +1,69 @@
+{
+  "tables": [
+    {
+      "__table_id___": 0,
+      "__name__": "employees",
+      "schema": [
+        {
+          "name": "name",
+          "type": 2,
+          "nullable": false
+        },
+        {
+          "name": "salary",
+          "type": 1,
+          "nullable": false
+        },
+        {
+          "name": "department",
+          "type": 2,
+          "nullable": false
+        }
+      ],
+      "page": [
+        {
+          "records": [
+            {
+              "__id__": 1,
+              "__deleted__": false,
+              "data": {
+                "name": "Alice",
+                "salary": 85000,
+                "department": "Engineering"
+              }
+            },
+            {
+              "__id__": 3,
+              "__deleted__": false,
+              "data": {
+                "name": "Carol",
+                "salary": 95000,
+                "department": "Engineering"
+              }
+            },
+            {
+              "__id__": 4,
+              "__deleted__": false,
+              "data": {
+                "name": "Dave",
+                "salary": 65000,
+                "department": "Support"
+              }
+            },
+            {
+              "__id__": 5,
+              "__deleted__": false,
+              "data": {
+                "name": "Eve",
+                "salary": 72000,
+                "department": "Sales"
+              }
+            }
+          ],
+          "__page_id__": 0
+        }
+      ]
+    }
+  ],
+  "__db_name__": "CompanyDB"
+}

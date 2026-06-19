@@ -1,0 +1,37 @@
+[
+  {
+    "course": "Computer Science",
+    "id": 1,
+    "age": 20,
+    "grade": 88,
+    "name": "Frank"
+  },
+  {
+    "course": "Computer Science",
+    "id": 2,
+    "age": 22,
+    "grade": 95,
+    "name": "Grace"
+  },
+  {
+    "course": "Mathematics",
+    "id": 3,
+    "age": 19,
+    "grade": 76,
+    "name": "Henry"
+  },
+  {
+    "course": "Mathematics",
+    "id": 4,
+    "age": 21,
+    "grade": 91,
+    "name": "Ivy"
+  },
+  {
+    "course": "Computer Science",
+    "id": 5,
+    "age": 23,
+    "grade": 67,
+    "name": "Jack"
+  }
+]
