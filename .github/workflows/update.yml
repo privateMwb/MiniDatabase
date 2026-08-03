@@ -85,6 +85,10 @@ jobs:
         id: submodules
         run: |
           SHA="${{ steps.source.outputs.sha }}"
+
+          echo "Actual libs/internal/ entries at $SHA:"
+          git ls-tree "$SHA" libs/internal/ | tee /dev/stderr
+
           declare -A REPOS=(
             [ArenaPro]=privateMwb/ArenaPro
             [CachePro]=privateMwb/CachePro
@@ -95,16 +99,23 @@ jobs:
             [VectorPro]=privateMwb/VectorPro
           )
           ARGS=()
+          MISSING=()
           for NAME in "${!REPOS[@]}"; do
             REPO="${REPOS[$NAME]}"
             SUB_SHA=$(git ls-tree "$SHA" "libs/internal/$NAME" | awk '{print $3}')
             if [ -z "$SUB_SHA" ]; then
-              echo "Could not resolve submodule commit for $NAME at libs/internal/$NAME" >&2
-              exit 1
+              MISSING+=("$NAME")
+              continue
             fi
             curl -L -o "${NAME}.tar.gz" "https://github.com/${REPO}/archive/${SUB_SHA}.tar.gz"
             ARGS+=("--submodule" "${NAME}=${REPO}:${SUB_SHA}:${NAME}.tar.gz")
           done
+
+          if [ "${#MISSING[@]}" -gt 0 ]; then
+            echo "Could not resolve libs/internal/{${MISSING[*]}} -- check names against the tree listing above" >&2
+            exit 1
+          fi
+
           {
             echo "args<<EOF"
             echo "${ARGS[@]}"
