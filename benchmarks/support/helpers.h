@@ -143,7 +143,7 @@ inline void doNotOptimize() {
 
 // Prints a horizontal separator line.
 inline void borderLine() {
-    std::cout << GRAY << std::string(70, '-') << RESET << "\n";
+    std::cout << GRAY << std::string(80, '-') << RESET << "\n";
 }
 
 // Prints a 3-column table header for benchmarks with no reference

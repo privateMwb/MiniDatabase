@@ -1,0 +1,1808 @@
+[
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, last slot)",
+    "total_ns": 2665231,
+    "iterations": 10000,
+    "ns_per_op": 266.52
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, last slot)",
+    "total_ns": 25916076,
+    "iterations": 100000,
+    "ns_per_op": 259.16
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, last slot)",
+    "total_ns": 258301846,
+    "iterations": 1000000,
+    "ns_per_op": 258.30
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, last slot)",
+    "total_ns": 27154,
+    "iterations": 10000,
+    "ns_per_op": 2.72
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, last slot)",
+    "total_ns": 270230,
+    "iterations": 100000,
+    "ns_per_op": 2.70
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, last slot)",
+    "total_ns": 2191923,
+    "iterations": 1000000,
+    "ns_per_op": 2.19
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, miss)",
+    "total_ns": 2578538,
+    "iterations": 10000,
+    "ns_per_op": 257.85
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, miss)",
+    "total_ns": 25925770,
+    "iterations": 100000,
+    "ns_per_op": 259.26
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, miss)",
+    "total_ns": 257870692,
+    "iterations": 1000000,
+    "ns_per_op": 257.87
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, out of range)",
+    "total_ns": 37847,
+    "iterations": 10000,
+    "ns_per_op": 3.78
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, out of range)",
+    "total_ns": 324538,
+    "iterations": 100000,
+    "ns_per_op": 3.25
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, out of range)",
+    "total_ns": 3264846,
+    "iterations": 1000000,
+    "ns_per_op": 3.26
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine selectAll",
+    "total_ns": 5343077,
+    "iterations": 1,
+    "ns_per_op": 5343077.00
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine selectAll",
+    "total_ns": 48215385,
+    "iterations": 10,
+    "ns_per_op": 4821538.50
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine selectAll",
+    "total_ns": 901127077,
+    "iterations": 100,
+    "ns_per_op": 9011270.77
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine select (eq predicate)",
+    "total_ns": 9597538,
+    "iterations": 1,
+    "ns_per_op": 9597538.00
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine select (eq predicate)",
+    "total_ns": 29736846,
+    "iterations": 10,
+    "ns_per_op": 2973684.60
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine select (eq predicate)",
+    "total_ns": 471110154,
+    "iterations": 100,
+    "ns_per_op": 4711101.54
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine select (sorted)",
+    "total_ns": 9966230,
+    "iterations": 1,
+    "ns_per_op": 9966230.00
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine select (sorted)",
+    "total_ns": 253525308,
+    "iterations": 10,
+    "ns_per_op": 25352530.80
+  },
+  {
+    "suite": "QueryEngine Select",
+    "operation": "QueryEngine select (sorted)",
+    "total_ns": 950104692,
+    "iterations": 100,
+    "ns_per_op": 9501046.92
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine fetchPage (hit)",
+    "total_ns": 1484846,
+    "iterations": 10000,
+    "ns_per_op": 148.48
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine fetchPage (hit)",
+    "total_ns": 13952693,
+    "iterations": 100000,
+    "ns_per_op": 139.53
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine fetchPage (hit)",
+    "total_ns": 140420846,
+    "iterations": 1000000,
+    "ns_per_op": 140.42
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine fetchPage (miss)",
+    "total_ns": 173533230,
+    "iterations": 10000,
+    "ns_per_op": 17353.32
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine fetchPage (miss)",
+    "total_ns": 2153711693,
+    "iterations": 100000,
+    "ns_per_op": 21537.12
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine fetchPage (miss)",
+    "total_ns": 31193760386,
+    "iterations": 1000000,
+    "ns_per_op": 31193.76
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine getCachedPage",
+    "total_ns": 1251692,
+    "iterations": 10000,
+    "ns_per_op": 125.17
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine getCachedPage",
+    "total_ns": 9604385,
+    "iterations": 100000,
+    "ns_per_op": 96.04
+  },
+  {
+    "suite": "StorageEngine Cache",
+    "operation": "StorageEngine getCachedPage",
+    "total_ns": 96899692,
+    "iterations": 1000000,
+    "ns_per_op": 96.90
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (single page)",
+    "total_ns": 1143077,
+    "iterations": 10000,
+    "ns_per_op": 114.31
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (single page)",
+    "total_ns": 11000923,
+    "iterations": 100000,
+    "ns_per_op": 110.01
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (single page)",
+    "total_ns": 110052384,
+    "iterations": 1000000,
+    "ns_per_op": 110.05
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (multi page)",
+    "total_ns": 513847,
+    "iterations": 10000,
+    "ns_per_op": 51.38
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (multi page)",
+    "total_ns": 5101539,
+    "iterations": 100000,
+    "ns_per_op": 51.02
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (multi page)",
+    "total_ns": 50709538,
+    "iterations": 1000000,
+    "ns_per_op": 50.71
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (miss)",
+    "total_ns": 66692,
+    "iterations": 10000,
+    "ns_per_op": 6.67
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (miss)",
+    "total_ns": 695154,
+    "iterations": 100000,
+    "ns_per_op": 6.95
+  },
+  {
+    "suite": "Table Access",
+    "operation": "Table getRecord (miss)",
+    "total_ns": 6297923,
+    "iterations": 1000000,
+    "ns_per_op": 6.30
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database createTable",
+    "total_ns": 11563616,
+    "iterations": 10000,
+    "ns_per_op": 1156.36
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database createTable",
+    "total_ns": 115551154,
+    "iterations": 100000,
+    "ns_per_op": 1155.51
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database createTable",
+    "total_ns": 1240674154,
+    "iterations": 1000000,
+    "ns_per_op": 1240.67
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database dropTable",
+    "total_ns": 19943923,
+    "iterations": 10000,
+    "ns_per_op": 1994.39
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database dropTable",
+    "total_ns": 111778692,
+    "iterations": 100000,
+    "ns_per_op": 1117.79
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database dropTable",
+    "total_ns": 2345176307,
+    "iterations": 1000000,
+    "ns_per_op": 2345.18
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database getTable",
+    "total_ns": 1379462,
+    "iterations": 10000,
+    "ns_per_op": 137.95
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database getTable",
+    "total_ns": 13445538,
+    "iterations": 100000,
+    "ns_per_op": 134.46
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database getTable",
+    "total_ns": 134777308,
+    "iterations": 1000000,
+    "ns_per_op": 134.78
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database hasTable",
+    "total_ns": 640846,
+    "iterations": 10000,
+    "ns_per_op": 64.08
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database hasTable",
+    "total_ns": 6518154,
+    "iterations": 100000,
+    "ns_per_op": 65.18
+  },
+  {
+    "suite": "Database Table Ops",
+    "operation": "Database hasTable",
+    "total_ns": 80300000,
+    "iterations": 1000000,
+    "ns_per_op": 80.30
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page addRecord (fill page)",
+    "total_ns": 226246692,
+    "iterations": 10000,
+    "ns_per_op": 22624.67
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page addRecord (fill page)",
+    "total_ns": 2294310846,
+    "iterations": 100000,
+    "ns_per_op": 22943.11
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page addRecord (fill page)",
+    "total_ns": 23778109847,
+    "iterations": 1000000,
+    "ns_per_op": 23778.11
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page updateRecord",
+    "total_ns": 2338769,
+    "iterations": 10000,
+    "ns_per_op": 233.88
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page updateRecord",
+    "total_ns": 21105308,
+    "iterations": 100000,
+    "ns_per_op": 211.05
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page updateRecord",
+    "total_ns": 212427923,
+    "iterations": 1000000,
+    "ns_per_op": 212.43
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page deleteRecord",
+    "total_ns": 4251615,
+    "iterations": 10000,
+    "ns_per_op": 425.16
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page deleteRecord",
+    "total_ns": 71515308,
+    "iterations": 100000,
+    "ns_per_op": 715.15
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page deleteRecord",
+    "total_ns": 434946462,
+    "iterations": 1000000,
+    "ns_per_op": 434.95
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page compact (half deleted)",
+    "total_ns": 300601000,
+    "iterations": 10000,
+    "ns_per_op": 30060.10
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page compact (half deleted)",
+    "total_ns": 3656880616,
+    "iterations": 100000,
+    "ns_per_op": 36568.81
+  },
+  {
+    "suite": "Page Mutation",
+    "operation": "Page compact (half deleted)",
+    "total_ns": 35528888848,
+    "iterations": 1000000,
+    "ns_per_op": 35528.89
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record setField",
+    "total_ns": 1965538,
+    "iterations": 10000,
+    "ns_per_op": 196.55
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record setField",
+    "total_ns": 18667307,
+    "iterations": 100000,
+    "ns_per_op": 186.67
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record setField",
+    "total_ns": 197828539,
+    "iterations": 1000000,
+    "ns_per_op": 197.83
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record getField",
+    "total_ns": 2000230,
+    "iterations": 10000,
+    "ns_per_op": 200.02
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record getField",
+    "total_ns": 20227462,
+    "iterations": 100000,
+    "ns_per_op": 202.27
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record getField",
+    "total_ns": 205970461,
+    "iterations": 1000000,
+    "ns_per_op": 205.97
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record getFieldRef",
+    "total_ns": 1898230,
+    "iterations": 10000,
+    "ns_per_op": 189.82
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record getFieldRef",
+    "total_ns": 18588308,
+    "iterations": 100000,
+    "ns_per_op": 185.88
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record getFieldRef",
+    "total_ns": 181492615,
+    "iterations": 1000000,
+    "ns_per_op": 181.49
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record hasField",
+    "total_ns": 780923,
+    "iterations": 10000,
+    "ns_per_op": 78.09
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record hasField",
+    "total_ns": 7935769,
+    "iterations": 100000,
+    "ns_per_op": 79.36
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record hasField",
+    "total_ns": 83097000,
+    "iterations": 1000000,
+    "ns_per_op": 83.10
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record removeField",
+    "total_ns": 10609154,
+    "iterations": 10000,
+    "ns_per_op": 1060.92
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record removeField",
+    "total_ns": 109325461,
+    "iterations": 100000,
+    "ns_per_op": 1093.25
+  },
+  {
+    "suite": "Record Field",
+    "operation": "Record removeField",
+    "total_ns": 1020434847,
+    "iterations": 1000000,
+    "ns_per_op": 1020.43
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table insertRecord",
+    "total_ns": 11616,
+    "iterations": 1,
+    "ns_per_op": 11616.00
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table insertRecord",
+    "total_ns": 14385,
+    "iterations": 10,
+    "ns_per_op": 1438.50
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table insertRecord",
+    "total_ns": 79000,
+    "iterations": 100,
+    "ns_per_op": 790.00
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table updateRecord",
+    "total_ns": 3164615,
+    "iterations": 10000,
+    "ns_per_op": 316.46
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table updateRecord",
+    "total_ns": 31343154,
+    "iterations": 100000,
+    "ns_per_op": 313.43
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table updateRecord",
+    "total_ns": 334300847,
+    "iterations": 1000000,
+    "ns_per_op": 334.30
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table deleteRecord",
+    "total_ns": 496000,
+    "iterations": 10000,
+    "ns_per_op": 49.60
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table deleteRecord",
+    "total_ns": 1341538,
+    "iterations": 100000,
+    "ns_per_op": 13.42
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table deleteRecord",
+    "total_ns": 13510769,
+    "iterations": 1000000,
+    "ns_per_op": 13.51
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table rebuildIndex",
+    "total_ns": 304692,
+    "iterations": 1,
+    "ns_per_op": 304692.00
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table rebuildIndex",
+    "total_ns": 2721923,
+    "iterations": 10,
+    "ns_per_op": 272192.30
+  },
+  {
+    "suite": "Table Mutation",
+    "operation": "Table rebuildIndex",
+    "total_ns": 27359692,
+    "iterations": 100,
+    "ns_per_op": 273596.92
+  },
+  {
+    "suite": "Database",
+    "operation": "Database ctor",
+    "total_ns": 8982769,
+    "iterations": 10000,
+    "ns_per_op": 898.28
+  },
+  {
+    "suite": "Database",
+    "operation": "Database ctor",
+    "total_ns": 86416077,
+    "iterations": 100000,
+    "ns_per_op": 864.16
+  },
+  {
+    "suite": "Database",
+    "operation": "Database ctor",
+    "total_ns": 883754154,
+    "iterations": 1000000,
+    "ns_per_op": 883.75
+  },
+  {
+    "suite": "Database",
+    "operation": "Database move ctor (empty)",
+    "total_ns": 9925307,
+    "iterations": 10000,
+    "ns_per_op": 992.53
+  },
+  {
+    "suite": "Database",
+    "operation": "Database move ctor (empty)",
+    "total_ns": 98119692,
+    "iterations": 100000,
+    "ns_per_op": 981.20
+  },
+  {
+    "suite": "Database",
+    "operation": "Database move ctor (empty)",
+    "total_ns": 935531693,
+    "iterations": 1000000,
+    "ns_per_op": 935.53
+  },
+  {
+    "suite": "Database",
+    "operation": "Database move ctor (50 tables)",
+    "total_ns": 1366091769,
+    "iterations": 10000,
+    "ns_per_op": 136609.18
+  },
+  {
+    "suite": "Database",
+    "operation": "Database move ctor (50 tables)",
+    "total_ns": 13796698155,
+    "iterations": 100000,
+    "ns_per_op": 137966.98
+  },
+  {
+    "suite": "Database",
+    "operation": "Database move ctor (50 tables)",
+    "total_ns": 136481774162,
+    "iterations": 1000000,
+    "ns_per_op": 136481.77
+  },
+  {
+    "suite": "Page",
+    "operation": "Page default ctor",
+    "total_ns": 8794154,
+    "iterations": 10000,
+    "ns_per_op": 879.42
+  },
+  {
+    "suite": "Page",
+    "operation": "Page default ctor",
+    "total_ns": 87679461,
+    "iterations": 100000,
+    "ns_per_op": 876.79
+  },
+  {
+    "suite": "Page",
+    "operation": "Page default ctor",
+    "total_ns": 878913231,
+    "iterations": 1000000,
+    "ns_per_op": 878.91
+  },
+  {
+    "suite": "Page",
+    "operation": "Page id ctor",
+    "total_ns": 8813538,
+    "iterations": 10000,
+    "ns_per_op": 881.35
+  },
+  {
+    "suite": "Page",
+    "operation": "Page id ctor",
+    "total_ns": 89812923,
+    "iterations": 100000,
+    "ns_per_op": 898.13
+  },
+  {
+    "suite": "Page",
+    "operation": "Page id ctor",
+    "total_ns": 907427077,
+    "iterations": 1000000,
+    "ns_per_op": 907.43
+  },
+  {
+    "suite": "Page",
+    "operation": "Page move ctor (empty)",
+    "total_ns": 9408923,
+    "iterations": 10000,
+    "ns_per_op": 940.89
+  },
+  {
+    "suite": "Page",
+    "operation": "Page move ctor (empty)",
+    "total_ns": 96752615,
+    "iterations": 100000,
+    "ns_per_op": 967.53
+  },
+  {
+    "suite": "Page",
+    "operation": "Page move ctor (empty)",
+    "total_ns": 943904000,
+    "iterations": 1000000,
+    "ns_per_op": 943.90
+  },
+  {
+    "suite": "Page",
+    "operation": "Page move ctor (full)",
+    "total_ns": 245611923,
+    "iterations": 10000,
+    "ns_per_op": 24561.19
+  },
+  {
+    "suite": "Page",
+    "operation": "Page move ctor (full)",
+    "total_ns": 2377597923,
+    "iterations": 100000,
+    "ns_per_op": 23775.98
+  },
+  {
+    "suite": "Page",
+    "operation": "Page move ctor (full)",
+    "total_ns": 23953796616,
+    "iterations": 1000000,
+    "ns_per_op": 23953.80
+  },
+  {
+    "suite": "Record",
+    "operation": "Record default ctor",
+    "total_ns": 941462,
+    "iterations": 10000,
+    "ns_per_op": 94.15
+  },
+  {
+    "suite": "Record",
+    "operation": "Record default ctor",
+    "total_ns": 8903616,
+    "iterations": 100000,
+    "ns_per_op": 89.04
+  },
+  {
+    "suite": "Record",
+    "operation": "Record default ctor",
+    "total_ns": 92688384,
+    "iterations": 1000000,
+    "ns_per_op": 92.69
+  },
+  {
+    "suite": "Record",
+    "operation": "Record id ctor",
+    "total_ns": 933616,
+    "iterations": 10000,
+    "ns_per_op": 93.36
+  },
+  {
+    "suite": "Record",
+    "operation": "Record id ctor",
+    "total_ns": 9273231,
+    "iterations": 100000,
+    "ns_per_op": 92.73
+  },
+  {
+    "suite": "Record",
+    "operation": "Record id ctor",
+    "total_ns": 91440000,
+    "iterations": 1000000,
+    "ns_per_op": 91.44
+  },
+  {
+    "suite": "Record",
+    "operation": "Record id+data ctor",
+    "total_ns": 18486692,
+    "iterations": 10000,
+    "ns_per_op": 1848.67
+  },
+  {
+    "suite": "Record",
+    "operation": "Record id+data ctor",
+    "total_ns": 184763385,
+    "iterations": 100000,
+    "ns_per_op": 1847.63
+  },
+  {
+    "suite": "Record",
+    "operation": "Record id+data ctor",
+    "total_ns": 1813986770,
+    "iterations": 1000000,
+    "ns_per_op": 1813.99
+  },
+  {
+    "suite": "Record",
+    "operation": "Record copy ctor",
+    "total_ns": 17612077,
+    "iterations": 10000,
+    "ns_per_op": 1761.21
+  },
+  {
+    "suite": "Record",
+    "operation": "Record copy ctor",
+    "total_ns": 171873000,
+    "iterations": 100000,
+    "ns_per_op": 1718.73
+  },
+  {
+    "suite": "Record",
+    "operation": "Record copy ctor",
+    "total_ns": 1679802462,
+    "iterations": 1000000,
+    "ns_per_op": 1679.80
+  },
+  {
+    "suite": "Record",
+    "operation": "Record move ctor",
+    "total_ns": 27794231,
+    "iterations": 10000,
+    "ns_per_op": 2779.42
+  },
+  {
+    "suite": "Record",
+    "operation": "Record move ctor",
+    "total_ns": 288103307,
+    "iterations": 100000,
+    "ns_per_op": 2881.03
+  },
+  {
+    "suite": "Record",
+    "operation": "Record move ctor",
+    "total_ns": 2849423154,
+    "iterations": 1000000,
+    "ns_per_op": 2849.42
+  },
+  {
+    "suite": "Table",
+    "operation": "Table ctor (empty schema)",
+    "total_ns": 8704616,
+    "iterations": 10000,
+    "ns_per_op": 870.46
+  },
+  {
+    "suite": "Table",
+    "operation": "Table ctor (empty schema)",
+    "total_ns": 91767615,
+    "iterations": 100000,
+    "ns_per_op": 917.68
+  },
+  {
+    "suite": "Table",
+    "operation": "Table ctor (empty schema)",
+    "total_ns": 887140307,
+    "iterations": 1000000,
+    "ns_per_op": 887.14
+  },
+  {
+    "suite": "Table",
+    "operation": "Table ctor (20-column schema)",
+    "total_ns": 18573924,
+    "iterations": 10000,
+    "ns_per_op": 1857.39
+  },
+  {
+    "suite": "Table",
+    "operation": "Table ctor (20-column schema)",
+    "total_ns": 164885846,
+    "iterations": 100000,
+    "ns_per_op": 1648.86
+  },
+  {
+    "suite": "Table",
+    "operation": "Table ctor (20-column schema)",
+    "total_ns": 1634362769,
+    "iterations": 1000000,
+    "ns_per_op": 1634.36
+  },
+  {
+    "suite": "Table",
+    "operation": "Table move ctor (empty)",
+    "total_ns": 9211385,
+    "iterations": 10000,
+    "ns_per_op": 921.14
+  },
+  {
+    "suite": "Table",
+    "operation": "Table move ctor (empty)",
+    "total_ns": 92062769,
+    "iterations": 100000,
+    "ns_per_op": 920.63
+  },
+  {
+    "suite": "Table",
+    "operation": "Table move ctor (empty)",
+    "total_ns": 943407923,
+    "iterations": 1000000,
+    "ns_per_op": 943.41
+  },
+  {
+    "suite": "Table",
+    "operation": "Table move ctor (populated)",
+    "total_ns": 640230,
+    "iterations": 1,
+    "ns_per_op": 640230.00
+  },
+  {
+    "suite": "Table",
+    "operation": "Table move ctor (populated)",
+    "total_ns": 3429846,
+    "iterations": 10,
+    "ns_per_op": 342984.60
+  },
+  {
+    "suite": "Table",
+    "operation": "Table move ctor (populated)",
+    "total_ns": 32994461,
+    "iterations": 100,
+    "ns_per_op": 329944.61
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (2 tables)",
+    "total_ns": 1032308,
+    "iterations": 1,
+    "ns_per_op": 1032308.00
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (2 tables)",
+    "total_ns": 2896692,
+    "iterations": 10,
+    "ns_per_op": 289669.20
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (2 tables)",
+    "total_ns": 13214077,
+    "iterations": 100,
+    "ns_per_op": 132140.77
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (4 tables)",
+    "total_ns": 1485462,
+    "iterations": 1,
+    "ns_per_op": 1485462.00
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (4 tables)",
+    "total_ns": 2795384,
+    "iterations": 10,
+    "ns_per_op": 279538.40
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (4 tables)",
+    "total_ns": 19068693,
+    "iterations": 100,
+    "ns_per_op": 190686.93
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (16 tables)",
+    "total_ns": 486692,
+    "iterations": 1,
+    "ns_per_op": 486692.00
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (16 tables)",
+    "total_ns": 4759769,
+    "iterations": 10,
+    "ns_per_op": 475976.90
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (16 tables)",
+    "total_ns": 51989462,
+    "iterations": 100,
+    "ns_per_op": 519894.62
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (64 tables)",
+    "total_ns": 6469307,
+    "iterations": 1,
+    "ns_per_op": 6469307.00
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (64 tables)",
+    "total_ns": 28954462,
+    "iterations": 10,
+    "ns_per_op": 2895446.20
+  },
+  {
+    "suite": "Concurrency Scaling",
+    "operation": "Concurrency rebuild (64 tables)",
+    "total_ns": 210714770,
+    "iterations": 100,
+    "ns_per_op": 2107147.70
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (10 tables)",
+    "total_ns": 24980538,
+    "iterations": 10000,
+    "ns_per_op": 2498.05
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (10 tables)",
+    "total_ns": 248034154,
+    "iterations": 100000,
+    "ns_per_op": 2480.34
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (10 tables)",
+    "total_ns": 2452719077,
+    "iterations": 1000000,
+    "ns_per_op": 2452.72
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (100 tables)",
+    "total_ns": 33370769,
+    "iterations": 10000,
+    "ns_per_op": 3337.08
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (100 tables)",
+    "total_ns": 333192308,
+    "iterations": 100000,
+    "ns_per_op": 3331.92
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (100 tables)",
+    "total_ns": 3313545231,
+    "iterations": 1000000,
+    "ns_per_op": 3313.55
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (200 tables)",
+    "total_ns": 43022769,
+    "iterations": 10000,
+    "ns_per_op": 4302.28
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (200 tables)",
+    "total_ns": 429762769,
+    "iterations": 100000,
+    "ns_per_op": 4297.63
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database createTable (200 tables)",
+    "total_ns": 4341405616,
+    "iterations": 1000000,
+    "ns_per_op": 4341.41
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (10 tables)",
+    "total_ns": 1498077,
+    "iterations": 10000,
+    "ns_per_op": 149.81
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (10 tables)",
+    "total_ns": 14221154,
+    "iterations": 100000,
+    "ns_per_op": 142.21
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (10 tables)",
+    "total_ns": 142935000,
+    "iterations": 1000000,
+    "ns_per_op": 142.94
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (100 tables)",
+    "total_ns": 1525538,
+    "iterations": 10000,
+    "ns_per_op": 152.55
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (100 tables)",
+    "total_ns": 14679307,
+    "iterations": 100000,
+    "ns_per_op": 146.79
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (100 tables)",
+    "total_ns": 147153231,
+    "iterations": 1000000,
+    "ns_per_op": 147.15
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (200 tables)",
+    "total_ns": 1480692,
+    "iterations": 10000,
+    "ns_per_op": 148.07
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (200 tables)",
+    "total_ns": 14283077,
+    "iterations": 100000,
+    "ns_per_op": 142.83
+  },
+  {
+    "suite": "Database Scaling",
+    "operation": "Database getTable (200 tables)",
+    "total_ns": 142781461,
+    "iterations": 1000000,
+    "ns_per_op": 142.78
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (1 page)",
+    "total_ns": 98154,
+    "iterations": 1,
+    "ns_per_op": 98154.00
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (1 page)",
+    "total_ns": 257616,
+    "iterations": 10,
+    "ns_per_op": 25761.60
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (1 page)",
+    "total_ns": 2820538,
+    "iterations": 100,
+    "ns_per_op": 28205.38
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (100 pages)",
+    "total_ns": 6836307,
+    "iterations": 1,
+    "ns_per_op": 6836307.00
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (100 pages)",
+    "total_ns": 65227462,
+    "iterations": 10,
+    "ns_per_op": 6522746.20
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (100 pages)",
+    "total_ns": 649608616,
+    "iterations": 100,
+    "ns_per_op": 6496086.16
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (1000 pages)",
+    "total_ns": 65536385,
+    "iterations": 1,
+    "ns_per_op": 65536385.00
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (1000 pages)",
+    "total_ns": 631611384,
+    "iterations": 10,
+    "ns_per_op": 63161138.40
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select eq (1000 pages)",
+    "total_ns": 6359067308,
+    "iterations": 100,
+    "ns_per_op": 63590673.08
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (1 page)",
+    "total_ns": 483693,
+    "iterations": 1,
+    "ns_per_op": 483693.00
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (1 page)",
+    "total_ns": 1902076,
+    "iterations": 10,
+    "ns_per_op": 190207.60
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (1 page)",
+    "total_ns": 18989846,
+    "iterations": 100,
+    "ns_per_op": 189898.46
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (100 pages)",
+    "total_ns": 44881154,
+    "iterations": 1,
+    "ns_per_op": 44881154.00
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (100 pages)",
+    "total_ns": 419364692,
+    "iterations": 10,
+    "ns_per_op": 41936469.20
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (100 pages)",
+    "total_ns": 4221208384,
+    "iterations": 100,
+    "ns_per_op": 42212083.84
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (1000 pages)",
+    "total_ns": 473833231,
+    "iterations": 1,
+    "ns_per_op": 473833231.00
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (1000 pages)",
+    "total_ns": 4256032846,
+    "iterations": 10,
+    "ns_per_op": 425603284.60
+  },
+  {
+    "suite": "QueryEngine",
+    "operation": "QueryEngine select sorted (1000 pages)",
+    "total_ns": 43580915464,
+    "iterations": 100,
+    "ns_per_op": 435809154.64
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (1 page)",
+    "total_ns": 3462,
+    "iterations": 1,
+    "ns_per_op": 3462.00
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (1 page)",
+    "total_ns": 10077,
+    "iterations": 10,
+    "ns_per_op": 1007.70
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (1 page)",
+    "total_ns": 77000,
+    "iterations": 100,
+    "ns_per_op": 770.00
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (100 pages)",
+    "total_ns": 9461,
+    "iterations": 1,
+    "ns_per_op": 9461.00
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (100 pages)",
+    "total_ns": 28230,
+    "iterations": 10,
+    "ns_per_op": 2823.00
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (100 pages)",
+    "total_ns": 163154,
+    "iterations": 100,
+    "ns_per_op": 1631.54
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (1000 pages)",
+    "total_ns": 60616,
+    "iterations": 1,
+    "ns_per_op": 60616.00
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (1000 pages)",
+    "total_ns": 159693,
+    "iterations": 10,
+    "ns_per_op": 15969.30
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table insertRecord (1000 pages)",
+    "total_ns": 1299000,
+    "iterations": 100,
+    "ns_per_op": 12990.00
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (1 page)",
+    "total_ns": 1273000,
+    "iterations": 10000,
+    "ns_per_op": 127.30
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (1 page)",
+    "total_ns": 12889308,
+    "iterations": 100000,
+    "ns_per_op": 128.89
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (1 page)",
+    "total_ns": 128125154,
+    "iterations": 1000000,
+    "ns_per_op": 128.13
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (100 pages)",
+    "total_ns": 1271616,
+    "iterations": 10000,
+    "ns_per_op": 127.16
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (100 pages)",
+    "total_ns": 12829307,
+    "iterations": 100000,
+    "ns_per_op": 128.29
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (100 pages)",
+    "total_ns": 128395077,
+    "iterations": 1000000,
+    "ns_per_op": 128.40
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (1000 pages)",
+    "total_ns": 1273308,
+    "iterations": 10000,
+    "ns_per_op": 127.33
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (1000 pages)",
+    "total_ns": 12823615,
+    "iterations": 100000,
+    "ns_per_op": 128.24
+  },
+  {
+    "suite": "Table Scaling",
+    "operation": "Table getRecord (1000 pages)",
+    "total_ns": 128018770,
+    "iterations": 1000000,
+    "ns_per_op": 128.02
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency saveAllTablesParallel",
+    "total_ns": 69735077,
+    "iterations": 1,
+    "ns_per_op": 69735077.00
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency saveAllTablesParallel",
+    "total_ns": 63750693,
+    "iterations": 10,
+    "ns_per_op": 6375069.30
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency saveAllTablesParallel",
+    "total_ns": 659340076,
+    "iterations": 100,
+    "ns_per_op": 6593400.76
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency loadAllTablesParallel",
+    "total_ns": 5268230,
+    "iterations": 1,
+    "ns_per_op": 5268230.00
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency loadAllTablesParallel",
+    "total_ns": 31209230,
+    "iterations": 10,
+    "ns_per_op": 3120923.00
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency loadAllTablesParallel",
+    "total_ns": 288016615,
+    "iterations": 100,
+    "ns_per_op": 2880166.15
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency rebuildAllIndexesParallel",
+    "total_ns": 315308,
+    "iterations": 1,
+    "ns_per_op": 315308.00
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency rebuildAllIndexesParallel",
+    "total_ns": 4043462,
+    "iterations": 10,
+    "ns_per_op": 404346.20
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency rebuildAllIndexesParallel",
+    "total_ns": 29428308,
+    "iterations": 100,
+    "ns_per_op": 294283.08
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency exportAllTablesParallel",
+    "total_ns": 11267308,
+    "iterations": 1,
+    "ns_per_op": 11267308.00
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency exportAllTablesParallel",
+    "total_ns": 56393538,
+    "iterations": 10,
+    "ns_per_op": 5639353.80
+  },
+  {
+    "suite": "Concurrency",
+    "operation": "Concurrency exportAllTablesParallel",
+    "total_ns": 598192308,
+    "iterations": 100,
+    "ns_per_op": 5981923.08
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO writeSlot",
+    "total_ns": 322138538,
+    "iterations": 10000,
+    "ns_per_op": 32213.85
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO writeSlot",
+    "total_ns": 3146563770,
+    "iterations": 100000,
+    "ns_per_op": 31465.64
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO writeSlot",
+    "total_ns": 32432106771,
+    "iterations": 1000000,
+    "ns_per_op": 32432.11
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO readSlot",
+    "total_ns": 208637308,
+    "iterations": 10000,
+    "ns_per_op": 20863.73
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO readSlot",
+    "total_ns": 2083510770,
+    "iterations": 100000,
+    "ns_per_op": 20835.11
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO readSlot",
+    "total_ns": 20943135386,
+    "iterations": 1000000,
+    "ns_per_op": 20943.14
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO writeFileAtomic",
+    "total_ns": 10037308,
+    "iterations": 1,
+    "ns_per_op": 10037308.00
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO writeFileAtomic",
+    "total_ns": 17148692,
+    "iterations": 10,
+    "ns_per_op": 1714869.20
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO writeFileAtomic",
+    "total_ns": 133264846,
+    "iterations": 100,
+    "ns_per_op": 1332648.46
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO readFile",
+    "total_ns": 486902231,
+    "iterations": 10000,
+    "ns_per_op": 48690.22
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO readFile",
+    "total_ns": 4692372847,
+    "iterations": 100000,
+    "ns_per_op": 46923.73
+  },
+  {
+    "suite": "File IO",
+    "operation": "FileIO readFile",
+    "total_ns": 47181682695,
+    "iterations": 1000000,
+    "ns_per_op": 47181.68
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Record toJson/fromJson",
+    "total_ns": 85378385,
+    "iterations": 10000,
+    "ns_per_op": 8537.84
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Record toJson/fromJson",
+    "total_ns": 842076077,
+    "iterations": 100000,
+    "ns_per_op": 8420.76
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Record toJson/fromJson",
+    "total_ns": 8415964924,
+    "iterations": 1000000,
+    "ns_per_op": 8415.96
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Record serialize/deserialize",
+    "total_ns": 265392693,
+    "iterations": 10000,
+    "ns_per_op": 26539.27
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Record serialize/deserialize",
+    "total_ns": 2678001615,
+    "iterations": 100000,
+    "ns_per_op": 26780.02
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Record serialize/deserialize",
+    "total_ns": 26787746155,
+    "iterations": 1000000,
+    "ns_per_op": 26787.75
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Page toJson/fromJson",
+    "total_ns": 824308,
+    "iterations": 1,
+    "ns_per_op": 824308.00
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Page toJson/fromJson",
+    "total_ns": 5862692,
+    "iterations": 10,
+    "ns_per_op": 586269.20
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Page toJson/fromJson",
+    "total_ns": 57193769,
+    "iterations": 100,
+    "ns_per_op": 571937.69
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Page serialize/deserialize",
+    "total_ns": 1480231,
+    "iterations": 1,
+    "ns_per_op": 1480231.00
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Page serialize/deserialize",
+    "total_ns": 12406154,
+    "iterations": 10,
+    "ns_per_op": 1240615.40
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Page serialize/deserialize",
+    "total_ns": 127947692,
+    "iterations": 100,
+    "ns_per_op": 1279476.92
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Table toJson/fromJson",
+    "total_ns": 6710692,
+    "iterations": 1,
+    "ns_per_op": 6710692.00
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Table toJson/fromJson",
+    "total_ns": 54027615,
+    "iterations": 10,
+    "ns_per_op": 5402761.50
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Table toJson/fromJson",
+    "total_ns": 561584000,
+    "iterations": 100,
+    "ns_per_op": 5615840.00
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Table serialize/deserialize",
+    "total_ns": 10609000,
+    "iterations": 1,
+    "ns_per_op": 10609000.00
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Table serialize/deserialize",
+    "total_ns": 96660615,
+    "iterations": 10,
+    "ns_per_op": 9666061.50
+  },
+  {
+    "suite": "Json Round Trip",
+    "operation": "Table serialize/deserialize",
+    "total_ns": 962277924,
+    "iterations": 100,
+    "ns_per_op": 9622779.24
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer exportTableToFile",
+    "total_ns": 39363461,
+    "iterations": 1,
+    "ns_per_op": 39363461.00
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer exportTableToFile",
+    "total_ns": 65274462,
+    "iterations": 10,
+    "ns_per_op": 6527446.20
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer exportTableToFile",
+    "total_ns": 583610692,
+    "iterations": 100,
+    "ns_per_op": 5836106.92
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer importTableFromFile",
+    "total_ns": 7400231,
+    "iterations": 1,
+    "ns_per_op": 7400231.00
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer importTableFromFile",
+    "total_ns": 61841307,
+    "iterations": 10,
+    "ns_per_op": 6184130.70
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer importTableFromFile",
+    "total_ns": 638261615,
+    "iterations": 100,
+    "ns_per_op": 6382616.15
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer exportDatabaseToJson",
+    "total_ns": 15283692,
+    "iterations": 1,
+    "ns_per_op": 15283692.00
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer exportDatabaseToJson",
+    "total_ns": 75813924,
+    "iterations": 10,
+    "ns_per_op": 7581392.40
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer exportDatabaseToJson",
+    "total_ns": 762421231,
+    "iterations": 100,
+    "ns_per_op": 7624212.31
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer importDatabaseFromJson",
+    "total_ns": 7118462,
+    "iterations": 1,
+    "ns_per_op": 7118462.00
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer importDatabaseFromJson",
+    "total_ns": 64577231,
+    "iterations": 10,
+    "ns_per_op": 6457723.10
+  },
+  {
+    "suite": "Serializer",
+    "operation": "Serializer importDatabaseFromJson",
+    "total_ns": 600776308,
+    "iterations": 100,
+    "ns_per_op": 6007763.08
+  }
+]
