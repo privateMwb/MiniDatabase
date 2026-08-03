@@ -12,7 +12,7 @@ class Conan(ConanFile):
     # edited here.
     name = "minidb"
     cmake_name = "MiniDB"  # matches project()'s name in the top-level CMakeLists.txt
-    version = "1.0.0"
+    version = "1.0.1"
 
     url = "https://github.com/privateMwb/MiniDatabase"
     description = "Embedded C++ database engine (in-process, no server) built on this project's own allocator, container, concurrency, and JSON libraries."
