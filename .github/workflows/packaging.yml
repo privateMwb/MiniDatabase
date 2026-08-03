@@ -2,11 +2,17 @@
 # .github/workflows/packaging.yml
 # Verifies the Conan recipe and vcpkg port actually build and are
 # consumable, on a real Linux runner (none of PACKAGING.md's Termux
-# workarounds apply here — this is what a real consumer experiences).
+# workarounds apply here -- this is what a real consumer experiences).
 #
 # Consumer verification is delegated to recipes/minidb/all/test_package/
 # and vcpkg-smoke-test/ rather than reimplemented here, so there's one
-# place — not two — that defines what "the package works" means.
+# place -- not two -- that defines what "the package works" means.
+#
+# Unlike the leaf libraries (VectorPro, JsonPro, ...), MiniDB's own
+# recipe/port declares all 7 of them as dependencies. This workflow
+# doesn't need to know that -- conan create / vcpkg both resolve MiniDB's
+# declared requirements automatically -- but it does mean a failure here
+# can originate from a dependency's package, not just MiniDB's own recipe.
 # ============================================================
 
 name: Packaging
@@ -62,7 +68,7 @@ jobs:
             -s compiler.cppstd=23 --build=missing
 
   # ------------------------------------------------------------
-  # Bootstrap vcpkg, then build vcpkg-smoke-test/ — its manifest
+  # Bootstrap vcpkg, then build vcpkg-smoke-test/ -- its manifest
   # (vcpkg.json + vcpkg-configuration.json's overlay-ports) installs
   # the port automatically during cmake configure.
   # ------------------------------------------------------------
@@ -72,6 +78,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          submodules: true
 
       - name: Bootstrap vcpkg
         run: |
