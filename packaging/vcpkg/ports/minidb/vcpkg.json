@@ -6,34 +6,6 @@
   "license": "MIT",
   "dependencies": [
     "vcpkg-cmake",
-    "vcpkg-cmake-config",
-    {
-      "name": "vectorpro",
-      "version>=": "1.0.0"
-    },
-    {
-      "name": "jsonpro",
-      "version>=": "1.0.0"
-    },
-    {
-      "name": "poolpro",
-      "version>=": "1.0.0"
-    },
-    {
-      "name": "hashmappro",
-      "version>=": "1.0.0"
-    },
-    {
-      "name": "cachepro",
-      "version>=": "1.0.0"
-    },
-    {
-      "name": "arenapro",
-      "version>=": "1.0.0"
-    },
-    {
-      "name": "threadpoolpro",
-      "version>=": "1.0.0"
-    }
+    "vcpkg-cmake-config"
   ]
 }
