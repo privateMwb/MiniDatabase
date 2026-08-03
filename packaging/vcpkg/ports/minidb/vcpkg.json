@@ -1,6 +1,6 @@
 {
   "name": "minidb",
-  "version": "1.0.1",
+  "version": "1.0.0",
   "description": "Embedded C++ database engine (in-process, no server) built on this project's own allocator, container, concurrency, and JSON libraries.",
   "homepage": "https://github.com/privateMwb/MiniDatabase",
   "license": "MIT",
