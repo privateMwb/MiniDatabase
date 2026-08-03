@@ -1,0 +1,86 @@
+[
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, last slot)",
+    "total_ns": 2620616,
+    "iterations": 10000,
+    "ns_per_op": 262.06
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, last slot)",
+    "total_ns": 26533616,
+    "iterations": 100000,
+    "ns_per_op": 265.34
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, last slot)",
+    "total_ns": 258039385,
+    "iterations": 1000000,
+    "ns_per_op": 258.04
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, last slot)",
+    "total_ns": 27153,
+    "iterations": 10000,
+    "ns_per_op": 2.72
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, last slot)",
+    "total_ns": 270384,
+    "iterations": 100000,
+    "ns_per_op": 2.70
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, last slot)",
+    "total_ns": 2409846,
+    "iterations": 1000000,
+    "ns_per_op": 2.41
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, miss)",
+    "total_ns": 2578769,
+    "iterations": 10000,
+    "ns_per_op": 257.88
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, miss)",
+    "total_ns": 25943461,
+    "iterations": 100000,
+    "ns_per_op": 259.43
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecord (id, miss)",
+    "total_ns": 259197000,
+    "iterations": 1000000,
+    "ns_per_op": 259.20
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, out of range)",
+    "total_ns": 38154,
+    "iterations": 10000,
+    "ns_per_op": 3.82
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, out of range)",
+    "total_ns": 324539,
+    "iterations": 100000,
+    "ns_per_op": 3.25
+  },
+  {
+    "suite": "Page Access",
+    "operation": "Page getRecordAt (index, out of range)",
+    "total_ns": 3243385,
+    "iterations": 1000000,
+    "ns_per_op": 3.24
+  }
+]

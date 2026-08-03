@@ -1,503 +1,267 @@
-# MiniDatabase
+<!--
+  Retargeting: replace every <angle-bracket> placeholder below. The
+  badge URLs, CI workflow names, and project-structure tree already
+  match this skeleton's actual layout — only the owner/repo and
+  project name need swapping in those. Features, Quick Start, and
+  Benchmarks are marked as sections to write fresh each time; don't
+  invent numbers or content to fill them.
+-->
 
-[![C++23](https://img.shields.io/badge/C%2B%2B-23-blue)](https://en.cppreference.com/w/cpp/23)
-[![Status](https://img.shields.io/badge/status-learning%20project-green)](https://github.com/privateMwb/MiniDatabase)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+# <ProjectName>
 
-A lightweight embedded database engine built entirely from custom C++23 libraries — no STL containers, no third-party dependencies. Every subsystem, from memory allocation to JSON parsing to concurrent execution, is built from scratch and assembled into a single working engine.
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/<owner>/<repo>?style=for-the-badge&logo=github&color=yellow" alt="Version">
+  <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="License - MIT">
+  <img src="https://img.shields.io/badge/C%2B%2B-23-blue?style=for-the-badge&logo=c%2B%2B" alt="C++ - 23">
+</p>
 
----
+<p align="center">
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/build.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/build.yml/badge.svg" alt="Build and Test">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/benchmark.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/benchmark.yml/badge.svg" alt="Benchmarks">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/coverage.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/coverage.yml/badge.svg" alt="Coverage">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/sanitizers.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/sanitizers.yml/badge.svg" alt="Sanitizers">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/clang-tidy.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/clang-tidy.yml/badge.svg" alt="Clang Tidy">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/clang-format.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/clang-format.yml/badge.svg" alt="Clang Format">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/docs.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/docs.yml/badge.svg" alt="Documentation">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/release.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/release.yml/badge.svg" alt="Release">
+  </a>
+  <a href="https://github.com/<owner>/<repo>/actions/workflows/packaging.yml">
+    <img src="https://github.com/<owner>/<repo>/actions/workflows/packaging.yml/badge.svg" alt="Packaging">
+  </a>
+</p>
 
-## Table of Contents
+<p align="center">
+  <img src="https://img.shields.io/badge/GCC-support-B46F1B?style=flat&logo=gnu" alt="GCC - support">
+  <img src="https://img.shields.io/badge/Clang-support-045891?style=flat&logo=llvm" alt="Clang - support">
+  <img src="https://img.shields.io/badge/MSVC-support-5C2D91?style=flat" alt="MSVC - support">
+  <img src="https://img.shields.io/badge/AppleClang-support-000000?style=flat&logo=apple" alt="AppleClang - support">
+</p>
 
-- [Overview](#overview)
-- [Motivation](#motivation)
+
+<!-- One or two sentences: what this is, and the two or three things
+     that make it worth using over the obvious alternative. This is
+     the only line most visitors read — make it specific, not generic
+     marketing copy. -->
+<ProjectName> is a <one-line description of what it does and why>.
+
+## 📑 Table of Contents
+
 - [Features](#features)
-- [Design Overview](#design-overview)
-  - [Architecture](#architecture)
-  - [Phase Breakdown](#phase-breakdown)
-  - [Custom Libraries Used](#custom-libraries-used)
-  - [Schema Validation](#schema-validation)
-  - [Tombstone Deletion & Compaction](#tombstone-deletion--compaction)
-  - [Page & Index Design](#page--index-design)
-  - [Caching Strategy](#caching-strategy)
-  - [Serialization Formats](#serialization-formats)
-  - [Concurrency Model](#concurrency-model)
-- [Complexity](#complexity)
-- [Quick Example](#quick-example)
-- [Core API](#core-api)
-- [Benchmark Results](#benchmark-results)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
 - [Project Structure](#project-structure)
-- [Build Instructions](#build-instructions)
-- [Notes / Known Limitations](#notes--known-limitations)
+- [Development](#development)
+- [Benchmarks](#benchmarks)
+- [Documentation](#documentation)
+- [Contributing](#contributing)
+- [Changelog](#changelog)
 - [License](#license)
 
----
+## <a id="features"></a>✨ Features
 
-## Overview
+<!-- Write these fresh per project — they should name the actual
+     design decisions that make this implementation different, the
+     way JsonPro's called out std::variant-backed storage and
+     std::to_chars-based serialization rather than just "it's fast."
+     A bullet that could describe any library in this category is a
+     bullet worth cutting. -->
 
-MiniDatabase is a tiny, embedded, table-based database engine. It supports table creation with a dynamic runtime schema, full CRUD operations, predicate-based querying with sorting and aggregates, disk persistence, page-level caching, JSON import/export, and parallel multi-table operations — all without depending on `std::vector`, `std::unordered_map`, or any other STL container for its core data structures.
+- **<Specific design decision>** — <what it is, why it matters, and
+  what it avoids compared to the obvious naive approach>.
+- **<Another concrete decision>** — <same pattern>.
 
-Records are stored as `Json` objects with a validated schema, giving the flexibility of a document store with the safety of typed columns.
+## <a id="requirements"></a>📋 Requirements
 
----
+- A C++23-conformant compiler (tested: Clang, GCC, MSVC)
+- CMake 3.20+
 
-## Motivation
+## <a id="installation"></a>📦 Installation
 
-This project exists to demonstrate systems-level engineering, not just algorithmic knowledge. The goal was to take a set of previously built, independent libraries — a vector, a hash map, a JSON parser, a thread pool, an LRU cache, and custom memory allocators — and integrate all of them into one cohesive, production-style application.
+**From source:**
 
-It answers a simple question: can these pieces, built independently, actually work together to form something real?
-
----
-
-## Features
-
-- Dynamic runtime schema definition with typed, nullable columns
-- Full CRUD: insert, update, delete, select
-- Predicate-based filtering with `AND`-combined conditions
-- Sorting (ascending/descending) and aggregates (`count`, `sum`, `avg`, `max`, `min`)
-- Tombstone-based deletion with explicit compaction
-- Multi-page tables with automatic page allocation on overflow
-- O(1) average record lookup via HashMap index
-- Full database persistence (`save`/`load`) with index rebuild on load
-- Page-level LRU caching with built-in hit/miss statistics
-- Human-readable JSON export/import per table or per database
-- Parallel save, load, index rebuild, and export via a custom thread pool
-- Zero STL containers in the core engine — `VectorPro` and `HashMap` throughout
-
----
-
-## Design Overview
-
-### Architecture
-
-```
-MiniDatabase
-     │
-     Database Engine
-     │
- ┌───────────┬───────────┬───────────┐
- │           │           │
-Storage     Query      Serialization
- │           │             │
- │           │         JsonParser
- │           │
-VectorPro  HashMap
- │           │
- └─────┬─────┘
-       │
-Custom Allocators
-       │
-   LRU Cache
-       │
-PulseThreadPool
+```bash
+git clone https://github.com/<owner>/<repo>.git
+cd <repo>
+cmake -B build \
+  -DBUILD_TESTS=OFF \
+  -DBUILD_BENCHMARKS=OFF \
+  -DBUILD_TOOLS=OFF \
+  -DBUILD_EXAMPLES=OFF
+cmake --install build
 ```
 
-### Phase Breakdown
+Then, in your own `CMakeLists.txt`:
 
-| Phase | Goal | Components |
-|-------|------|-------------|
-| 1 — Foundation | Core primitives | `Types`, `Record`, `Page`, `Table` |
-| 2 — Database Core | Working in-memory database | `Database`, `QueryEngine` |
-| 3 — Storage & Caching | Persistence and performance | `StorageEngine`, `LRUCache` integration |
-| 4 — Serialization | JSON import/export | `Serializer` |
-| 5 — Concurrency | Parallel operations | `Concurrency`, `PulseThreadPool` integration |
-| 6 — Polish | Verification and demonstration | `tests/`, `benchmarks/`, `examples/` |
+```cmake
+find_package(<ProjectName> CONFIG REQUIRED)
+target_link_libraries(your_target PRIVATE <ProjectName>::<ProjectName>)
+```
 
-### Custom Libraries Used
+> vcpkg and Conan packages are built and verified (recipe in
+> `packaging/recipes/<name>/`, port in `packaging/vcpkg/ports/<name>/`),
+> but not yet published to the public registries. This section will be
+> updated once they are.
 
-| Library | Role in MiniDatabase | Repository |
-|---------|----------------------|-------------|
-| VectorPro | Table row storage, page lists, schema storage | [VectorPro](https://github.com/privateMwb/VectorPro) |
-| HashMap | Record ID → page index, table name index | [HashMap](https://github.com/privateMwb/HashMap) |
-| JsonParser | Record storage format, serialization, import/export | [JsonParser](https://github.com/privateMwb/JsonParser) |
-| LRUCache | Page-level caching in StorageEngine | [LRUCache](https://github.com/privateMwb/LRUCache) |
-| PulseThreadPool | Parallel save/load/export/index-rebuild | [Pulse-Thread-Pool](https://github.com/privateMwb/Pulse-Thread-Pool) |
-| Custom Allocators | PoolAllocator (record slots), ArenaAllocator (query scratch space) | [Custom-Allocators](https://github.com/privateMwb/Custom-Allocators) |
+## <a id="quick-start"></a>🚀 Quick Start
 
-### Schema Validation
-
-Every table is created with a `VectorPro<ColumnDef>` schema — each column has a name, a `ColumnType` (`INT`, `DOUBLE`, `STRING`, `BOOL`), and a nullable flag. Every insert and update runs `Record::validate()` against this schema before anything is written, rejecting missing required fields (`INVALID_SCEMA`) or mismatched types (`INVALID_TYPE`).
-
-### Tombstone Deletion & Compaction
-
-Deleting a record never immediately frees its memory. `Page::deleteRecord()` marks the record with a `deleted` flag — the record becomes invisible to all queries immediately, but its physical slot remains until `Page::compact()` runs, which sweeps every tombstoned record, returns its slot to the `PoolAllocator`, and rebuilds the page's live record list.
-
-### Page & Index Design
-
-Each `Table` holds a `VectorPro<Page*>` and a `HashMap<RecordID, PageID>` index. Insertion finds (or allocates) a page with a free slot; lookups go straight through the index to the owning page in O(1) average time, rather than scanning every page.
-
-### Caching Strategy
-
-`StorageEngine` wraps an `LRUCache<PageID, Page>` between the engine and disk. Reads check the cache first; on a cache hit, no disk access occurs. The cache reports its own hit/miss counters and hit rate via `cacheHitRate()`, `cacheHits()`, and `cacheMisses()`.
-
-### Serialization Formats
-
-MiniDatabase has three distinct export/import paths, each suited to a different use case:
-
-| Path | Format | Scope | Use case |
-|------|--------|-------|----------|
-| `Database::save` / `Database::load` | Internal, full metadata | Whole database | Reloading MiniDatabase's own state exactly |
-| `Serializer::exportTableToFile` / `importTableFromFile` | Clean, human-readable | One table | Backups, external tools, sharing |
-| `Serializer::exportDatabaseToJson` / `importDatabaseFromJson` | Clean, human-readable | Whole database | Multi-table human-readable backup |
-
-`Concurrency::exportAllTablesParallel` uses the same format as the second row, parallelized across tables via the thread pool.
-
-### Concurrency Model
-
-`Concurrency` wraps a `PulseThreadPool` and exposes parallel versions of save, load, index rebuild, and export — one task per table, awaited via `std::future`. Tables are only ever touched by their own task, so no locking is required between concurrent operations.
-
----
-
-## Complexity
-
-| Operation | Complexity | Notes |
-|-----------|:----------:|-------|
-| `Table::insertRecord` | O(1) amortized | Page lookup/allocation + HashMap insert |
-| `Table::getRecord` | O(1) average | HashMap index lookup |
-| `Table::updateRecord` | O(1) average | Index lookup + in-place overwrite |
-| `Table::deleteRecord` | O(1) average | Index lookup + tombstone flag |
-| `QueryEngine::selectById` | O(1) average | Delegates to `Table::getRecord` |
-| `QueryEngine::selectAll` / `select` | O(n) | Full scan across all pages |
-| `QueryEngine::count` / `sum` / `avg` / `max` / `min` | O(n) | Full scan with predicate evaluation |
-| `Page::compact` | O(p) | p = records on the page |
-| `Table::rebuildIndex` | O(n) | Full scan, rebuilds HashMap from scratch |
-
----
-
-## Quick Example
+<!-- 2–3 short, runnable examples: the most common single call, one
+     example that builds something up rather than just reading it,
+     and error handling if the library has anything like an exception
+     hierarchy worth showing. Real code that compiles against the
+     actual API — not the placeholder below. -->
 
 ```cpp
-#include "Database.h"
-#include "QueryEngine.h"
-#include "ArenaAllocator.h"
+#include <ProjectName/Header.h>
 
-// Schema
-VectorPro<ColumnDef> schema;
-schema.push_back({"name", ColumnType::STRING, false});
-schema.push_back({"salary", ColumnType::DOUBLE, false});
-
-// Database and table
-Database db("CompanyDB");
-db.createTable("employees", schema);
-Table* employees = db.getTable("employees");
-
-// Insert
-Json fields(Json::ObjectType{});
-fields["name"]   = "Alice";
-fields["salary"] = 85000;
-employees->insertRecord(Record(1, fields));
-
-// Query
-ArenaAllocator arena(DBConstants::ARENA_SIZE);
-QueryEngine qe(arena);
-
-FilterPredicate filter{"salary", Op::GT, Json(50000.0)};
-VectorPro<FilterPredicate*> predicates;
-predicates.push_back(&filter);
-
-QueryResult result = qe.select(*employees, predicates);
-
-// Persistence
-db.save("company.json");
+int main() {
+    // ...
+}
 ```
 
-See `examples/employees.cpp`, `examples/students.cpp`, and `examples/products.cpp` for complete, runnable programs covering querying, sorting, aggregates, persistence, JSON export/import, and parallel operations.
-
----
-
-## Core API
-
-### Database
-`createTable`, `dropTable`, `getTable`, `hasTable`, `save`, `load`, `compact`, `recordCount`, `tableCount`
-
-### Table
-`insertRecord`, `getRecord`, `updateRecord`, `deleteRecord`, `compact`, `rebuildIndex`, `serialize`, `deserialize`
-
-### Record
-`setField`, `getField`, `hasField`, `removeField`, `validate`, `serialize`, `deserialize`, `markDeleted`
-
-### QueryEngine
-`select`, `selectAll`, `selectById`, `count`, `sum`, `avg`, `max`, `min`
-
-### StorageEngine
-`saveDatabase`, `loadDatabase`, `getCachedPage`, `cachePage`, `isCached`, `evictPage`, `cacheHitRate`
-
-### Serializer
-`exportTableToJson`, `importTableFromJson`, `exportTableToFile`, `importTableFromFile`, `exportDatabaseToJson`, `importDatabaseFromJson`
-
-### Concurrency
-`saveAllTablesParallel`, `loadAllTablesParallel`, `rebuildAllIndexesParallel`, `exportAllTablesParallel`
-
----
-
-## Benchmark Results
-
-All benchmarks compiled with `-O2`. Full raw output available under `benchmarks/`.
-
-### Insert Throughput
-
-| Records | Time | Rate |
-|---------|------|------|
-| 1,000 | 19,843 µs | 50,395 rec/s |
-| 10,000 | 196,316 µs | 50,938 rec/s |
-| 100,000 | 4,333,115 µs | 23,078 rec/s |
-
-Throughput holds steady up to 10,000 records, then drops at 100,000 — consistent with the table spanning many pages and `findPageWithSlot()`'s linear scan for an open page becoming more expensive as page count grows.
-
-### Average Insert Cost
-
-| Records | Avg Cost |
-|---------|----------|
-| 1,000 | 17,323 ns/insert |
-| 10,000 | 19,365 ns/insert |
-| 100,000 | 168,937 ns/insert |
-
-### Select By Id (HashMap Index) — 10,000 lookups
-
-| Table Size | Time |
-|------------|------|
-| 1,000 | 179,259 µs |
-| 10,000 | 208,626 µs |
-| 100,000 | 207,674 µs |
-
-Lookup time stays roughly flat from 10,000 to 100,000 records — the expected signature of an O(1) average-case index lookup, regardless of table size.
-
-### Select All (Full Scan)
-
-| Table Size | Time |
-|------------|------|
-| 1,000 | 14,089 µs |
-| 10,000 | 123,566 µs |
-| 100,000 | 1,439,153 µs |
-
-Scan time grows roughly linearly with table size, as expected for an O(n) full scan — contrasting directly with the flat `selectById` numbers above.
-
-### Filtered Select (`salary > threshold`)
-
-| Table Size | Time |
-|------------|------|
-| 1,000 | 9,986 µs |
-| 10,000 | 141,453 µs |
-| 100,000 | 1,094,077 µs |
-
-### Aggregates — 100,000 records
-
-| Aggregate | Time |
-|-----------|------|
-| sum | 443,300 µs |
-| avg | 417,384 µs |
-| max | 414,529 µs |
-| min | 416,977 µs |
-
-All four aggregates cost roughly the same, as expected — each is a single O(n) scan with a different running calculation per record.
-
-### Cached vs Uncached Page Access — 1,000 ops
-
-| Access Type | Time |
-|-------------|------|
-| Cached (hit) | 366 µs |
-| Uncached (simulated disk) | 8,210,420 µs |
-
-The cached path is roughly 22,000× faster than the simulated disk path in this benchmark, demonstrating the practical value of the LRU page cache when disk latency is involved.
-
-### Cache Hit Rate — Working Set Fits in Cache
-
-| Metric | Value |
-|--------|-------|
-| Hits | 1,000 |
-| Misses | 0 |
-| Hit Rate | 100% |
-
-### Cache Hit Rate — Working Set Exceeds Capacity
-
-| Metric | Value |
-|--------|-------|
-| Hits | 1,000 |
-| Misses | 0 |
-| Hit Rate | 100% |
-
-> **Note:** this result is suspected to be a bug rather than genuine cache behavior. A working set of `2 × LRU_CACHE_CAP` accessed sequentially should produce a meaningful number of misses as older pages are evicted. A 100% hit rate with zero misses here most likely indicates an issue in either the benchmark's cache-fill logic or in `LRUCache`'s eviction path under this access pattern, and is flagged here rather than presented as a genuine result. See [Known Limitations](#notes--known-limitations).
-
-### Export Throughput
-
-| Records | Time | Rate |
-|---------|------|------|
-| 1,000 | 45,128 µs | 22,159 rec/s |
-| 10,000 | 657,169 µs | 15,216 rec/s |
-| 100,000 | 4,597,666 µs | 21,750 rec/s |
-
-### Import Throughput
-
-| Records | Time | Rate |
-|---------|------|------|
-| 1,000 | 80,445 µs | 12,430 rec/s |
-| 10,000 | 843,439 µs | 11,856 rec/s |
-| 100,000 | 14,214,954 µs | 7,034 rec/s |
-
-Import is consistently slower than export at every scale — expected, since import additionally performs schema validation and HashMap index insertion per record via `Table::insertRecord`, while export only reads and serializes existing data.
-
-### Round Trip (Export + Import)
-
-| Records | Time |
-|---------|------|
-| 1,000 | 139,061 µs |
-| 10,000 | 1,388,359 µs |
-| 100,000 | 19,107,715 µs |
-
-### Summary
-
-- **Index lookups are genuinely O(1) average-case** — flat across two orders of magnitude of table size, in clear contrast to the linear growth of full scans.
-- **The page cache provides a substantial, measurable speedup** over simulated disk access.
-- **Import is consistently more expensive than export**, due to schema validation and index maintenance that export doesn't need to perform.
-- **Insert and import throughput both degrade at 100,000 records**, suggesting page-scan and index-maintenance costs that would benefit from further optimization at larger scales.
-
----
-
-## Project Structure
+## <a id="project-structure"></a>🗂️ Project Structure
 
 ```
-MiniDatabase/
+<repo>/
 ├── include/
-│   ├── Core/
-│   │   ├── Record.h
-│   │   ├── Page.h
-│   │   ├── Table.h
-│   │   └── Database.h
-│   ├── Engine/
-│   │   ├── QueryEngine.h
-│   │   ├── StorageEngine.h
-│   │   ├── Serializer.h
-│   │   └── Concurrency.h
-│   └── Common/
-│       └── Types.h
+│   └── <ProjectName>/
+│       ├── ...
 │
 ├── src/
-│   ├── Core/
-│   │   ├── Record.cpp
-│   │   ├── Page.cpp
-│   │   ├── Table.cpp
-│   │   └── Database.cpp
-│   └── Engine/
-│       ├── QueryEngine.cpp
-│       ├── StorageEngine.cpp
-│       ├── Serializer.cpp
-│       └── Concurrency.cpp
-│
-├── libs/
-│   ├── VectorPro/
-│   ├── HashMap/
-│   ├── JsonParser/
-│   ├── PulseThreadPool/
-│   ├── LRUCache/
-│   └── CustomAllocators/
-│       ├── ArenaAllocator/
-│       └── PoolAllocator/
+│   └── <ProjectName>/
+│       ├── ...
 │
 ├── tests/
-│   ├── TestHelpers.h
-│   ├── main.cpp
-│   ├── test_record.cpp
-│   ├── test_page.cpp
-│   ├── test_table.cpp
-│   ├── test_database.cpp
-│   ├── test_query.cpp
-│   ├── test_storage.cpp
-│   ├── test_serializer.cpp
-│   └── test_concurrency.cpp
+│   ├── support/
+│   ├── suite/
+│   ├── test_main.cpp
+│   └── CMakeLists.txt
 │
 ├── benchmarks/
-│   ├── BenchTable.h
-│   ├── bench_insert.cpp
-│   ├── bench_query.cpp
-│   ├── bench_storage.cpp
-│   └── bench_serializer.cpp
+│   ├── support/
+│   ├── suite/
+│   ├── baselines/
+│   ├── bench_main.cpp
+│   └── CMakeLists.txt
 │
 ├── examples/
-│   ├── employees.cpp
-│   ├── students.cpp
-│   ├── products.cpp
-│   └── exported/
+│   ├── support/
+│   ├── suite/
+│   ├── example_main.cpp
+│   └── CMakeLists.txt
 │
+├── tools/
+│   ├── regression/
+│   └── CMakeLists.txt
+│
+├── packaging/
+│   ├── recipes/
+│   │   └── <name>/
+│   ├── vcpkg/
+│   │   └── ports/
+│   └── vcpkg-smoke-test/
+│
+├── scripts/
+│   └── update_package_files.py
+│
+├── .github/
+│   └── workflows/
+│
+├── cmake/
+│   └── <ProjectName>Config.cmake.in
+│
+├── docs/
+│   ├── Doxyfile
+│   └── README.md
+│
+├── .gitignore
+├── CMakeLists.txt
 ├── README.md
+├── RETARGETING.md
 └── LICENSE
 ```
 
----
+## <a id="development"></a>🛠️ Development
 
-## Build Instructions
-
-All commands assume you are in the `MiniDatabase/` project root.
-
-### Running the test suite
+The from-source install above builds the library only. To work on
+<ProjectName> itself — running tests, benchmarks, or the regression
+tool — build with everything enabled (the default):
 
 ```bash
-g++ -std=c++23 \
-    tests/*.cpp \
-    src/Core/*.cpp \
-    src/Engine/*.cpp \
-    libs/JsonParser/*.cpp \
-    libs/PulseThreadPool/*.cpp \
-    -I include -I libs \
-    -lpthread \
-    -o run_tests
-
-./run_tests
+cmake -B build
+cmake --build build
 ```
 
-### Running a benchmark
+**Run the test suite:**
 
 ```bash
-g++ -std=c++23 -O2 \
-    benchmarks/bench_insert.cpp \
-    src/Core/Record.cpp \
-    src/Core/Page.cpp \
-    src/Core/Table.cpp \
-    libs/JsonParser/Json.cpp \
-    libs/JsonParser/Parser.cpp \
-    -I include -I libs \
-    -o bench_insert
-
-./bench_insert
+ctest --test-dir build
 ```
 
-Repeat with `bench_query.cpp`, `bench_storage.cpp`, or `bench_serializer.cpp`, adjusting the linked source files to match each benchmark's dependencies (see each file's header comment).
-
-### Running an example
+**Run benchmarks and check for regressions:**
 
 ```bash
-g++ -std=c++23 -O2 \
-    examples/employees.cpp \
-    src/Core/Record.cpp \
-    src/Core/Page.cpp \
-    src/Core/Table.cpp \
-    src/Core/Database.cpp \
-    src/Engine/QueryEngine.cpp \
-    libs/JsonParser/Json.cpp \
-    libs/JsonParser/Parser.cpp \
-    -I include -I libs \
-    -o employees_example
-
-./employees_example
+./build/benchmarks
+./build/regression                  # latest baseline vs. benchmarks/results/benchmark_results.json
+./build/regression v1.2.0           # a specific baseline vs. current
+./build/regression v1.2.0 v1.4.0    # two baselines against each other
 ```
 
-`students.cpp` additionally requires `src/Engine/Serializer.cpp`. `products.cpp` additionally requires `src/Engine/Concurrency.cpp`, `libs/PulseThreadPool/ThreadPool.cpp`, and `-lpthread`.
+`regression` picks the latest baseline by semantic version (`v1.10.0`
+correctly outranks `v1.9.0`), not alphabetical filename order, and
+auto-names its output (`regression_v1.2.0_vs_current.md`/`.json`, etc.).
 
-> **Note:** examples that write files (`students.cpp`, `products.cpp`) expect an `examples/exported/` directory to already exist on disk. Create it first with `mkdir -p examples/exported` if it isn't present.
+See [docs/README.md](docs/README.md) for notes on verifying the vcpkg
+port and Conan recipe locally.
 
----
+## <a id="benchmarks"></a>📊 Benchmarks
 
-## Notes / Known Limitations
+<!-- Real measured numbers only — from an actual benchmarks/baselines/
+     snapshot, never invented. If there's nothing to compare against
+     yet, say so plainly instead of leaving a fabricated table here. -->
 
-- **StackAllocator and FreeListAllocator were built but never wired in.** Both were part of the original library set but ended up unused in the final design — deletion uses tombstoning rather than a free list, and no part of the engine required stack-discipline allocation. They remain available as standalone libraries.
-- **The eviction-pressure cache benchmark currently reports a 100% hit rate**, which is almost certainly incorrect for a working set twice the cache's capacity. This is flagged as a known issue rather than presented as genuine cache behavior — likely a benchmark setup issue or an `LRUCache` eviction edge case worth investigating further.
-- **`Table::findPageWithSlot()` performs a linear scan** over all pages to find one with a free slot before allocating a new page. This is the likely cause of the insert-throughput drop-off observed at 100,000 records, and would benefit from a free-page tracking structure at larger scales.
-- **Numeric columns (`INT` vs `DOUBLE`) are both backed by `Json`'s single `double`-based number type**, since the underlying JSON value model does not distinguish integers from floating-point numbers. `Record::validate()` approximates an `INT` check by confirming the value has no fractional component.
-- **`Serializer::importTableFromJson`/`importDatabaseFromJson` only populate existing tables** — they never create new ones. The caller is responsible for calling `createTable` with a matching schema first.
+Measured against `<reference-implementation>`, same build, at 10K /
+100K / 1M iterations (`benchmarks/baselines/<version>.json` has the
+full dataset).
 
----
+| Operation | <ProjectName> | <reference-implementation> | Difference |
+|---|---|---|---|
+| `<operation>` | `<time>` | `<time>` | `<±N%>` |
 
-## License
+## <a id="documentation"></a>📖 Documentation
 
-[MIT](LICENSE) — free to use, modify, and distribute for educational and personal purposes.
+Full API reference, generated with Doxygen from `docs/Doxyfile`:
 
+**https://<owner>.github.io/<repo>/**
+
+## <a id="contributing"></a>🤝 Contributing
+
+Issues and pull requests are welcome. Before submitting a PR:
+
+- Run the test suite (`ctest --test-dir build`)
+- If you're changing a hot path, run `./build/regression` and mention
+  the results in your PR description
+
+## <a id="changelog"></a>📝 Changelog
+
+See the [Releases](https://github.com/<owner>/<repo>/releases)
+page for version history and release notes.
+
+## <a id="license"></a>📄 License
+
+MIT — see [LICENSE](LICENSE) for details.

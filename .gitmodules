@@ -1,0 +1,21 @@
+[submodule "libs/internal/VectorPro"]
+	path = libs/internal/VectorPro
+	url = https://github.com/privateMwb/VectorPro
+[submodule "libs/internal/PoolAllocator"]
+	path = libs/internal/PoolAllocator
+	url = https://github.com/privateMwb/PoolAllocator
+[submodule "libs/internal/LRUCache"]
+	path = libs/internal/LRUCache
+	url = https://github.com/privateMwb/LRUCache
+[submodule "libs/internal/HashMap"]
+	path = libs/internal/HashMap
+	url = https://github.com/privateMwb/HashMap
+[submodule "libs/internal/JsonParser"]
+	path = libs/internal/JsonParser
+	url = https://github.com/privateMwb/JsonParser
+[submodule "libs/internal/ArenaAllocator"]
+	path = libs/internal/ArenaAllocator
+	url = https://github.com/privateMwb/ArenaAllocator
+[submodule "libs/internal/PulseThreadPool"]
+	path = libs/internal/PulseThreadPool
+	url = https://github.com/privateMwb/PulseThreadPool
