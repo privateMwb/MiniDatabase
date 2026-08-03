@@ -110,11 +110,30 @@ foreach(entry ${MINIDB_INTERNAL_LIBS})
     list(GET entry 1 folder_name)
     list(GET entry 2 target_name)
 
+    # Try the vcpkg port name first (e.g. "jsonpro"), since that's what
+    # vcpkg's toolchain expects to find under share/<port_name>/. Some
+    # ports may instead export their config under the project's own
+    # PROJECT_NAME casing (e.g. "JsonPro" -> JsonProConfig.cmake) if their
+    # portfile.cmake never renamed it via vcpkg_cmake_config_fixup(), so
+    # fall back to trying the target name too before giving up on
+    # find_package() entirely and dropping to the local submodule glob.
+    set(dep_resolved FALSE)
+
     find_package(${port_name} CONFIG QUIET)
     if(${port_name}_FOUND)
-        message(STATUS "Resolved ${port_name} via find_package() -> ${target_name}::${target_name}")
+        message(STATUS "Resolved ${port_name} via find_package(${port_name}) -> ${target_name}::${target_name}")
         list(APPEND SUBMODULE_LINK_LIBS ${target_name}::${target_name})
+        set(dep_resolved TRUE)
     else()
+        find_package(${target_name} CONFIG QUIET)
+        if(${target_name}_FOUND)
+            message(STATUS "Resolved ${port_name} via find_package(${target_name}) -> ${target_name}::${target_name}")
+            list(APPEND SUBMODULE_LINK_LIBS ${target_name}::${target_name})
+            set(dep_resolved TRUE)
+        endif()
+    endif()
+
+    if(NOT dep_resolved)
         set(repo_root "${CMAKE_CURRENT_SOURCE_DIR}/libs/internal/${folder_name}")
         set(include_dir "${repo_root}/include")
         if(EXISTS "${include_dir}")
