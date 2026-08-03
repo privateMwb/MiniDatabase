@@ -92,6 +92,14 @@ jobs:
           cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
           cmake --build build
 
+      - name: Show MiniDB build logs
+        if: failure()
+        run: |
+          echo "===== OUT ====="
+          cat /tmp/vcpkg/buildtrees/minidb/install-x64-linux-dbg-out.log
+          echo "===== ERR ====="
+          cat /tmp/vcpkg/buildtrees/minidb/install-x64-linux-dbg-err.log
+
       - name: Run the smoke test
         working-directory: packaging/vcpkg-smoke-test
         run: ./build/smoke_test
