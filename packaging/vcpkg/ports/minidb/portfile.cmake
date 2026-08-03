@@ -1,40 +1,67 @@
-vcpkg_find_acquire_program(GIT)
-
-# NOTE: not using vcpkg_from_github here. It downloads a GitHub archive
-# tarball, which -- unlike a real git clone -- never contains submodule
-# content and has no .git directory, so a follow-up
-# `git submodule update --init` has nothing to operate on and fails
-# outright (confirmed against other vcpkg ports hitting the same issue,
-# e.g. https://github.com/microsoft/vcpkg/issues/27004). MiniDB's own
-# internal libraries (ArenaPro, CachePro, HashMapPro, JsonPro, PoolPro,
-# ThreadPoolPro, VectorPro) live under libs/internal/ as real git
-# submodules and need an actual clone to materialize.
-#
-# Trade-off: this loses vcpkg_from_github's SHA512 archive-integrity
-# pinning (a plain `git clone` has no equivalent built-in check) --
-# acceptable here since this is a private overlay port for our own repo,
-# not a port intended for the public vcpkg registry.
-set(SOURCE_PATH "${CURRENT_BUILDTREES_DIR}/src/minidb-v1.0.0")
-file(REMOVE_RECURSE "${SOURCE_PATH}")
-# vcpkg's built-in fetch helpers (e.g. vcpkg_from_github) create
-# CURRENT_BUILDTREES_DIR/src themselves before running anything in it.
-# Bypassing them for a manual git clone means nothing creates that
-# directory for us -- without this, vcpkg_execute_required_process fails
-# immediately trying to chdir into a WORKING_DIRECTORY that doesn't exist
-# yet ("Error code: no such file or directory").
-file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/src")
-
-vcpkg_execute_required_process(
-    COMMAND "${GIT}" clone
-        --branch v1.0.0
-        --depth 1
-        --recurse-submodules
-        --shallow-submodules
-        https://github.com/privateMwb/MiniDatabase.git
-        "${SOURCE_PATH}"
-    WORKING_DIRECTORY "${CURRENT_BUILDTREES_DIR}/src"
-    LOGNAME "minidb-clone-${TARGET_TRIPLET}"
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO privateMwb/MiniDatabase
+    REF REPLACE_WITH_COMMIT_SHA
+    SHA512 REPLACE_WITH_SHA512
 )
+
+# GitHub archive tarballs never include submodule content, so MiniDB's
+# internal libraries under libs/internal/ are fetched separately here,
+# each pinned to the exact commit the submodule points at, then copied
+# into place.
+vcpkg_from_github(
+    OUT_SOURCE_PATH ARENAPRO_SOURCE_PATH
+    REPO privateMwb/ArenaPro
+    REF REPLACE_WITH_ARENAPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_ARENAPRO_SHA512
+)
+vcpkg_from_github(
+    OUT_SOURCE_PATH CACHEPRO_SOURCE_PATH
+    REPO privateMwb/CachePro
+    REF REPLACE_WITH_CACHEPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_CACHEPRO_SHA512
+)
+vcpkg_from_github(
+    OUT_SOURCE_PATH HASHMAPPRO_SOURCE_PATH
+    REPO privateMwb/HashMapPro
+    REF REPLACE_WITH_HASHMAPPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_HASHMAPPRO_SHA512
+)
+vcpkg_from_github(
+    OUT_SOURCE_PATH JSONPRO_SOURCE_PATH
+    REPO privateMwb/JsonPro
+    REF REPLACE_WITH_JSONPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_JSONPRO_SHA512
+)
+vcpkg_from_github(
+    OUT_SOURCE_PATH POOLPRO_SOURCE_PATH
+    REPO privateMwb/PoolPro
+    REF REPLACE_WITH_POOLPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_POOLPRO_SHA512
+)
+vcpkg_from_github(
+    OUT_SOURCE_PATH THREADPOOLPRO_SOURCE_PATH
+    REPO privateMwb/ThreadPoolPro
+    REF REPLACE_WITH_THREADPOOLPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_THREADPOOLPRO_SHA512
+)
+vcpkg_from_github(
+    OUT_SOURCE_PATH VECTORPRO_SOURCE_PATH
+    REPO privateMwb/VectorPro
+    REF REPLACE_WITH_VECTORPRO_COMMIT_SHA
+    SHA512 REPLACE_WITH_VECTORPRO_SHA512
+)
+
+foreach(SUBMODULE_NAME ARENAPRO CACHEPRO HASHMAPPRO JSONPRO POOLPRO THREADPOOLPRO VECTORPRO)
+    file(REMOVE_RECURSE "${SOURCE_PATH}/libs/internal/${SUBMODULE_NAME}")
+endforeach()
+file(RENAME "${ARENAPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/ArenaPro")
+file(RENAME "${CACHEPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/CachePro")
+file(RENAME "${HASHMAPPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/HashMapPro")
+file(RENAME "${JSONPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/JsonPro")
+file(RENAME "${POOLPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/PoolPro")
+file(RENAME "${THREADPOOLPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/ThreadPoolPro")
+file(RENAME "${VECTORPRO_SOURCE_PATH}" "${SOURCE_PATH}/libs/internal/VectorPro")
 
 set(VCPKG_PORT_NAME MiniDB)
 
