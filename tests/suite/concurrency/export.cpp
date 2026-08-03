@@ -47,7 +47,7 @@ static void export_writes_one_file_per_table() {
         CHK(db.getTable("customers")->insertRecord(Record(i)) == Status::OK);
     }
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.exportAllTablesParallel(db, dir) == Status::OK);
 
     CHK(std::filesystem::exists(dir + "/orders.json"));
@@ -76,7 +76,7 @@ static void export_excludes_deleted_records() {
     CHK(db.getTable("orders")->deleteRecord(2) == Status::OK);
     CHK(db.getTable("orders")->deleteRecord(4) == Status::OK);
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.exportAllTablesParallel(db, dir) == Status::OK);
 
     Table fresh("orders", 1, Vector<ColumnDef>{});
@@ -107,7 +107,7 @@ static void export_handles_more_tables_than_threads() {
         }
     }
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.exportAllTablesParallel(db, dir) == Status::OK);
 
     for (int t = 0; t < kTableCount; ++t) {
@@ -126,7 +126,7 @@ static void export_empty_table() {
     Database db("shop");
     CHK(db.createTable("empty_table", Vector<ColumnDef>{}) == Status::OK);
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.exportAllTablesParallel(db, dir) == Status::OK);
 
     std::string content;

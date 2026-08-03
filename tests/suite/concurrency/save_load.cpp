@@ -55,7 +55,7 @@ static void save_load_round_trip() {
         CHK(db.getTable("customers")->insertRecord(r) == Status::OK);
     }
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.saveAllTablesParallel(db, base) == Status::OK);
 
     CHK(std::filesystem::exists(base + "_orders.json"));
@@ -98,7 +98,7 @@ static void save_load_many_tables() {
         }
     }
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.saveAllTablesParallel(db, base) == Status::OK);
 
     Database restored("shop_restored");
@@ -130,7 +130,7 @@ static void load_duplicate_key() {
         CHK(source.getTable("orders")->insertRecord(Record(i)) == Status::OK);
     }
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.saveAllTablesParallel(source, base) == Status::OK);
 
     Database target("shop_target");

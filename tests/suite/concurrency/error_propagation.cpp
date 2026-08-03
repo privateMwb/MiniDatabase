@@ -51,7 +51,7 @@ static void all_succeed_returns_ok() {
     writeRawFile(dir + "/db_a.json", "[]");
     writeRawFile(dir + "/db_b.json", "[]");
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.loadAllTablesParallel(db, dir + "/db") == Status::OK);
 }
 
@@ -82,7 +82,7 @@ static void last_non_ok_status_wins() {
     // "c": succeeds trivially.
     writeRawFile(dir + "/db_c.json", "[]");
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     Status result = conc.loadAllTablesParallel(db, base);
 
     CHK(result == Status::INVALID_TYPE);
@@ -104,7 +104,7 @@ static void failure_partial_apply() {
     writeRawFile(dir + "/db_b.json", R"([{"n":"not-a-number"}])");
     writeRawFile(dir + "/db_c.json", R"([{"id":1},{"id":2},{"id":3}])");
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     Status result = conc.loadAllTablesParallel(db, base);
 
     CHK(result != Status::OK);
@@ -131,7 +131,7 @@ static void save_shares_fold() {
     std::filesystem::create_directories(base + "_a.json.tmp");
     std::filesystem::create_directories(base + "_b.json.tmp");
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     Status result = conc.saveAllTablesParallel(db, base);
 
     CHK(result == Status::IO_ERROR);

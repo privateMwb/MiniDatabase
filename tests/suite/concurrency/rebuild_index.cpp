@@ -36,7 +36,7 @@ static void rebuild_preserves_lookups() {
 
     CHK(db.createTable("empty", Vector<ColumnDef>{}) == Status::OK);
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.rebuildAllIndexesParallel(db) == Status::OK);
 
     Record out;
@@ -53,7 +53,7 @@ static void rebuild_preserves_lookups() {
 // clean no-op (Status::OK), not a crash on an empty futures vector.
 static void rebuild_empty_db() {
     Database db("empty_db");
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.rebuildAllIndexesParallel(db) == Status::OK);
 }
 
@@ -73,7 +73,7 @@ static void rebuild_many_tables() {
         }
     }
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.rebuildAllIndexesParallel(db) == Status::OK);
 
     Record out;
@@ -93,7 +93,7 @@ static void rebuild_empty_tables() {
     CHK(db.createTable("a", Vector<ColumnDef>{}) == Status::OK);
     CHK(db.createTable("b", Vector<ColumnDef>{}) == Status::OK);
 
-    Concurrency conc;
+    MiniDB::Engine::Concurrency conc;
     CHK(conc.rebuildAllIndexesParallel(db) == Status::OK);
 
     CHK(db.getTable("a")->recordCount() == 0);
