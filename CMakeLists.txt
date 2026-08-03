@@ -5,7 +5,7 @@
 #
 # Sections:
 #   1. C++ Configuration
-#   2. External / Internal Submodule Libraries
+#   2. Dependencies
 #   3. MiniDB Library
 #   4. Subdirectories
 #   5. Installation
@@ -29,26 +29,28 @@ set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Place all executables directly in the build directory.
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # ============================================================================
-# External / Internal Submodule Libraries
+# Dependencies
 # ============================================================================
 #
-# lib/internal/  -> libraries owned/maintained by this project
-# lib/external/  -> third-party libraries pinned as submodules
+# MiniDB depends on:
 #
-# Packaged dependencies are resolved through find_package().
-# Local development falls back to the checked-out submodules.
+#   ArenaPro
+#   CachePro
+#   HashMapPro
+#   JsonPro
+#   PoolPro
+#   ThreadPoolPro
+#   VectorPro
 #
-# Mapping:
-#   arenapro      -> ArenaAllocator  -> ArenaPro
-#   cachepro      -> LRUCache        -> CachePro
-#   hashmappro    -> HashMap         -> HashMapPro
-#   jsonpro       -> JsonParser      -> JsonPro
-#   poolpro       -> PoolAllocator   -> PoolPro
-#   threadpoolpro -> PulseThreadPool -> ThreadPoolPro
-#   vectorpro     -> VectorPro       -> VectorPro
+# Packaged builds:
+#   Dependencies are resolved through find_package().
+#
+# Local development:
+#   If a package is not installed, the corresponding local submodule is used.
 #
 # ============================================================================
 
@@ -68,16 +70,16 @@ set(SUBMODULE_LINK_LIBS "")
 
 foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
 
-    string(REPLACE "|" ";" entry "${entry}")
+    string(REPLACE "|" ";" entry_parts "${entry}")
 
-    list(GET entry 0 port_name)
-    list(GET entry 1 folder_name)
-    list(GET entry 2 target_name)
+    list(GET entry_parts 0 port_name)
+    list(GET entry_parts 1 folder_name)
+    list(GET entry_parts 2 target_name)
 
     set(dep_resolved FALSE)
 
     # ------------------------------------------------------------------------
-    # Try the vcpkg/Conan package name first.
+    # Try package name first.
     # ------------------------------------------------------------------------
 
     find_package(${port_name} CONFIG QUIET)
@@ -86,21 +88,40 @@ foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
 
         if(TARGET ${target_name}::${target_name})
 
-            message(STATUS
-                "Resolved ${port_name} -> ${target_name}::${target_name}"
+            message(
+                STATUS
+                "MiniDB: resolved ${port_name} -> ${target_name}::${target_name}"
             )
 
-            list(APPEND SUBMODULE_LINK_LIBS
+            list(
+                APPEND
+                SUBMODULE_LINK_LIBS
                 ${target_name}::${target_name}
+            )
+
+            set(dep_resolved TRUE)
+
+        elseif(TARGET ${target_name})
+
+            message(
+                STATUS
+                "MiniDB: resolved ${port_name} -> ${target_name}"
+            )
+
+            list(
+                APPEND
+                SUBMODULE_LINK_LIBS
+                ${target_name}
             )
 
             set(dep_resolved TRUE)
 
         else()
 
-            message(WARNING
-                "Package '${port_name}' was found, but target "
-                "'${target_name}::${target_name}' does not exist."
+            message(
+                WARNING
+                "MiniDB: package '${port_name}' was found, but target "
+                "'${target_name}::${target_name}' was not exported."
             )
 
         endif()
@@ -108,7 +129,7 @@ foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
     endif()
 
     # ------------------------------------------------------------------------
-    # Try the CMake project/target name.
+    # Try project/target name as fallback.
     # ------------------------------------------------------------------------
 
     if(NOT dep_resolved)
@@ -119,23 +140,33 @@ foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
 
             if(TARGET ${target_name}::${target_name})
 
-                message(STATUS
-                    "Resolved ${port_name} via ${target_name} -> "
-                    "${target_name}::${target_name}"
+                message(
+                    STATUS
+                    "MiniDB: resolved ${port_name} -> ${target_name}::${target_name}"
                 )
 
-                list(APPEND SUBMODULE_LINK_LIBS
+                list(
+                    APPEND
+                    SUBMODULE_LINK_LIBS
                     ${target_name}::${target_name}
                 )
 
                 set(dep_resolved TRUE)
 
-            else()
+            elseif(TARGET ${target_name})
 
-                message(WARNING
-                    "Package '${target_name}' was found, but target "
-                    "'${target_name}::${target_name}' does not exist."
+                message(
+                    STATUS
+                    "MiniDB: resolved ${port_name} -> ${target_name}"
                 )
+
+                list(
+                    APPEND
+                    SUBMODULE_LINK_LIBS
+                    ${target_name}
+                )
+
+                set(dep_resolved TRUE)
 
             endif()
 
@@ -144,42 +175,53 @@ foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
     endif()
 
     # ------------------------------------------------------------------------
-    # Local submodule fallback.
+    # Fall back to local submodule.
     # ------------------------------------------------------------------------
 
     if(NOT dep_resolved)
 
-        set(repo_root
+        set(
+            repo_root
             "${CMAKE_CURRENT_SOURCE_DIR}/libs/internal/${folder_name}"
         )
 
-        set(include_dir
+        set(
+            include_dir
             "${repo_root}/include"
         )
 
         if(EXISTS "${include_dir}")
 
-            message(STATUS
-                "find_package(${port_name}) not found; "
+            message(
+                STATUS
+                "MiniDB: ${port_name} package not found; "
                 "using local submodule at ${repo_root}"
             )
 
-            list(APPEND SUBMODULE_INCLUDE_DIRS
+            list(
+                APPEND
+                SUBMODULE_INCLUDE_DIRS
                 "${include_dir}"
             )
 
-            file(GLOB_RECURSE repo_sources CONFIGURE_DEPENDS
+            file(
+                GLOB_RECURSE
+                repo_sources
+                CONFIGURE_DEPENDS
                 "${repo_root}/src/*.cpp"
             )
 
             if(repo_sources)
 
-                message(STATUS
-                    "Compiling submodule sources from: "
+                message(
+                    STATUS
+                    "MiniDB: compiling submodule sources from "
                     "${repo_root}/src"
                 )
 
-                list(APPEND SUBMODULE_SOURCES
+                list(
+                    APPEND
+                    SUBMODULE_SOURCES
                     ${repo_sources}
                 )
 
@@ -187,12 +229,16 @@ foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
 
         else()
 
-            message(WARNING
-                "Could not resolve internal dependency '${port_name}': "
-                "no installed package found via find_package(), and no "
-                "submodule checked out at ${repo_root}. Run "
-                "'git submodule update --init --recursive', or ensure "
-                "${port_name} is available via vcpkg/Conan."
+            message(
+                FATAL_ERROR
+                "Could not resolve internal dependency '${port_name}'.\n"
+                "No installed package was found and the local submodule "
+                "does not exist at:\n"
+                "  ${repo_root}\n\n"
+                "Run:\n"
+                "  git submodule update --init --recursive\n"
+                "or make sure the dependency is available through "
+                "vcpkg/Conan."
             )
 
         endif()
@@ -202,14 +248,23 @@ foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
 endforeach()
 
 # ============================================================================
-# External Third-Party Submodules
+# External submodules
+# ============================================================================
+#
+# Third-party libraries under libs/external/ remain local submodules.
+#
 # ============================================================================
 
-file(GLOB EXTERNAL_LIB_INCLUDE_DIRS CONFIGURE_DEPENDS
+file(
+    GLOB
+    EXTERNAL_LIB_INCLUDE_DIRS
+    CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/external/*/include"
 )
 
-list(APPEND SUBMODULE_INCLUDE_DIRS
+list(
+    APPEND
+    SUBMODULE_INCLUDE_DIRS
     ${EXTERNAL_LIB_INCLUDE_DIRS}
 )
 
@@ -221,17 +276,23 @@ foreach(include_dir IN LISTS EXTERNAL_LIB_INCLUDE_DIRS)
         DIRECTORY
     )
 
-    file(GLOB_RECURSE repo_sources CONFIGURE_DEPENDS
+    file(
+        GLOB_RECURSE
+        repo_sources
+        CONFIGURE_DEPENDS
         "${repo_root}/src/*.cpp"
     )
 
     if(repo_sources)
 
-        message(STATUS
-            "Compiling submodule sources from: ${repo_root}/src"
+        message(
+            STATUS
+            "MiniDB: compiling external sources from ${repo_root}/src"
         )
 
-        list(APPEND SUBMODULE_SOURCES
+        list(
+            APPEND
+            SUBMODULE_SOURCES
             ${repo_sources}
         )
 
@@ -239,38 +300,36 @@ foreach(include_dir IN LISTS EXTERNAL_LIB_INCLUDE_DIRS)
 
 endforeach()
 
-# Display resolved local include directories.
-
-foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
-
-    message(STATUS
-        "Include: ${dir}"
-    )
-
-endforeach()
-
 # ============================================================================
 # MiniDB Library
 # ============================================================================
 #
-# Automatically creates:
-#   STATIC    -> when .cpp sources exist
-#   INTERFACE -> when no .cpp sources exist
+# If MiniDB has .cpp files:
+#     STATIC library
+#
+# If MiniDB has no .cpp files:
+#     INTERFACE header-only library
 #
 # ============================================================================
 
-file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
+file(
+    GLOB_RECURSE
+    LIB_SOURCES
+    CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/*.cpp"
 )
 
-list(APPEND LIB_SOURCES
+# Add locally compiled submodule sources.
+list(
+    APPEND
+    LIB_SOURCES
     ${SUBMODULE_SOURCES}
 )
 
 if(LIB_SOURCES)
 
     # ------------------------------------------------------------------------
-    # Compiled library
+    # Compiled MiniDB library.
     # ------------------------------------------------------------------------
 
     add_library(
@@ -292,15 +351,22 @@ if(LIB_SOURCES)
             cxx_std_23
     )
 
-    set(MINIDB_VISIBILITY PUBLIC)
+    set(
+        MINIDB_VISIBILITY
+        PUBLIC
+    )
 
+    # ------------------------------------------------------------------------
     # Link packaged dependencies.
     #
-    # For example:
+    # This is important for vcpkg:
     #
-    #   JsonPro::JsonPro
+    # JsonPro::JsonPro
+    # VectorPro::VectorPro
+    # etc.
     #
-    # supplies JsonPro's include directories and library to MiniDB.
+    # Their exported targets carry their own include directories.
+    # ------------------------------------------------------------------------
 
     if(SUBMODULE_LINK_LIBS)
 
@@ -315,7 +381,7 @@ if(LIB_SOURCES)
 else()
 
     # ------------------------------------------------------------------------
-    # Header-only library
+    # Header-only MiniDB library.
     # ------------------------------------------------------------------------
 
     add_library(
@@ -336,7 +402,10 @@ else()
             cxx_std_23
     )
 
-    set(MINIDB_VISIBILITY INTERFACE)
+    set(
+        MINIDB_VISIBILITY
+        INTERFACE
+    )
 
     if(SUBMODULE_LINK_LIBS)
 
@@ -351,7 +420,7 @@ else()
 endif()
 
 # ============================================================================
-# Expose Local Submodule Include Directories
+# Local submodule include directories
 # ============================================================================
 
 foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
@@ -360,7 +429,6 @@ foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
         ${PROJECT_NAME}
         ${MINIDB_VISIBILITY}
         $<BUILD_INTERFACE:${dir}>
-        $<INSTALL_INTERFACE:include>
     )
 
 endforeach()
@@ -369,22 +437,26 @@ endforeach()
 # Subdirectories
 # ============================================================================
 
-option(BUILD_TESTS
+option(
+    BUILD_TESTS
     "Build the test suite"
     ON
 )
 
-option(BUILD_BENCHMARKS
+option(
+    BUILD_BENCHMARKS
     "Build the benchmark suite"
     ON
 )
 
-option(BUILD_REGRESSION
+option(
+    BUILD_REGRESSION
     "Build the regression benchmark tools"
     ON
 )
 
-option(BUILD_EXAMPLES
+option(
+    BUILD_EXAMPLES
     "Build the examples suite"
     ON
 )
@@ -432,32 +504,45 @@ endif()
 # ============================================================================
 
 install(
-    TARGETS ${PROJECT_NAME}
-    EXPORT ${PROJECT_NAME}Targets
+    TARGETS
+        ${PROJECT_NAME}
+    EXPORT
+        ${PROJECT_NAME}Targets
 )
 
 install(
-    EXPORT ${PROJECT_NAME}Targets
-    FILE ${PROJECT_NAME}Targets.cmake
-    NAMESPACE ${PROJECT_NAME}::
-    DESTINATION lib/cmake/${PROJECT_NAME}
+    EXPORT
+        ${PROJECT_NAME}Targets
+    FILE
+        ${PROJECT_NAME}Targets.cmake
+    NAMESPACE
+        ${PROJECT_NAME}::
+    DESTINATION
+        lib/cmake/${PROJECT_NAME}
 )
 
+# Install MiniDB public headers.
 install(
-    DIRECTORY include/
-    DESTINATION include
+    DIRECTORY
+        include/
+    DESTINATION
+        include
 )
 
-# Install local submodule headers when using local submodules.
+# Install locally resolved submodule headers.
 #
-# Packaged dependencies are already installed by their own vcpkg ports,
-# so their headers do not need to be copied into MiniDB's package.
-
+# These are needed only when the dependencies were built from local
+# submodules rather than installed packages.
+#
+# Packaged dependencies such as JsonPro are normally installed separately
+# by vcpkg.
 foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
 
     install(
-        DIRECTORY ${dir}/
-        DESTINATION include
+        DIRECTORY
+            ${dir}/
+        DESTINATION
+            include
     )
 
 endforeach()
@@ -466,23 +551,32 @@ endforeach()
 # Packaging
 # ============================================================================
 
-include(CMakePackageConfigHelpers)
+include(
+    CMakePackageConfigHelpers
+)
 
+# Generate MiniDBConfig.cmake.
 configure_package_config_file(
     cmake/${PROJECT_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
-    INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+    INSTALL_DESTINATION
+        lib/cmake/${PROJECT_NAME}
 )
 
+# Generate MiniDBConfigVersion.cmake.
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    VERSION ${PROJECT_VERSION}
-    COMPATIBILITY SameMajorVersion
+    VERSION
+        ${PROJECT_VERSION}
+    COMPATIBILITY
+        SameMajorVersion
 )
 
+# Install package configuration files.
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
-    DESTINATION lib/cmake/${PROJECT_NAME}
+    DESTINATION
+        lib/cmake/${PROJECT_NAME}
 )
