@@ -73,10 +73,43 @@ jobs:
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
 
       - name: Download source archive
+        id: source
         run: |
+          SHA=$(git rev-list -n 1 "${{ steps.tag.outputs.tag }}")
+          echo "sha=$SHA" >> "$GITHUB_OUTPUT"
           curl -L \
             -o source.tar.gz \
-            https://github.com/${{ env.REPOSITORY }}/archive/refs/tags/${{ steps.tag.outputs.tag }}.tar.gz
+            "https://github.com/${{ env.REPOSITORY }}/archive/${SHA}.tar.gz"
+
+      - name: Resolve and download submodule archives
+        id: submodules
+        run: |
+          SHA="${{ steps.source.outputs.sha }}"
+          declare -A REPOS=(
+            [ArenaPro]=privateMwb/ArenaPro
+            [CachePro]=privateMwb/CachePro
+            [HashMapPro]=privateMwb/HashMapPro
+            [JsonPro]=privateMwb/JsonPro
+            [PoolPro]=privateMwb/PoolPro
+            [ThreadPoolPro]=privateMwb/ThreadPoolPro
+            [VectorPro]=privateMwb/VectorPro
+          )
+          ARGS=()
+          for NAME in "${!REPOS[@]}"; do
+            REPO="${REPOS[$NAME]}"
+            SUB_SHA=$(git ls-tree "$SHA" "libs/internal/$NAME" | awk '{print $3}')
+            if [ -z "$SUB_SHA" ]; then
+              echo "Could not resolve submodule commit for $NAME at libs/internal/$NAME" >&2
+              exit 1
+            fi
+            curl -L -o "${NAME}.tar.gz" "https://github.com/${REPO}/archive/${SUB_SHA}.tar.gz"
+            ARGS+=("--submodule" "${NAME}=${REPO}:${SUB_SHA}:${NAME}.tar.gz")
+          done
+          {
+            echo "args<<EOF"
+            echo "${ARGS[@]}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -89,10 +122,12 @@ jobs:
             --package ${{ env.PACKAGE_NAME }} \
             --repo ${{ env.REPOSITORY }} \
             --version ${{ steps.tag.outputs.version }} \
+            --ref ${{ steps.source.outputs.sha }} \
             --archive source.tar.gz \
             --root-dir "$ROOT_DIR" \
             --conan-dir "$CONAN_RECIPE_DIR" \
-            --vcpkg-dir "$VCPKG_PORT_DIR"
+            --vcpkg-dir "$VCPKG_PORT_DIR" \
+            ${{ steps.submodules.outputs.args }}
 
       - name: Commit changes
         run: |
