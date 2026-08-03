@@ -1,7 +1,8 @@
 from conan import ConanFile
 from conan.tools.build import check_min_cppstd
 from conan.tools.cmake import CMake, CMakeDeps, CMakeToolchain, cmake_layout
-from conan.tools.files import copy, get
+from conan.tools.files import copy
+from conan.tools.scm import Git
 import os
 
 
@@ -64,41 +65,32 @@ class Conan(ConanFile):
     def layout(self):
         cmake_layout(self)
 
-    def requirements(self):
-        # All 7 are consumed directly by MiniDB's own public headers (e.g.
-        # Record.h includes <VectorPro/Vector.h> and <JsonPro/Json.h> at
-        # namespace scope), so both flags are needed:
-        #   transitive_headers=True -- a consumer of MiniDB who includes
-        #     MiniDB/Core/Record.h needs these headers on their include
-        #     path too, not just MiniDB's own.
-        #   transitive_libs=True -- MiniDB links these in as
-        #     PUBLIC/${MINIDB_VISIBILITY} in CMakeLists.txt (see the
-        #     add_subdirectory + target_link_libraries section), so a
-        #     consumer linking against MiniDB needs these libs linked too.
-        #
-        # ASSUMPTION: package names follow the same lowercase-of-cmake_name
-        # pattern this recipe itself uses (cmake_name "MiniDB" -> name
-        # "minidb") -- confirmed for cachepro via packaging.yml's
-        # recipes/cachepro/all path, inferred by the same pattern for the
-        # other six. Verify each name/version against the actual published
-        # packages before this will resolve.
-        self.requires("vectorpro/1.0.0",     transitive_headers=True, transitive_libs=True)
-        self.requires("jsonpro/1.0.0",       transitive_headers=True, transitive_libs=True)
-        self.requires("poolpro/1.0.0",       transitive_headers=True, transitive_libs=True)
-        self.requires("hashmappro/1.0.0",    transitive_headers=True, transitive_libs=True)
-        self.requires("cachepro/1.0.0",      transitive_headers=True, transitive_libs=True)
-        self.requires("arenapro/1.0.0",      transitive_headers=True, transitive_libs=True)
-        self.requires("threadpoolpro/1.0.0", transitive_headers=True, transitive_libs=True)
-
     def validate(self):
         check_min_cppstd(self, 23)
 
     def source(self):
-        get(
-            self,
-            **self.conan_data["sources"][self.version],
-            strip_root=True,
+        # NOTE: not using conan.tools.files.get() with a GitHub tarball URL
+        # here. Like vcpkg_from_github, that downloads a plain archive with
+        # no .git directory and no submodule content -- MiniDB's own
+        # internal libraries (ArenaPro, CachePro, HashMapPro, JsonPro,
+        # PoolPro, ThreadPoolPro, VectorPro) live under libs/internal/ as
+        # real git submodules, which need an actual clone + submodule
+        # checkout to materialize (a bare `get()` would silently leave
+        # those directories empty, failing later at compile time with a
+        # much more confusing "header not found" error instead of here).
+        #
+        # Trade-off: this loses the sha256 archive-integrity pin get()
+        # would otherwise give -- acceptable for a private recipe against
+        # our own repo, not a package intended for conan-center.
+        sources = self.conan_data["sources"][self.version]
+        git = Git(self)
+        git.clone(
+            url=sources["url"],
+            target=".",
+            args=["--branch", sources["tag"], "--depth", "1"],
         )
+        git.run("submodule sync --recursive")
+        git.run("submodule update --init --recursive")
 
     def generate(self):
         deps = CMakeDeps(self)

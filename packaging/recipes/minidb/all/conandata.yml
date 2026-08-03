@@ -1,4 +1,4 @@
 sources:
   "1.0.0":
-    url: "https://github.com/privateMwb/MiniDatabase/archive/refs/tags/v1.0.0.tar.gz"
-    sha256: "62635d032c06dbc9c1a823e8c8467a289d8ba8bec4256f47d4879ac2787e7c6e"
+    url: "https://github.com/privateMwb/MiniDatabase.git"
+    tag: "v1.0.0"
