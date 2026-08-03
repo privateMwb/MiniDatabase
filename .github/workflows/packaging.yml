@@ -92,6 +92,10 @@ jobs:
           cmake -B build -S . -DCMAKE_TOOLCHAIN_FILE=/tmp/vcpkg/scripts/buildsystems/vcpkg.cmake
           cmake --build build
 
+      - name: Inspect installed jsonpro package on failure
+        if: failure()
+        run: find /tmp/vcpkg/packages/jsonpro_x64-linux -type f || echo "package dir not found"
+
       - name: Run the smoke test
         working-directory: packaging/vcpkg-smoke-test
         run: ./build/smoke_test
