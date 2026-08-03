@@ -16,6 +16,13 @@ vcpkg_find_acquire_program(GIT)
 # not a port intended for the public vcpkg registry.
 set(SOURCE_PATH "${CURRENT_BUILDTREES_DIR}/src/minidb-v1.0.0")
 file(REMOVE_RECURSE "${SOURCE_PATH}")
+# vcpkg's built-in fetch helpers (e.g. vcpkg_from_github) create
+# CURRENT_BUILDTREES_DIR/src themselves before running anything in it.
+# Bypassing them for a manual git clone means nothing creates that
+# directory for us -- without this, vcpkg_execute_required_process fails
+# immediately trying to chdir into a WORKING_DIRECTORY that doesn't exist
+# yet ("Error code: no such file or directory").
+file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/src")
 
 vcpkg_execute_required_process(
     COMMAND "${GIT}" clone
