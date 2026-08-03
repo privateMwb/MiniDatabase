@@ -19,3 +19,21 @@
 [submodule "libs/internal/PulseThreadPool"]
 	path = libs/internal/PulseThreadPool
 	url = https://github.com/privateMwb/PulseThreadPool
+[submodule "libs/external/VectorPro"]
+	path = libs/external/VectorPro
+	url = https://github.com/privateMwb/VectorPro.git
+[submodule "libs/external/HashMapPro"]
+	path = libs/external/HashMapPro
+	url = https://github.com/privateMwb/HashMapPro.git
+[submodule "libs/external/ThreadPoolPro"]
+	path = libs/external/ThreadPoolPro
+	url = https://github.com/privateMwb/ThreadPoolPro.git
+[submodule "libs/external/JsonParser"]
+	path = libs/external/JsonParser
+	url = https://github.com/privateMwb/JsonParser.git
+[submodule "libs/external/PoolAllocator"]
+	path = libs/external/PoolAllocator
+	url = https://github.com/privateMwb/PoolAllocator.git
+[submodule "libs/external/ArenaAllocator"]
+	path = libs/external/ArenaAllocator
+	url = https://github.com/privateMwb/ArenaAllocator.git
