@@ -39,7 +39,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # ============================================================================
 #
 # lib/internal/  -> libraries owned/maintained by this project (ArenaPro,
-#                    VectorPro, JsonPro, CachePro, StackPro, FunctionPro...)
+#                    VectorPro, JsonPro, MiniDB, StackPro, FunctionPro...)
 # lib/external/  -> third-party libraries pinned as submodules
 #
 # Both follow the same layout convention: <repo>/include/<LibName>/*.h
@@ -174,6 +174,7 @@ foreach(dir ${SUBMODULE_INCLUDE_DIRS})
         ${PROJECT_NAME}
         ${MINIDB_VISIBILITY}
         $<BUILD_INTERFACE:${dir}>
+        $<INSTALL_INTERFACE:include>
     )
 endforeach()
 
@@ -189,6 +190,7 @@ endforeach()
 # ON so local development and existing CI workflows are unaffected.
 option(BUILD_TESTS "Build the test suite" ON)
 option(BUILD_BENCHMARKS "Build the benchmark suite" ON)
+option(BUILD_REGRESSION "Build the regression benchmark tools" ON)
 option(BUILD_EXAMPLES "Build the examples suite" ON)
 
 enable_testing()
@@ -199,6 +201,10 @@ endif()
 
 if(BUILD_BENCHMARKS)
     add_subdirectory(benchmarks benchmarks_build)
+endif()
+
+if(BUILD_REGRESSION)
+    add_subdirectory(regression regression_build)
 endif()
 
 if(BUILD_EXAMPLES)
@@ -229,26 +235,14 @@ install(
     DESTINATION include
 )
 
-# Install each submodule's headers into the SAME include/ destination as
-# MiniDB's own headers above, rather than a separate location. MiniDB's
-# target only declares $<INSTALL_INTERFACE:include> once (on its own
-# target_include_directories call, further up) -- merging submodule
-# headers into that same installed include/ tree means that single
-# INSTALL_INTERFACE entry covers them too, with no extra per-submodule
-# genex needed.
-#
-# BUGFIX: previously, submodule include dirs were only ever wired in via
-# $<BUILD_INTERFACE:${dir}>, never $<INSTALL_INTERFACE:...>, and their
-# headers were never install()'d anywhere. This was invisible in-tree
-# (tests_build/benchmarks_build/regression_build consume MiniDB via
-# add_subdirectory, where BUILD_INTERFACE applies) but broke the first
-# real out-of-tree consumer -- an installed package found via
-# find_package(MiniDB CONFIG), e.g. via vcpkg/Conan -- with
-# "JsonPro/Json.h: No such file or directory" despite MiniDB itself
-# having installed and configured successfully.
+# Install each submodule's public headers alongside MiniDB's own, since
+# MiniDB's public headers (e.g. Record.h) include them directly (e.g.
+# <JsonPro/Json.h>). Every submodule follows the same
+# <repo>/include/<LibName>/*.h layout, so flattening each into the shared
+# include/ destination reproduces that layout without any renaming.
 foreach(dir ${SUBMODULE_INCLUDE_DIRS})
     install(
-        DIRECTORY "${dir}/"
+        DIRECTORY ${dir}/
         DESTINATION include
     )
 endforeach()

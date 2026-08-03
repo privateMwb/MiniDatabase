@@ -1,39 +1,8 @@
-vcpkg_find_acquire_program(GIT)
-
-# NOTE: not using vcpkg_from_github here. It downloads a GitHub archive
-# tarball, which -- unlike a real git clone -- never contains submodule
-# content and has no .git directory, so a follow-up
-# `git submodule update --init` has nothing to operate on and fails
-# outright (confirmed against other vcpkg ports hitting the same issue,
-# e.g. https://github.com/microsoft/vcpkg/issues/27004). MiniDB's own
-# internal libraries (ArenaPro, CachePro, HashMapPro, JsonPro, PoolPro,
-# ThreadPoolPro, VectorPro) live under libs/internal/ as real git
-# submodules and need an actual clone to materialize.
-#
-# Trade-off: this loses vcpkg_from_github's SHA512 archive-integrity
-# pinning (a plain `git clone` has no equivalent built-in check) --
-# acceptable here since this is a private overlay port for our own repo,
-# not a port intended for the public vcpkg registry.
-set(SOURCE_PATH "${CURRENT_BUILDTREES_DIR}/src/minidb-v1.0.0")
-file(REMOVE_RECURSE "${SOURCE_PATH}")
-# vcpkg's built-in fetch helpers (e.g. vcpkg_from_github) create
-# CURRENT_BUILDTREES_DIR/src themselves before running anything in it.
-# Bypassing them for a manual git clone means nothing creates that
-# directory for us -- without this, vcpkg_execute_required_process fails
-# immediately trying to chdir into a WORKING_DIRECTORY that doesn't exist
-# yet ("Error code: no such file or directory").
-file(MAKE_DIRECTORY "${CURRENT_BUILDTREES_DIR}/src")
-
-vcpkg_execute_required_process(
-    COMMAND "${GIT}" clone
-        --branch v1.0.0
-        --depth 1
-        --recurse-submodules
-        --shallow-submodules
-        https://github.com/privateMwb/MiniDatabase.git
-        "${SOURCE_PATH}"
-    WORKING_DIRECTORY "${CURRENT_BUILDTREES_DIR}/src"
-    LOGNAME "minidb-clone-${TARGET_TRIPLET}"
+vcpkg_from_github(
+    OUT_SOURCE_PATH SOURCE_PATH
+    REPO privateMwb/MiniDatabase
+    REF v1.0.0
+    SHA512 a11df9f11d8bb99c8c912536a39031b69a7a3e4f76e0fb2b296e0608ef93565e9d3d1507ca71449021f2c7658f92f85fe68c5cc996598c6c216899d418fcb9bc
 )
 
 set(VCPKG_PORT_NAME MiniDB)

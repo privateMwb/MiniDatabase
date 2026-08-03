@@ -1,5 +1,12 @@
 {
   "overlay-ports": [
-    "../vcpkg/ports"
+    "../vcpkg/ports",
+    "../../libs/internal/VectorPro/packaging/vcpkg/ports",
+    "../../libs/internal/JsonParser/packaging/vcpkg/ports",
+    "../../libs/internal/PoolAllocator/packaging/vcpkg/ports",
+    "../../libs/internal/HashMap/packaging/vcpkg/ports",
+    "../../libs/internal/LRUCache/packaging/vcpkg/ports",
+    "../../libs/internal/ArenaAllocator/packaging/vcpkg/ports",
+    "../../libs/internal/PulseThreadPool/packaging/vcpkg/ports"
   ]
 }
