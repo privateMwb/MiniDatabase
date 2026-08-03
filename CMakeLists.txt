@@ -25,70 +25,32 @@ project(
 # C++ Configuration
 # ============================================================================
 
-# Configure the C++ language standard.
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Place all executables directly in the build directory, regardless of
-# which subdirectory defines them (e.g. build/tests, build/benchmarks).
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # ============================================================================
 # External / Internal Submodule Libraries
 # ============================================================================
 #
-# lib/internal/  -> libraries owned/maintained by this project (ArenaPro,
-#                    VectorPro, JsonPro, MiniDB, StackPro, FunctionPro...)
+# lib/internal/  -> libraries owned/maintained by this project
 # lib/external/  -> third-party libraries pinned as submodules
 #
-# Both follow the same layout convention: <repo>/include/<LibName>/*.h
-# so we only need to glob each repo's include/ directory, not the files
-# themselves. This keeps #include paths short, e.g. <JsonPro/Json.h>
-# regardless of how deep the submodule sits in lib/.
+# Packaged dependencies are resolved through find_package().
+# Local development falls back to the checked-out submodules.
 #
-# Deliberately NOT using add_subdirectory() + target_link_libraries() here:
-# that requires every submodule's own CMakeLists.txt to define an
-# add_library() target whose name we'd have to guess correctly (folder
-# names and target/namespace names don't always match -- e.g. JsonParser/
-# vs JsonPro).
+# Mapping:
+#   arenapro      -> ArenaAllocator  -> ArenaPro
+#   cachepro      -> LRUCache        -> CachePro
+#   hashmappro    -> HashMap         -> HashMapPro
+#   jsonpro       -> JsonParser      -> JsonPro
+#   poolpro       -> PoolAllocator   -> PoolPro
+#   threadpoolpro -> PulseThreadPool -> ThreadPoolPro
+#   vectorpro     -> VectorPro       -> VectorPro
 #
-# IMPORTANT: not every submodule is actually header-only (e.g. JsonPro,
-# PulseThreadPool ship compiled .cpp files). Gluing in include/ dirs alone
-# gets you declarations without definitions -> undefined symbol errors at
-# link time. So alongside each include/ dir, we also glob the matching
-# src/ dir (same <repo>/src/<LibName>/*.cpp convention) and compile those
-# sources directly into MiniDB itself. Truly header-only submodules simply
-# contribute an empty src/ glob and cost nothing extra.
-#
-# CAVEAT: the glob-based approach above only works when the submodules are
-# actually checked out on disk (local dev, or CI jobs that clone with
-# --recurse-submodules). When MiniDB is packaged (e.g. via vcpkg), the port
-# fetches a plain GitHub archive tarball of this repo, which never contains
-# submodule content -- the glob then returns nothing and MiniDB's own .cpp
-# files fail to compile with unresolved <VectorPro/Vector.h>-style includes.
-#
-# In that packaged scenario, each internal dependency has already been
-# built and installed as its own real package one step earlier (vcpkg
-# installs arenapro, cachepro, hashmappro, jsonpro, poolpro, threadpoolpro,
-# vectorpro before building minidb itself), each exposing a
-# find_package()-able <port>-config.cmake. So for each internal lib we
-# try find_package() first, and only fall back to the local submodule glob
-# if that package isn't available. This covers both cases:
-#   - packaged (vcpkg/Conan): resolved via find_package()
-#   - local dev with submodules checked out: falls back to the glob,
-#     unchanged from before
-#
-# Mapping of vcpkg port name -> repo folder -> CMake project/target name
-# (folder and target names intentionally don't match the port name, so
-# this table has to be maintained by hand):
-#   arenapro      -> ArenaAllocator   -> ArenaPro
-#   cachepro      -> LRUCache         -> CachePro
-#   hashmappro    -> HashMap          -> HashMapPro
-#   jsonpro       -> JsonParser       -> JsonPro
-#   poolpro       -> PoolAllocator    -> PoolPro
-#   threadpoolpro -> PulseThreadPool  -> ThreadPoolPro
-#   vectorpro     -> VectorPro        -> VectorPro
+# ============================================================================
 
 set(MINIDB_INTERNAL_LIBS
     "arenapro|ArenaAllocator|ArenaPro"
@@ -104,106 +66,213 @@ set(SUBMODULE_INCLUDE_DIRS "")
 set(SUBMODULE_SOURCES "")
 set(SUBMODULE_LINK_LIBS "")
 
-foreach(entry ${MINIDB_INTERNAL_LIBS})
-    string(REPLACE "|" ";" entry ${entry})
+foreach(entry IN LISTS MINIDB_INTERNAL_LIBS)
+
+    string(REPLACE "|" ";" entry "${entry}")
+
     list(GET entry 0 port_name)
     list(GET entry 1 folder_name)
     list(GET entry 2 target_name)
 
-    # Try the vcpkg port name first (e.g. "jsonpro"), since that's what
-    # vcpkg's toolchain expects to find under share/<port_name>/. Some
-    # ports may instead export their config under the project's own
-    # PROJECT_NAME casing (e.g. "JsonPro" -> JsonProConfig.cmake) if their
-    # portfile.cmake never renamed it via vcpkg_cmake_config_fixup(), so
-    # fall back to trying the target name too before giving up on
-    # find_package() entirely and dropping to the local submodule glob.
     set(dep_resolved FALSE)
 
+    # ------------------------------------------------------------------------
+    # Try the vcpkg/Conan package name first.
+    # ------------------------------------------------------------------------
+
     find_package(${port_name} CONFIG QUIET)
+
     if(${port_name}_FOUND)
-        message(STATUS "Resolved ${port_name} via find_package(${port_name}) -> ${target_name}::${target_name}")
-        list(APPEND SUBMODULE_LINK_LIBS ${target_name}::${target_name})
-        set(dep_resolved TRUE)
-    else()
-        find_package(${target_name} CONFIG QUIET)
-        if(${target_name}_FOUND)
-            message(STATUS "Resolved ${port_name} via find_package(${target_name}) -> ${target_name}::${target_name}")
-            list(APPEND SUBMODULE_LINK_LIBS ${target_name}::${target_name})
+
+        if(TARGET ${target_name}::${target_name})
+
+            message(STATUS
+                "Resolved ${port_name} -> ${target_name}::${target_name}"
+            )
+
+            list(APPEND SUBMODULE_LINK_LIBS
+                ${target_name}::${target_name}
+            )
+
             set(dep_resolved TRUE)
+
+        else()
+
+            message(WARNING
+                "Package '${port_name}' was found, but target "
+                "'${target_name}::${target_name}' does not exist."
+            )
+
         endif()
+
     endif()
 
+    # ------------------------------------------------------------------------
+    # Try the CMake project/target name.
+    # ------------------------------------------------------------------------
+
     if(NOT dep_resolved)
-        set(repo_root "${CMAKE_CURRENT_SOURCE_DIR}/libs/internal/${folder_name}")
-        set(include_dir "${repo_root}/include")
+
+        find_package(${target_name} CONFIG QUIET)
+
+        if(${target_name}_FOUND)
+
+            if(TARGET ${target_name}::${target_name})
+
+                message(STATUS
+                    "Resolved ${port_name} via ${target_name} -> "
+                    "${target_name}::${target_name}"
+                )
+
+                list(APPEND SUBMODULE_LINK_LIBS
+                    ${target_name}::${target_name}
+                )
+
+                set(dep_resolved TRUE)
+
+            else()
+
+                message(WARNING
+                    "Package '${target_name}' was found, but target "
+                    "'${target_name}::${target_name}' does not exist."
+                )
+
+            endif()
+
+        endif()
+
+    endif()
+
+    # ------------------------------------------------------------------------
+    # Local submodule fallback.
+    # ------------------------------------------------------------------------
+
+    if(NOT dep_resolved)
+
+        set(repo_root
+            "${CMAKE_CURRENT_SOURCE_DIR}/libs/internal/${folder_name}"
+        )
+
+        set(include_dir
+            "${repo_root}/include"
+        )
+
         if(EXISTS "${include_dir}")
-            message(STATUS "find_package(${port_name}) not found; using local submodule at ${repo_root}")
-            list(APPEND SUBMODULE_INCLUDE_DIRS "${include_dir}")
+
+            message(STATUS
+                "find_package(${port_name}) not found; "
+                "using local submodule at ${repo_root}"
+            )
+
+            list(APPEND SUBMODULE_INCLUDE_DIRS
+                "${include_dir}"
+            )
 
             file(GLOB_RECURSE repo_sources CONFIGURE_DEPENDS
                 "${repo_root}/src/*.cpp"
             )
+
             if(repo_sources)
-                message(STATUS "Compiling submodule sources from: ${repo_root}/src")
-                list(APPEND SUBMODULE_SOURCES ${repo_sources})
+
+                message(STATUS
+                    "Compiling submodule sources from: "
+                    "${repo_root}/src"
+                )
+
+                list(APPEND SUBMODULE_SOURCES
+                    ${repo_sources}
+                )
+
             endif()
+
         else()
+
             message(WARNING
-                "Could not resolve internal dependency '${port_name}': no installed "
-                "package found via find_package(), and no submodule checked out at "
-                "${repo_root}. Run 'git submodule update --init --recursive', or "
-                "ensure ${port_name} is available via vcpkg/Conan."
+                "Could not resolve internal dependency '${port_name}': "
+                "no installed package found via find_package(), and no "
+                "submodule checked out at ${repo_root}. Run "
+                "'git submodule update --init --recursive', or ensure "
+                "${port_name} is available via vcpkg/Conan."
             )
+
         endif()
+
     endif()
+
 endforeach()
 
-# Third-party submodules under libs/external/ are unaffected by the above --
-# still resolved via local glob only (extend this the same way if any of
-# them ever get packaged independently).
+# ============================================================================
+# External Third-Party Submodules
+# ============================================================================
+
 file(GLOB EXTERNAL_LIB_INCLUDE_DIRS CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/libs/external/*/include"
 )
-list(APPEND SUBMODULE_INCLUDE_DIRS ${EXTERNAL_LIB_INCLUDE_DIRS})
 
-foreach(include_dir ${EXTERNAL_LIB_INCLUDE_DIRS})
-    get_filename_component(repo_root "${include_dir}" DIRECTORY)
+list(APPEND SUBMODULE_INCLUDE_DIRS
+    ${EXTERNAL_LIB_INCLUDE_DIRS}
+)
+
+foreach(include_dir IN LISTS EXTERNAL_LIB_INCLUDE_DIRS)
+
+    get_filename_component(
+        repo_root
+        "${include_dir}"
+        DIRECTORY
+    )
+
     file(GLOB_RECURSE repo_sources CONFIGURE_DEPENDS
         "${repo_root}/src/*.cpp"
     )
+
     if(repo_sources)
-        message(STATUS "Compiling submodule sources from: ${repo_root}/src")
-        list(APPEND SUBMODULE_SOURCES ${repo_sources})
+
+        message(STATUS
+            "Compiling submodule sources from: ${repo_root}/src"
+        )
+
+        list(APPEND SUBMODULE_SOURCES
+            ${repo_sources}
+        )
+
     endif()
+
 endforeach()
 
-foreach(dir ${SUBMODULE_INCLUDE_DIRS})
-    message(STATUS "Include: ${dir}")
+# Display resolved local include directories.
+
+foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
+
+    message(STATUS
+        "Include: ${dir}"
+    )
+
 endforeach()
 
 # ============================================================================
-# MiniDB Library (auto: header-only INTERFACE if no .cpp files, STATIC otherwise)
+# MiniDB Library
+# ============================================================================
+#
+# Automatically creates:
+#   STATIC    -> when .cpp sources exist
+#   INTERFACE -> when no .cpp sources exist
+#
 # ============================================================================
 
-# Collect any library source files under src/MiniDB/.
-# CONFIGURE_DEPENDS makes CMake re-run this glob on reconfigure, so
-# adding sources to a previously header-only project is picked up
-# automatically on the next cmake run -- no manual editing required.
 file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS
     "${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}/*.cpp"
 )
 
-# Fold in any submodule sources so a submodule that isn't header-only
-# (e.g. JsonPro, PulseThreadPool) still gets compiled and linked, and so
-# MiniDB correctly becomes a STATIC target rather than INTERFACE the
-# moment any of them has real .cpp files, even if MiniDB itself doesn't.
-list(APPEND LIB_SOURCES ${SUBMODULE_SOURCES})
+list(APPEND LIB_SOURCES
+    ${SUBMODULE_SOURCES}
+)
 
 if(LIB_SOURCES)
-    # Sources found (Database.cpp, Table.cpp, Page.cpp, Record.cpp,
-    # QueryEngine.cpp, Concurrency.cpp, Serializer.cpp, StorageEngine.cpp,
-    # etc., plus any compiled submodule sources): build a real compiled
-    # static library.
+
+    # ------------------------------------------------------------------------
+    # Compiled library
+    # ------------------------------------------------------------------------
+
     add_library(
         ${PROJECT_NAME}
         STATIC
@@ -225,15 +294,30 @@ if(LIB_SOURCES)
 
     set(MINIDB_VISIBILITY PUBLIC)
 
+    # Link packaged dependencies.
+    #
+    # For example:
+    #
+    #   JsonPro::JsonPro
+    #
+    # supplies JsonPro's include directories and library to MiniDB.
+
     if(SUBMODULE_LINK_LIBS)
+
         target_link_libraries(
             ${PROJECT_NAME}
             PUBLIC
                 ${SUBMODULE_LINK_LIBS}
         )
+
     endif()
+
 else()
-    # No sources: header-only library, INTERFACE target.
+
+    # ------------------------------------------------------------------------
+    # Header-only library
+    # ------------------------------------------------------------------------
+
     add_library(
         ${PROJECT_NAME}
         INTERFACE
@@ -255,77 +339,103 @@ else()
     set(MINIDB_VISIBILITY INTERFACE)
 
     if(SUBMODULE_LINK_LIBS)
+
         target_link_libraries(
             ${PROJECT_NAME}
             INTERFACE
                 ${SUBMODULE_LINK_LIBS}
         )
+
     endif()
+
 endif()
 
-# Expose each submodule include directory individually.
-# NOTE: Do NOT interpolate SUBMODULE_INCLUDE_DIRS directly inside a
-# generator expression (e.g. $<BUILD_INTERFACE:${SUBMODULE_INCLUDE_DIRS}>).
-# It's a semicolon-separated list, and CMake's command parser splits on
-# semicolons before the genex is evaluated, corrupting the first entry.
-# Looping and wrapping one path per call keeps each genex well-formed.
-#
-# MINIDB_VISIBILITY matches whichever branch above actually ran: PUBLIC
-# for the compiled STATIC case, INTERFACE for the header-only case (an
-# INTERFACE target cannot use PUBLIC/PRIVATE).
-foreach(dir ${SUBMODULE_INCLUDE_DIRS})
+# ============================================================================
+# Expose Local Submodule Include Directories
+# ============================================================================
+
+foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
+
     target_include_directories(
         ${PROJECT_NAME}
         ${MINIDB_VISIBILITY}
         $<BUILD_INTERFACE:${dir}>
         $<INSTALL_INTERFACE:include>
     )
+
 endforeach()
 
 # ============================================================================
 # Subdirectories
 # ============================================================================
 
-# tests/, benchmarks/, and examples/ each own their own CMakeLists.txt
-# and define their own executable target(s) from their own source layout
-# (e.g. tests/suite/concurrency/*.cpp, tests/suite/integration/*.cpp, ...).
-# Consumers (e.g. vcpkg) should disable these -- only the library itself
-# needs to be configured/installed for downstream projects. Defaults to
-# ON so local development and existing CI workflows are unaffected.
-option(BUILD_TESTS "Build the test suite" ON)
-option(BUILD_BENCHMARKS "Build the benchmark suite" ON)
-option(BUILD_REGRESSION "Build the regression benchmark tools" ON)
-option(BUILD_EXAMPLES "Build the examples suite" ON)
+option(BUILD_TESTS
+    "Build the test suite"
+    ON
+)
+
+option(BUILD_BENCHMARKS
+    "Build the benchmark suite"
+    ON
+)
+
+option(BUILD_REGRESSION
+    "Build the regression benchmark tools"
+    ON
+)
+
+option(BUILD_EXAMPLES
+    "Build the examples suite"
+    ON
+)
 
 enable_testing()
 
 if(BUILD_TESTS)
-    add_subdirectory(tests tests_build)
+
+    add_subdirectory(
+        tests
+        tests_build
+    )
+
 endif()
 
 if(BUILD_BENCHMARKS)
-    add_subdirectory(benchmarks benchmarks_build)
+
+    add_subdirectory(
+        benchmarks
+        benchmarks_build
+    )
+
 endif()
 
 if(BUILD_REGRESSION)
-    add_subdirectory(regression regression_build)
+
+    add_subdirectory(
+        regression
+        regression_build
+    )
+
 endif()
 
 if(BUILD_EXAMPLES)
-    add_subdirectory(examples examples_build)
+
+    add_subdirectory(
+        examples
+        examples_build
+    )
+
 endif()
 
 # ============================================================================
 # Installation
 # ============================================================================
 
-# Install the MiniDB target and export it for downstream projects.
 install(
     TARGETS ${PROJECT_NAME}
     EXPORT ${PROJECT_NAME}Targets
 )
 
-# Install the exported CMake targets.
 install(
     EXPORT ${PROJECT_NAME}Targets
     FILE ${PROJECT_NAME}Targets.cmake
@@ -333,22 +443,23 @@ install(
     DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
-# Install the public header files.
 install(
     DIRECTORY include/
     DESTINATION include
 )
 
-# Install each submodule's public headers alongside MiniDB's own, since
-# MiniDB's public headers (e.g. Record.h) include them directly (e.g.
-# <JsonPro/Json.h>). Every submodule follows the same
-# <repo>/include/<LibName>/*.h layout, so flattening each into the shared
-# include/ destination reproduces that layout without any renaming.
-foreach(dir ${SUBMODULE_INCLUDE_DIRS})
+# Install local submodule headers when using local submodules.
+#
+# Packaged dependencies are already installed by their own vcpkg ports,
+# so their headers do not need to be copied into MiniDB's package.
+
+foreach(dir IN LISTS SUBMODULE_INCLUDE_DIRS)
+
     install(
         DIRECTORY ${dir}/
         DESTINATION include
     )
+
 endforeach()
 
 # ============================================================================
@@ -357,21 +468,18 @@ endforeach()
 
 include(CMakePackageConfigHelpers)
 
-# Generate the package configuration file.
 configure_package_config_file(
     cmake/${PROJECT_NAME}Config.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
     INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
 )
 
-# Generate the package version file.
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
     VERSION ${PROJECT_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 
-# Install the package configuration files.
 install(
     FILES
         ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
