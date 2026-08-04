@@ -34,9 +34,6 @@
   <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/packaging.yml">
     <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/packaging.yml/badge.svg" alt="Packaging">
   </a>
-  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/submodule-update.yml">
-    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/submodule-update.yml/badge.svg" alt="Submodule Update">
-  </a>
 </p>
 
 <p align="center">
