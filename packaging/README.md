@@ -58,6 +58,17 @@ overrides below can be dropped entirely off-device.
   instead (see step 1 below) — no need to cut a release just to verify
   packaging still works.
 
+- **A downloaded release tarball never contains submodule content**
+  — same reason `portfile.cmake` and `conanfile.py` can't just fetch
+  one directly (see their own comments). `libs/internal/` (containing
+  `ArenaAllocator`, `HashMap`, `JsonParser`, `LRUCache`,
+  `PoolAllocator`, `PulseThreadPool`, `VectorPro`) would extract
+  empty, failing later at compile time with a confusing "header not
+  found" instead of here. If testing against a tarball, either fetch
+  each submodule separately (mirroring the portfile's approach) or
+  just use the local repo checkout below and run
+  `git submodule update --init --recursive` first.
+
 - **`CMAKE_BUILD_TYPE` matters even without a toolchain file** —
   Conan's `CMakeDeps`-generated `INTERFACE_INCLUDE_DIRECTORIES` are
   gated behind `$<$<CONFIG:Release>:...>` generator expressions. If
@@ -71,7 +82,14 @@ overrides below can be dropped entirely off-device.
 **1. Install to a staging prefix**, using the same disable flags
 `portfile.cmake` does. Against a release tarball, `cd` into it first
 (see the quirks note above on its folder name); against local source,
-just start from the repo root:
+just start from the repo root. Either way, this bypasses
+`portfile.cmake`'s own fetch logic entirely, so `libs/internal/`'s
+submodules need to already be populated — run this first if they
+aren't:
+
+```bash
+git submodule update --init --recursive
+```
 
 ```bash
 cmake -B build-install \
@@ -149,6 +167,12 @@ package files side by side, and a later `find_package()` call could
 silently resolve the wrong one.
 
 ## Verifying the Conan recipe
+
+Unlike the vcpkg local-source shortcut above, `conan create` always
+runs `conanfile.py`'s own `source()` step, which clones fresh from
+GitHub and initializes submodules itself — no manual
+`git submodule update` needed here, even if your local checkout's
+submodules are stale or missing.
 
 **1. Build and package the recipe.** The `os`/`libcxx` overrides are
 the Termux-specific ones from the quirks section above — drop them

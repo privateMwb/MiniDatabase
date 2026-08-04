@@ -189,6 +189,7 @@ endforeach()
 # ON so local development and existing CI workflows are unaffected.
 option(BUILD_TESTS "Build the test suite" ON)
 option(BUILD_BENCHMARKS "Build the benchmark suite" ON)
+option(BUILD_REGRESSION "Build the regression test" ON)
 option(BUILD_EXAMPLES "Build the examples suite" ON)
 
 enable_testing()
@@ -199,6 +200,10 @@ endif()
 
 if(BUILD_BENCHMARKS)
     add_subdirectory(benchmarks benchmarks_build)
+endif()
+
+if(BUILD_REGRESSION)
+    add_subdirectory(regression regression_build)
 endif()
 
 if(BUILD_EXAMPLES)
