@@ -72,23 +72,32 @@ class Conan(ConanFile):
         # NOTE: not using conan.tools.files.get() with a GitHub tarball URL
         # here. Like vcpkg_from_github, that downloads a plain archive with
         # no .git directory and no submodule content -- MiniDB's own
-        # internal libraries (ArenaPro, CachePro, HashMapPro, JsonPro,
-        # PoolPro, ThreadPoolPro, VectorPro) live under libs/internal/ as
-        # real git submodules, which need an actual clone + submodule
-        # checkout to materialize (a bare `get()` would silently leave
-        # those directories empty, failing later at compile time with a
-        # much more confusing "header not found" error instead of here).
+        # internal libraries (ArenaAllocator, LRUCache, HashMap, JsonParser,
+        # PoolAllocator, PulseThreadPool, VectorPro) live under
+        # libs/internal/ as real git submodules, which need an actual
+        # clone + submodule checkout to materialize (a bare `get()` would
+        # silently leave those directories empty, failing later at compile
+        # time with a much more confusing "header not found" error instead
+        # of here).
+        #
+        # `git clone --branch` only accepts branches/tags, not arbitrary
+        # commit SHAs, so pinning to a specific commit needs the
+        # init/fetch/checkout sequence below instead. Once checked out,
+        # `submodule update` reads .gitmodules from the real clone and
+        # resolves each submodule's own pinned commit automatically --
+        # no per-submodule hash bookkeeping needed here, unlike the vcpkg
+        # port (which has to fetch submodule archives manually since
+        # GitHub tarballs never include them).
         #
         # Trade-off: this loses the sha256 archive-integrity pin get()
         # would otherwise give -- acceptable for a private recipe against
         # our own repo, not a package intended for conan-center.
         sources = self.conan_data["sources"][self.version]
         git = Git(self)
-        git.clone(
-            url=sources["url"],
-            target=".",
-            args=["--branch", sources["tag"], "--depth", "1"],
-        )
+        git.run("init .")
+        git.run(f"remote add origin {sources['url']}")
+        git.run(f"fetch --depth 1 origin {sources['commit']}")
+        git.run("checkout FETCH_HEAD")
         git.run("submodule sync --recursive")
         git.run("submodule update --init --recursive")
 

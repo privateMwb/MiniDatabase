@@ -128,19 +128,34 @@ print("✓ Updated conanfile.py")
 
 conandata = recipe_dir / "conandata.yml"
 
-if args.ref:
-    conandata_url = f"https://github.com/{repo}/archive/{main_ref}.tar.gz"
+if args.submodule:
+    # This package's conanfile.py does a real git clone + submodule
+    # init (see its source() method) rather than fetching a tarball,
+    # since GitHub archives never include submodule content. conandata
+    # needs a clonable git URL and the commit to pin, not a tarball
+    # URL/sha256.
+    conandata.write_text(
+f'''sources:
+  "{version}":
+    url: "https://github.com/{repo}.git"
+    commit: "{main_ref}"
+''',
+encoding="utf-8"
+    )
 else:
-    conandata_url = f"https://github.com/{repo}/archive/refs/tags/{main_ref}.tar.gz"
+    if args.ref:
+        conandata_url = f"https://github.com/{repo}/archive/{main_ref}.tar.gz"
+    else:
+        conandata_url = f"https://github.com/{repo}/archive/refs/tags/{main_ref}.tar.gz"
 
-conandata.write_text(
+    conandata.write_text(
 f'''sources:
   "{version}":
     url: "{conandata_url}"
     sha256: "{sha256}"
 ''',
 encoding="utf-8"
-)
+    )
 
 print("✓ Updated conandata.yml")
 
