@@ -1,267 +1,118 @@
-<!--
-  Retargeting: replace every <angle-bracket> placeholder below. The
-  badge URLs, CI workflow names, and project-structure tree already
-  match this skeleton's actual layout — only the owner/repo and
-  project name need swapping in those. Features, Quick Start, and
-  Benchmarks are marked as sections to write fresh each time; don't
-  invent numbers or content to fill them.
--->
+# MiniDB v1.0.0
 
-# <ProjectName>
+The first stable release of **MiniDB**, an embedded C++ database engine built on this project's own allocator, container, concurrency, and JSON libraries.
 
-<p align="center">
-  <img src="https://img.shields.io/github/v/release/<owner>/<repo>?style=for-the-badge&logo=github&color=yellow" alt="Version">
-  <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="License - MIT">
-  <img src="https://img.shields.io/badge/C%2B%2B-23-blue?style=for-the-badge&logo=c%2B%2B" alt="C++ - 23">
-</p>
+## Highlights
 
-<p align="center">
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/build.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/build.yml/badge.svg" alt="Build and Test">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/benchmark.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/benchmark.yml/badge.svg" alt="Benchmarks">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/coverage.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/coverage.yml/badge.svg" alt="Coverage">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/sanitizers.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/sanitizers.yml/badge.svg" alt="Sanitizers">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/clang-tidy.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/clang-tidy.yml/badge.svg" alt="Clang Tidy">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/clang-format.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/clang-format.yml/badge.svg" alt="Clang Format">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/docs.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/docs.yml/badge.svg" alt="Documentation">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/release.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/release.yml/badge.svg" alt="Release">
-  </a>
-  <a href="https://github.com/<owner>/<repo>/actions/workflows/packaging.yml">
-    <img src="https://github.com/<owner>/<repo>/actions/workflows/packaging.yml/badge.svg" alt="Packaging">
-  </a>
-</p>
+- In-process, embedded storage engine — no server, no connection, no network protocol.
+- Schema-validated records: `STRING`, `INT`, `DOUBLE`, and `BOOL` columns, each nullable or required.
+- Full CRUD on tables: `insertRecord()`, `getRecord()`, `updateRecord()`, `deleteRecord()`.
+- Fixed-slot page storage with true O(1) random-access disk I/O by page id.
+- LRU-backed page cache (buffer pool) with explicit `fetchPage()` / `flushPage()` / `evictPage()` control.
+- Atomic whole-database persistence: `save()`/`load()` via temp-file-plus-rename, never a partial write.
+- All-or-nothing load semantics — a corrupt or truncated file can't leave the database half-replaced.
+- `QueryEngine`: predicate filtering, sorting, result limiting, and `count`/`sum`/`avg`/`max`/`min` aggregates.
+- `Serializer`: table- and database-level JSON export/import, independent of the primary save/load path.
+- `Concurrency`: thread-pool-backed parallel save, load, index rebuild, and export across every table in a database.
+- Move-only `Page`/`Table`/`Database` — storage ownership can't be silently duplicated by an accidental copy.
+- Built directly on `VectorPro`, `JsonPro`, `PoolPro`, `HashMapPro`, `CachePro`, `ArenaPro`, and `ThreadPoolPro`.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/GCC-support-B46F1B?style=flat&logo=gnu" alt="GCC - support">
-  <img src="https://img.shields.io/badge/Clang-support-045891?style=flat&logo=llvm" alt="Clang - support">
-  <img src="https://img.shields.io/badge/MSVC-support-5C2D91?style=flat" alt="MSVC - support">
-  <img src="https://img.shields.io/badge/AppleClang-support-000000?style=flat&logo=apple" alt="AppleClang - support">
-</p>
+## Performance
 
+The storage and query paths are designed around avoiding unnecessary I/O, allocation, and scanning:
 
-<!-- One or two sentences: what this is, and the two or three things
-     that make it worth using over the obvious alternative. This is
-     the only line most visitors read — make it specific, not generic
-     marketing copy. -->
-<ProjectName> is a <one-line description of what it does and why>.
+- Fixed `PAGE_SIZE` slots give every page a true `id * PAGE_SIZE` disk offset — no directory scan to locate a page.
+- The LRU page cache avoids re-reading and re-parsing hot pages from disk.
+- Pool-allocated records within a page avoid per-record heap churn on insert.
+- `O(1)` `PageID → Page*` and `TableID → Table*` indexes replace what were originally linear scans.
+- `toJson()`/`fromJson()` build and consume the in-memory tree directly — no redundant dump-then-reparse round trip at each nesting level (record → page → table → database).
+- Atomic saves cost one `fsync` and one `rename`, not one per record.
+- Parallel save/load/rebuildIndex/export share a single thread pool across every table in a database.
 
-## 📑 Table of Contents
+## Benchmarks
 
-- [Features](#features)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Project Structure](#project-structure)
-- [Development](#development)
-- [Benchmarks](#benchmarks)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
-- [Changelog](#changelog)
-- [License](#license)
+Unlike `CachePro`, MiniDB has no natural drop-in standard-library
+equivalent to benchmark against (there's no `std::` embedded database) --
+these are absolute measurements, not a comparison. Figures below are at
+1M iterations; full results across every subsystem and scale:
+`benchmarks/results/v1_0_0.md`.
 
-## <a id="features"></a>✨ Features
+| Test                                      | 1M       |
+|--------------------------------------------|----------|
+| Table GetRecord (single page)               | 72.69 ms |
+| Table GetRecord (multi page, 1000 pages)    | 22.28 ms |
+| StorageEngine FetchPage (cache hit)         | 53.92 ms |
+| StorageEngine FetchPage (cache miss)        | 5.22 s   |
+| Database GetTable (200 tables)              | 21.16 ms |
+| FileIO WriteFileAtomic (100 iterations)     | 43.11 ms |
+| Concurrency SaveAllTablesParallel (100 iterations) | 169.05 ms |
 
-<!-- Write these fresh per project — they should name the actual
-     design decisions that make this implementation different, the
-     way JsonPro's called out std::variant-backed storage and
-     std::to_chars-based serialization rather than just "it's fast."
-     A bullet that could describe any library in this category is a
-     bullet worth cutting. -->
+A few things worth calling out honestly:
 
-- **<Specific design decision>** — <what it is, why it matters, and
-  what it avoids compared to the obvious naive approach>.
-- **<Another concrete decision>** — <same pattern>.
+- **The page cache is doing real work**: a `FetchPage` hit is roughly
+  **~100x faster** than a miss at 1M (53.92 ms vs 5.22 s). That gap is
+  the entire argument for the buffer pool existing.
+- **`Table GetRecord` is actually *faster* per lookup when a table spans
+  more pages** (22.28 ms for a 1000-page table vs 72.69 ms for a
+  single-page table, both at 1M) -- this looks counterintuitive but
+  reflects the O(1) `pageIndex` lookup doing its job: page count stops
+  being a cost variable in the lookup path at all.
+- **`QueryEngine`'s sorted select is the single most expensive operation
+  measured**, and by a wide margin -- `Select Sorted (1000 pages)` at 100
+  iterations takes 7.30 s versus 409.38 ms for the equivalent unsorted
+  `Select Eq` at the same scale, roughly a 17x gap. Expected, given
+  `std::sort`'s O(n log n) versus a linear predicate scan -- but worth
+  knowing explicitly before running a sort over a large result set on a
+  latency-sensitive path.
 
-## <a id="requirements"></a>📋 Requirements
+## Testing
 
-- A C++23-conformant compiler (tested: Clang, GCC, MSVC)
-- CMake 3.20+
+The project includes a comprehensive test suite covering:
 
-## <a id="installation"></a>📦 Installation
+- Unit-level correctness for `Record`, `Page`, `Table`, `Database`, `QueryEngine`, and `FileIO` in isolation
+- Cross-component integration: full save/load round trips, `Serializer` export/import, `StorageEngine` per-page I/O against real files, and multi-table/multi-page lifecycle scenarios
+- Regression coverage pinning every bug fixed during development (sort correctness, id-collision safety, schema validation edge cases, atomic-write and load-atomicity guarantees, dirty-page eviction safety, and more) so none of them can silently return
+- Contract-level invariants: id monotonicity, move-only ownership, serialization-path equivalence, and consistent `Status` reporting with no silent data loss
+- Concurrency correctness: parallel save/load/export/rebuildIndex under the shared thread pool, including error-propagation and partial-failure behavior
 
-**From source:**
+## Code Coverage
 
-```bash
-git clone https://github.com/<owner>/<repo>.git
-cd <repo>
-cmake -B build \
-  -DBUILD_TESTS=OFF \
-  -DBUILD_BENCHMARKS=OFF \
-  -DBUILD_TOOLS=OFF \
-  -DBUILD_EXAMPLES=OFF
-cmake --install build
-```
+The current test suite achieves:
 
-Then, in your own `CMakeLists.txt`:
+- **90.4% line coverage** (849 / 939 lines)
+- **90.8% function coverage** (139 / 153 functions)
 
-```cmake
-find_package(<ProjectName> CONFIG REQUIRED)
-target_link_libraries(your_target PRIVATE <ProjectName>::<ProjectName>)
-```
+| Directory | Line Coverage | Function Coverage |
+|-----------|---------------|--------------------|
+| `Core`    | 92.1% (481/522) | 94.5% (86/91) |
+| `Engine`  | 89.6% (294/328) | 84.5% (49/58) |
+| `Common`  | 83.1% (74/89)   | 100.0% (4/4)  |
 
-> vcpkg and Conan packages are built and verified (recipe in
-> `packaging/recipes/<name>/`, port in `packaging/vcpkg/ports/<name>/`),
-> but not yet published to the public registries. This section will be
-> updated once they are.
+Coverage reports exclude test infrastructure and submodule dependencies
+(`libs/internal/`), focusing on MiniDB's own implementation.
+`Engine`'s function coverage is the softest spot of the three -- worth a
+look before the next release to see which functions there aren't
+exercised yet.
 
-## <a id="quick-start"></a>🚀 Quick Start
+## Continuous Integration
 
-<!-- 2–3 short, runnable examples: the most common single call, one
-     example that builds something up rather than just reading it,
-     and error handling if the library has anything like an exception
-     hierarchy worth showing. Real code that compiles against the
-     actual API — not the placeholder below. -->
+Automated builds, tests, and checks are configured across:
 
-```cpp
-#include <ProjectName/Header.h>
+- Multi-compiler builds (GCC, Clang, and MSVC configurations)
+- ASan/UBSan and a separate TSan job — the latter specifically exercising `Concurrency`'s real thread-pool usage
+- `clang-format` and `clang-tidy` checks on every push and pull request
+- Code coverage collection, with submodule and test-infrastructure sources excluded from the measured result
+- Conan and vcpkg packaging, each verified with a real consumer smoke test against the built package
+- A weekly submodule-update workflow that bumps all 7 internal dependencies, builds, and runs the full test suite before ever proposing the change — broken bumps are caught before merge, not after
 
-int main() {
-    // ...
-}
-```
+*(Exact compiler/configuration matrix should be double-checked against `build.yml`'s current contents before publishing — noting here so it isn't asserted without confirmation.)*
 
-## <a id="project-structure"></a>🗂️ Project Structure
+## Release
 
-```
-<repo>/
-├── include/
-│   └── <ProjectName>/
-│       ├── ...
-│
-├── src/
-│   └── <ProjectName>/
-│       ├── ...
-│
-├── tests/
-│   ├── support/
-│   ├── suite/
-│   ├── test_main.cpp
-│   └── CMakeLists.txt
-│
-├── benchmarks/
-│   ├── support/
-│   ├── suite/
-│   ├── baselines/
-│   ├── bench_main.cpp
-│   └── CMakeLists.txt
-│
-├── examples/
-│   ├── support/
-│   ├── suite/
-│   ├── example_main.cpp
-│   └── CMakeLists.txt
-│
-├── tools/
-│   ├── regression/
-│   └── CMakeLists.txt
-│
-├── packaging/
-│   ├── recipes/
-│   │   └── <name>/
-│   ├── vcpkg/
-│   │   └── ports/
-│   └── vcpkg-smoke-test/
-│
-├── scripts/
-│   └── update_package_files.py
-│
-├── .github/
-│   └── workflows/
-│
-├── cmake/
-│   └── <ProjectName>Config.cmake.in
-│
-├── docs/
-│   ├── Doxyfile
-│   └── README.md
-│
-├── .gitignore
-├── CMakeLists.txt
-├── README.md
-├── RETARGETING.md
-└── LICENSE
-```
+This release represents the first stable version of MiniDB and establishes its initial storage engine, query engine, concurrency model, and cross-platform build and packaging pipeline.
 
-## <a id="development"></a>🛠️ Development
+## Installation
 
-The from-source install above builds the library only. To work on
-<ProjectName> itself — running tests, benchmarks, or the regression
-tool — build with everything enabled (the default):
+Clone the repository and integrate MiniDB into your C++ project using the provided CMake configuration.
 
-```bash
-cmake -B build
-cmake --build build
-```
-
-**Run the test suite:**
-
-```bash
-ctest --test-dir build
-```
-
-**Run benchmarks and check for regressions:**
-
-```bash
-./build/benchmarks
-./build/regression                  # latest baseline vs. benchmarks/results/benchmark_results.json
-./build/regression v1.2.0           # a specific baseline vs. current
-./build/regression v1.2.0 v1.4.0    # two baselines against each other
-```
-
-`regression` picks the latest baseline by semantic version (`v1.10.0`
-correctly outranks `v1.9.0`), not alphabetical filename order, and
-auto-names its output (`regression_v1.2.0_vs_current.md`/`.json`, etc.).
-
-See [docs/README.md](docs/README.md) for notes on verifying the vcpkg
-port and Conan recipe locally.
-
-## <a id="benchmarks"></a>📊 Benchmarks
-
-<!-- Real measured numbers only — from an actual benchmarks/baselines/
-     snapshot, never invented. If there's nothing to compare against
-     yet, say so plainly instead of leaving a fabricated table here. -->
-
-Measured against `<reference-implementation>`, same build, at 10K /
-100K / 1M iterations (`benchmarks/baselines/<version>.json` has the
-full dataset).
-
-| Operation | <ProjectName> | <reference-implementation> | Difference |
-|---|---|---|---|
-| `<operation>` | `<time>` | `<time>` | `<±N%>` |
-
-## <a id="documentation"></a>📖 Documentation
-
-Full API reference, generated with Doxygen from `docs/Doxyfile`:
-
-**https://<owner>.github.io/<repo>/**
-
-## <a id="contributing"></a>🤝 Contributing
-
-Issues and pull requests are welcome. Before submitting a PR:
-
-- Run the test suite (`ctest --test-dir build`)
-- If you're changing a hot path, run `./build/regression` and mention
-  the results in your PR description
-
-## <a id="changelog"></a>📝 Changelog
-
-See the [Releases](https://github.com/<owner>/<repo>/releases)
-page for version history and release notes.
-
-## <a id="license"></a>📄 License
-
-MIT — see [LICENSE](LICENSE) for details.
+See the project documentation for build instructions, API usage, and integration details.
