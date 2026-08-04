@@ -201,8 +201,8 @@ inline void setHeader(std::string_view header) {
     borderLine();
 
     markdown_buffer() += "\n## " + prettify(header) + "\n\n";
-    markdown_buffer() += "| Test | Iteration | " + custom + " | " + standard + " | Δ |\n";
-    markdown_buffer() += "|---|---|---|---|---|\n";
+    markdown_buffer() += "| Test | Iteration | " + custom;
+    markdown_buffer() += "|---|---|---|\n";
 }
 
 // Prints one merged comparison row: name, iteration tier, both durations,
