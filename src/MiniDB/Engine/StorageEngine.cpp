@@ -20,8 +20,8 @@
 //
 // ============================================================
 
-#include <MiniDB/Engine/StorageEngine.h>
 #include <MiniDB/Common/FileIO.h>
+#include <MiniDB/Engine/StorageEngine.h>
 
 #include <cstdint>
 
@@ -56,9 +56,7 @@ namespace MiniDB::Engine {
 //  Section 1 — Constructor
 // ============================================================
 StorageEngine::StorageEngine(const std::string& dataDirectory)
-    : dataDirectory(dataDirectory)
-    , pageCache(DBConstants::LRU_CACHE_CAP) {}
-
+    : dataDirectory(dataDirectory), pageCache(DBConstants::LRU_CACHE_CAP) {}
 
 // ============================================================
 //  Section 2 — Whole-Database Persistence
@@ -73,7 +71,6 @@ Status StorageEngine::loadDatabase(Database& db, const std::string& filename) co
     return db.load(fullpath);
 }
 
-
 // ============================================================
 //  Section 3 — Helpers
 // ============================================================
@@ -85,29 +82,23 @@ std::string StorageEngine::cacheKey(const std::string& tableName, PageID id) {
     return tableName + "#" + std::to_string(id);
 }
 
-
 // ============================================================
 //  Section 4 — Per-Page Disk I/O
 // ============================================================
 Status StorageEngine::writePage(const std::string& tableName, const Page& page) const {
-    return Common::FileIO::writeSlot(
-        pageFilePath(tableName),
-        static_cast<std::uint64_t>(page.getID()),
-        DBConstants::PAGE_SIZE,
-        page.serialize());
+    return Common::FileIO::writeSlot(pageFilePath(tableName),
+                                     static_cast<std::uint64_t>(page.getID()),
+                                     DBConstants::PAGE_SIZE, page.serialize());
 }
 
 Status StorageEngine::readPageFromDisk(const std::string& tableName, PageID id, Page& out) const {
     std::string payload;
-    Status s = Common::FileIO::readSlot(
-        pageFilePath(tableName),
-        static_cast<std::uint64_t>(id),
-        DBConstants::PAGE_SIZE,
-        payload);
-    if (s != Status::OK) return s;   // NOT_FOUND: no such page written yet
+    Status s = Common::FileIO::readSlot(pageFilePath(tableName), static_cast<std::uint64_t>(id),
+                                        DBConstants::PAGE_SIZE, payload);
+    if (s != Status::OK)
+        return s; // NOT_FOUND: no such page written yet
     return out.deserialize(payload);
 }
-
 
 // ============================================================
 //  Section 5 — Page Cache
@@ -124,7 +115,7 @@ Page* StorageEngine::fetchPage(const std::string& tableName, PageID id) {
 
     Page loaded(id);
     if (Status s = readPageFromDisk(tableName, id, loaded); s != Status::OK) {
-        return nullptr;   // no such page on disk (or a read/parse failure)
+        return nullptr; // no such page on disk (or a read/parse failure)
     }
 
     pageCache.put(key, std::move(loaded));
@@ -151,31 +142,41 @@ bool StorageEngine::isCached(const std::string& tableName, PageID id) const {
 Status StorageEngine::flushPage(const std::string& tableName, PageID id) {
     std::string key = cacheKey(tableName, id);
     Page* cached = pageCache.get(key);
-    if (!cached) return Status::NOT_FOUND;
-    if (!cached->dirty) return Status::OK;   // clean: nothing to write
+    if (!cached)
+        return Status::NOT_FOUND;
+    if (!cached->dirty)
+        return Status::OK; // clean: nothing to write
 
     Status s = writePage(tableName, *cached);
-    if (s != Status::OK) return s;
+    if (s != Status::OK)
+        return s;
 
-    cached->dirty = false;   // `dirty` is a public data member on Page.
+    cached->dirty = false; // `dirty` is a public data member on Page.
     return Status::OK;
 }
 
 Status StorageEngine::evictPage(const std::string& tableName, PageID id) {
     Status s = flushPage(tableName, id);
-    if (s == Status::NOT_FOUND) return Status::OK;   // wasn't cached: idempotent no-op
-    if (s != Status::OK) return s;                   // real write failure: do NOT drop the page
+    if (s == Status::NOT_FOUND)
+        return Status::OK; // wasn't cached: idempotent no-op
+    if (s != Status::OK)
+        return s; // real write failure: do NOT drop the page
 
     (void)pageCache.erase(cacheKey(tableName, id));
     return Status::OK;
 }
 
-
 // ============================================================
 //  Section 6 — Cache Stats
 // ============================================================
-double       StorageEngine::cacheHitRate()  const { return pageCache.hitRate(); }
-std::size_t  StorageEngine::cacheHits()     const { return pageCache.hitCount(); }
-std::size_t  StorageEngine::cacheMisses()   const { return pageCache.missCount(); }
+double StorageEngine::cacheHitRate() const {
+    return pageCache.hitRate();
+}
+std::size_t StorageEngine::cacheHits() const {
+    return pageCache.hitCount();
+}
+std::size_t StorageEngine::cacheMisses() const {
+    return pageCache.missCount();
+}
 
 } // namespace MiniDB::Engine

@@ -7,9 +7,13 @@
 # -fsanitize=address,undefined: ASan and TSan instrument memory access
 # in mutually exclusive, incompatible ways and cannot share a build.
 # TSan is the one that actually matters most for this project --
-# Concurrency.cpp drives a real thread pool across parallel
-# save/load/rebuildIndex/export -- so it's not just included for
-# completeness.
+# Server dispatches every connection onto a real ThreadPoolPro-backed
+# pool (see tests/suite/concurrency/pool_concurrent_requests.cpp), and
+# the streaming-connection capacity guard added for SSE
+# (Server::activeStreams_, checked and incremented/decremented around
+# each StreamHandler invocation - see
+# tests/suite/concurrency/sse_capacity_cap.cpp) is exactly the kind of
+# freshly-written, race-sensitive code TSan exists to catch a bug in.
 # ============================================================
 
 name: Sanitizers
@@ -18,15 +22,18 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   asan-ubsan:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Install dependencies
         run: |
@@ -34,7 +41,7 @@ jobs:
           sudo apt install -y cmake clang
 
       # Benchmarks/regression/examples are skipped: instrumenting a
-      # fetched third-party dependency (benchmarks/ pulls in
+      # fetched third-party dependency (regression/ pulls in
       # nlohmann_json) with sanitizer flags wastes build time and
       # surfaces warnings this repo can't fix.
       - name: Configure
@@ -58,9 +65,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Install dependencies
         run: |

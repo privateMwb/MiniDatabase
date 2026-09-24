@@ -42,8 +42,7 @@ namespace {
 // every table here regardless of each lambda's distinct closure type).
 // FutureType is deduced via decltype instead of naming that type directly,
 // so this doesn't hardcode a ThreadPoolPro-internal type name.
-template <class F>
-Status runParallel(ThreadPool& pool, const Vector<Table*>& tables, F&& fn) {
+template <class F> Status runParallel(ThreadPool& pool, const Vector<Table*>& tables, F&& fn) {
     using FutureType = decltype(pool.enqueue([]() -> Status { return Status::OK; }));
 
     std::vector<FutureType> futures;
@@ -55,73 +54,64 @@ Status runParallel(ThreadPool& pool, const Vector<Table*>& tables, F&& fn) {
 
     Status finalStatus = Status::OK;
     for (auto& f : futures) {
-        if (Status s = f.get(); s != Status::OK) finalStatus = s;
+        if (Status s = f.get(); s != Status::OK)
+            finalStatus = s;
     }
     return finalStatus;
 }
 } // namespace
 
-
 // ============================================================
 //  Section 2 — Constructor
 // ============================================================
-Concurrency::Concurrency(std::size_t threadCount)
-    : pool(threadCount) {}
-
+Concurrency::Concurrency(std::size_t threadCount) : pool(threadCount) {}
 
 // ============================================================
 //  Section 3 — Parallel Save/Load
 // ============================================================
-Status Concurrency::saveAllTablesParallel(
-    const Database&     db,
-    const std::string&  baseFilename)
-{
+Status Concurrency::saveAllTablesParallel(const Database& db, const std::string& baseFilename) {
     return runParallel(pool, db.getTables(), [&baseFilename](Table* t) -> Status {
         std::string filename = baseFilename + "_" + t->getName() + ".json";
         return Serializer::exportTableToFile(*t, filename);
     });
 }
 
-Status Concurrency::loadAllTablesParallel(
-    Database&           db,
-    const std::string&  baseFilename)
-{
+Status Concurrency::loadAllTablesParallel(Database& db, const std::string& baseFilename) {
     return runParallel(pool, db.getTables(), [&baseFilename](Table* t) -> Status {
         std::string filename = baseFilename + "_" + t->getName() + ".json";
         return Serializer::importTableFromFile(*t, filename);
     });
 }
 
-
 // ============================================================
 //  Section 4 — Parallel Index Rebuilding
 // ============================================================
 Status Concurrency::rebuildAllIndexesParallel(Database& db) {
-    return runParallel(pool, db.getTables(), [](Table* t) -> Status {
-        return t->rebuildIndex();
-    });
+    return runParallel(pool, db.getTables(), [](Table* t) -> Status { return t->rebuildIndex(); });
 }
-
 
 // ============================================================
 //  Section 5 — Parallel Export
 // ============================================================
-Status Concurrency::exportAllTablesParallel(
-    const Database&     db,
-    const std::string&  outputDirectory)
-{
+Status Concurrency::exportAllTablesParallel(const Database& db,
+                                            const std::string& outputDirectory) {
     return runParallel(pool, db.getTables(), [&outputDirectory](Table* t) -> Status {
         std::string path = outputDirectory + "/" + t->getName() + ".json";
         return Serializer::exportTableToFile(*t, path);
     });
 }
 
-
 // ============================================================
 //  Section 6 — Introspection
 // ============================================================
-std::size_t Concurrency::activeTasks() const noexcept { return pool.activeTaskCount(); }
-std::size_t Concurrency::queuedTasks() const noexcept { return pool.queuedTasks(); }
-std::size_t Concurrency::threadCount() const noexcept { return pool.threadCount(); }
+std::size_t Concurrency::activeTasks() const noexcept {
+    return pool.activeTaskCount();
+}
+std::size_t Concurrency::queuedTasks() const noexcept {
+    return pool.queuedTasks();
+}
+std::size_t Concurrency::threadCount() const noexcept {
+    return pool.threadCount();
+}
 
 } // namespace MiniDB::Engine

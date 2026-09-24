@@ -17,8 +17,8 @@
 //
 // ============================================================
 
-#include <MiniDB/Engine/Serializer.h>
 #include <MiniDB/Common/FileIO.h>
+#include <MiniDB/Engine/Serializer.h>
 
 namespace MiniDB::Engine {
 
@@ -31,7 +31,8 @@ std::string Serializer::exportTableToJson(const Table& table) {
     for (const Page* page : table.getPages()) {
         for (std::size_t i = 0; i < page->recordCount(); ++i) {
             const Record* r = page->getRecordAt(i);
-            if (!r || r->isDeleted()) continue;
+            if (!r || r->isDeleted())
+                continue;
 
             Json entry = r->data;
             entry["id"] = static_cast<int>(r->getID());
@@ -42,8 +43,10 @@ std::string Serializer::exportTableToJson(const Table& table) {
 }
 
 Status Serializer::importTableFromJson(Table& table, const Json& parsed) {
-    if (parsed.isNull())    return Status::PARSE_ERROR;
-    if (!parsed.isArray())  return Status::PARSE_ERROR;
+    if (parsed.isNull())
+        return Status::PARSE_ERROR;
+    if (!parsed.isArray())
+        return Status::PARSE_ERROR;
 
     RecordID nextId = 0;
     for (const Json& entry : parsed.asArray()) {
@@ -61,7 +64,8 @@ Status Serializer::importTableFromJson(Table& table, const Json& parsed) {
 
         Record r(id, cleanData);
         Status s = table.insertRecord(r);
-        if (s != Status::OK) return s;
+        if (s != Status::OK)
+            return s;
     }
     return Status::OK;
 }
@@ -70,7 +74,6 @@ Status Serializer::importTableFromJson(Table& table, const std::string& json) {
     Json parsed = Json::parse(json);
     return importTableFromJson(table, parsed);
 }
-
 
 // ============================================================
 //  Section 2 — File-based Export/Import
@@ -83,10 +86,10 @@ Status Serializer::importTableFromFile(Table& table, const std::string& path) {
     std::string raw;
     // Sized single read instead of stringstream/rdbuf (avoids per-char
     // streambuf overhead on large files).
-    if (Status s = FileIO::readFile(path, raw); s != Status::OK) return s;
+    if (Status s = FileIO::readFile(path, raw); s != Status::OK)
+        return s;
     return importTableFromJson(table, raw);
 }
-
 
 // ============================================================
 //  Section 3 — Database-wide Export/Import
@@ -99,7 +102,8 @@ Status Serializer::exportDatabaseToJson(const Database& db, const std::string& p
         for (const Page* page : t->getPages()) {
             for (std::size_t i = 0; i < page->recordCount(); ++i) {
                 const Record* r = page->getRecordAt(i);
-                if (!r || r->isDeleted()) continue;
+                if (!r || r->isDeleted())
+                    continue;
 
                 Json entry = r->data;
                 entry["id"] = static_cast<int>(r->getID());

@@ -1,0 +1,76 @@
+name: CodeQL
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Catches new CodeQL query packs/advisories even on weeks with no
+    # pushes -- Mondays 06:00 UTC.
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  analyze:
+    name: Analyze (C++)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      security-events: write
+      actions: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          submodules: true
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          languages: cpp
+          # security-extended pulls in additional query packs beyond
+          # the default security-and-quality set (more coverage, more
+          # runtime) -- drop this line to fall back to CodeQL's
+          # built-in default suite if runs get too slow.
+          queries: security-extended
+
+      - name: Configure and build
+        # Tests are enabled so CodeQL traces and analyzes that code
+        # too, not just the library itself. Benchmarks, regression, and
+        # examples stay OFF, matching the convention already used in
+        # clang-tidy.yml/coverage.yml/sanitizers.yml: regression/
+        # fetches nlohmann_json via FetchContent, and analyzing a
+        # third-party dependency's source produces findings this repo
+        # has no way to fix.
+        #
+        # --parallel is capped, not left to default to every core:
+        # CodeQL's tracer wraps and instruments every compiler
+        # invocation it sees (LD_PRELOAD, visible in this job's own
+        # env), multiplying real memory use per parallel process well
+        # above a normal build - combined with tests/google now
+        # fetching and compiling GoogleTest from source (gtest-all.cc
+        # alone is a heavy single translation unit), an uncapped
+        # --parallel here has been observed to get the whole build
+        # killed by the OOM killer mid-compile (exit 143, several
+        # unrelated translation units "Terminated" simultaneously -
+        # not a real compile error). 2 is conservative on purpose;
+        # raise it only alongside evidence the runner has headroom to
+        # spare under the tracer specifically, not just in a plain
+        # build.
+        run: |
+          cmake -B build -S . \
+            -DBUILD_TESTS=ON \
+            -DBUILD_EXAMPLES=OFF \
+            -DBUILD_BENCHMARKS=OFF \
+            -DBUILD_REGRESSION=OFF
+          cmake --build build --parallel 2
+
+      - name: Perform CodeQL analysis
+        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4.37.9
+        with:
+          category: "/language:cpp"

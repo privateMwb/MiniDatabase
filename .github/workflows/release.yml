@@ -16,14 +16,16 @@ on:
         required: true
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # creates the GitHub Release and uploads assets
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Resolve tag
         id: resolve_tag
@@ -34,8 +36,12 @@ jobs:
             echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
           fi
 
+      # v3 moves the action's runtime from Node 20 to Node 24 (v2.x is
+      # no longer maintained); tag_name/body_path/generate_release_notes/
+      # overwrite_files below are all unchanged inputs, no other changes
+      # needed here.
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
         with:
           tag_name: ${{ steps.resolve_tag.outputs.tag }}
           body_path: .github/releases/${{ steps.resolve_tag.outputs.tag }}.md

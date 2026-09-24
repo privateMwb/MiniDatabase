@@ -10,22 +10,25 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   clang-tidy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Install clang-tidy
         run: |
           sudo apt update
           sudo apt install -y clang-tidy
 
-      # Benchmarks/regression/examples aren't tidied here: benchmarks/
+      # Benchmarks/regression/examples aren't tidied here: regression/
       # fetches nlohmann_json via FetchContent, and running clang-tidy
       # against a third-party dependency's source produces warnings this
       # repo has no way to fix.
