@@ -10,6 +10,9 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: "${{ matrix.os }} | ${{ matrix.compiler }} | ${{ matrix.build_type }}"
@@ -60,9 +63,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Install dependencies (Ubuntu)
         if: runner.os == 'Linux'
@@ -70,8 +73,26 @@ jobs:
           sudo apt update
           sudo apt install -y cmake ninja-build g++ clang
 
-      # Only tests/ are exercised by this workflow (via ctest below).
-      # Benchmarks, tools, and examples are disabled to reduce CI time.
+      # GoogleTest is fetched by tests/google/CMakeLists.txt via
+      # FetchContent at configure time - cached per matrix leg (OS +
+      # compiler + build type all affect the resulting binary, so a
+      # cache hit on one leg must never be reused by another) to avoid
+      # a fresh clang++-and-cmake-built GoogleTest on every one of the
+      # 8 legs below, every run.
+      - name: Cache fetched dependencies
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: build-${{ matrix.compiler }}-${{ matrix.build_type }}/_deps
+          key: deps-${{ matrix.os }}-${{ matrix.compiler }}-${{ matrix.build_type }}-${{ hashFiles('tests/google/CMakeLists.txt') }}
+
+      # tests/ is the only thing this workflow exercises (via ctest
+      # below) - both tests/custom (one aggregate CTest entry, added
+      # via add_test()) and tests/google (one CTest entry per TEST(),
+      # discovered via gtest_discover_tests()) ride on the same
+      # BUILD_TESTS default (ON) and don't need separate build/run
+      # steps from each other, unlike benchmark.yml's custom/google
+      # split, which does. Benchmarks, regression, and examples are
+      # disabled here to reduce CI time.
       - name: Configure
         env:
           CXX: ${{ matrix.cxx || '' }}

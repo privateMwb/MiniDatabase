@@ -32,30 +32,25 @@ namespace MiniDB::Core {
 // ============================================================
 //  Section 1 — Constructors
 // ============================================================
-Record::Record()
-    : id(DBConstants::INVALID_RECORD_ID)
-    , data(Json::ObjectType{}) {}
+Record::Record() : id(DBConstants::INVALID_RECORD_ID), data(Json::ObjectType{}) {}
 
-Record::Record(RecordID id)
-    : id(id)
-    , data(Json::ObjectType{}) {}
+Record::Record(RecordID id) : id(id), data(Json::ObjectType{}) {}
 
-Record::Record(RecordID id, Json data)
-    : id(id)
-    , data(std::move(data)) {}
-
+Record::Record(RecordID id, Json data) : id(id), data(std::move(data)) {}
 
 // ============================================================
 //  Section 2 — Field Access
 // ============================================================
 Status Record::setField(const FieldName& key, const Json& value) {
-    if (key.empty()) return Status::INVALID_SCHEMA;
+    if (key.empty())
+        return Status::INVALID_SCHEMA;
     data[key] = value;
     return Status::OK;
 }
 
 Json Record::getField(const FieldName& key) const {
-    if (!data.contains(key)) return Json{};
+    if (!data.contains(key))
+        return Json{};
     return data[key];
 }
 
@@ -65,7 +60,8 @@ const Json& Record::getFieldRef(const FieldName& key) const {
     // const returning Json& (zero-copy) vs Json (still a copy internally,
     // just bound to a temporary here) -- confirm against JsonPro's header.
     static const Json kNull{};
-    if (!data.contains(key)) return kNull;
+    if (!data.contains(key))
+        return kNull;
     return data[key];
 }
 
@@ -74,11 +70,11 @@ bool Record::hasField(const FieldName& key) const {
 }
 
 Status Record::removeField(const FieldName& key) {
-    if (!data.contains(key)) return Status::NOT_FOUND;
+    if (!data.contains(key))
+        return Status::NOT_FOUND;
     data.asObject().erase(key);
     return Status::OK;
 }
-
 
 // ============================================================
 //  Section 3 — Schema Validation
@@ -86,7 +82,8 @@ Status Record::removeField(const FieldName& key) {
 Status Record::validate(const Vector<ColumnDef>& schema) const {
     for (const auto& col : schema) {
         if (!data.contains(col.name)) {
-            if (!col.nullable) return Status::INVALID_SCHEMA;
+            if (!col.nullable)
+                return Status::INVALID_SCHEMA;
             continue;
         }
 
@@ -94,36 +91,36 @@ Status Record::validate(const Vector<ColumnDef>& schema) const {
         bool typeOK = false;
 
         switch (col.type) {
-            case ColumnType::INT: {
-                // BUGFIX: previously used `static_cast<int64_t>(val.asNumber())`
-                // as a truthiness check, which rejected the valid value 0.
-                // Correct check: is a number AND has no fractional part AND
-                // fits in int64_t.
-                if (val.isNumber()) {
-                    double d = val.asNumber();
-                    typeOK = (d == std::trunc(d))
-                          && (d >= static_cast<double>(std::numeric_limits<int64_t>::min()))
-                          && (d <= static_cast<double>(std::numeric_limits<int64_t>::max()));
-                }
-                break;
+        case ColumnType::INT: {
+            // BUGFIX: previously used `static_cast<int64_t>(val.asNumber())`
+            // as a truthiness check, which rejected the valid value 0.
+            // Correct check: is a number AND has no fractional part AND
+            // fits in int64_t.
+            if (val.isNumber()) {
+                double d = val.asNumber();
+                typeOK = (d == std::trunc(d)) &&
+                         (d >= static_cast<double>(std::numeric_limits<int64_t>::min())) &&
+                         (d <= static_cast<double>(std::numeric_limits<int64_t>::max()));
             }
-            case ColumnType::DOUBLE:
-                typeOK = val.isNumber();
-                break;
-            case ColumnType::STRING:
-                typeOK = val.isString();
-                break;
-            case ColumnType::BOOL:
-                typeOK = val.isBool();
-                break;
+            break;
+        }
+        case ColumnType::DOUBLE:
+            typeOK = val.isNumber();
+            break;
+        case ColumnType::STRING:
+            typeOK = val.isString();
+            break;
+        case ColumnType::BOOL:
+            typeOK = val.isBool();
+            break;
         }
 
-        if (!typeOK) return Status::INVALID_TYPE;
+        if (!typeOK)
+            return Status::INVALID_TYPE;
     }
 
     return Status::OK;
 }
-
 
 // ============================================================
 //  Section 4 — Serialization
@@ -137,7 +134,8 @@ Json Record::toJson() const {
 }
 
 Status Record::fromJson(const Json& envelope) {
-    if (envelope.isNull()) return Status::PARSE_ERROR;
+    if (envelope.isNull())
+        return Status::PARSE_ERROR;
 
     id = static_cast<RecordID>(envelope["__id__"].asNumber());
     deleted = envelope["__deleted__"].asBool();
@@ -157,12 +155,10 @@ Status Record::deserialize(const std::string& raw) {
             return Status::PARSE_ERROR;
 
         return fromJson(envelope);
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception&) {
         return Status::PARSE_ERROR;
     }
 }
-
 
 // ============================================================
 //  Section 5 — Utility
@@ -178,7 +174,6 @@ void Record::markDeleted() {
 RecordID Record::getID() const {
     return id;
 }
-
 
 // ============================================================
 //  Section 6 — Operators

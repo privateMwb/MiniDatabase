@@ -1,0 +1,55 @@
+# ============================================================
+# .github/workflows/cflite_pr.yml
+# Runs a short fuzz pass against fuzz_record_deserialize and
+# fuzz_wal_recovery on every pull request that touches the
+# parsing/recovery code they exercise, so a change that introduces a
+# memory-safety bug fails CI before merge rather than waiting for the
+# next scheduled batch run.
+# ============================================================
+
+name: PR Fuzzing
+
+on:
+  pull_request:
+    paths:
+      - "include/MiniDB/Core/Record.h"
+      - "src/MiniDB/Core/Record.cpp"
+      - "include/MiniDB/Common/Json.h"
+      - "src/MiniDB/Common/Json.cpp"
+      - "include/MiniDB/Storage/WriteAheadLog.h"
+      - "src/MiniDB/Storage/WriteAheadLog.cpp"
+      - "include/MiniDB/Common/FileIO.h"
+      - "src/MiniDB/Common/FileIO.cpp"
+      - "fuzz/**"
+      - ".clusterfuzzlite/**"
+
+permissions:
+  contents: read
+
+jobs:
+  PR:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        sanitizer:
+          - address
+          - undefined
+    steps:
+      - name: Build Fuzzers (${{ matrix.sanitizer }})
+        id: build
+        uses: google/clusterfuzzlite/actions/build_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
+        with:
+          language: c++
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sanitizer: ${{ matrix.sanitizer }}
+
+      - name: Run Fuzzers (${{ matrix.sanitizer }})
+        id: run
+        uses: google/clusterfuzzlite/actions/run_fuzzers@884713a6c30a92e5e8544c39945cd7cb630abcd1 # v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          fuzz-seconds: 300
+          mode: "code-change"
+          sanitizer: ${{ matrix.sanitizer }}
+          output-sarif: true

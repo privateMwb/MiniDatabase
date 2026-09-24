@@ -10,15 +10,18 @@ on:
   push:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   coverage:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          submodules: true
+          submodules: recursive
 
       - name: Install dependencies
         run: |
@@ -26,7 +29,7 @@ jobs:
           sudo apt install -y cmake g++ lcov
 
       # Benchmarks/regression/examples are skipped: instrumenting a
-      # fetched third-party dependency (benchmarks/ pulls in
+      # fetched third-party dependency (regression/ pulls in
       # nlohmann_json) with --coverage adds irrelevant, unowned coverage
       # noise and slows the build for no benefit.
       - name: Configure
@@ -63,7 +66,7 @@ jobs:
             --output-directory coverage-html
 
       - name: Upload HTML report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: coverage-html
           path: coverage-html

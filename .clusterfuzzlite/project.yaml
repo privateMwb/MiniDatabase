@@ -1,0 +1,11 @@
+# ============================================================
+# .clusterfuzzlite/project.yaml
+# FalconHTTP's copy of this file is empty (0 bytes) in this
+# ecosystem -- the GitHub Actions workflows pass `language: c++`
+# directly to build_fuzzers, so a bare project.yaml isn't strictly
+# required for the PR/batch workflows to run. Kept minimal here for
+# the same reason, with the one field ClusterFuzzLite's own docs call
+# required regardless of workflow-level overrides.
+# ============================================================
+
+language: c++

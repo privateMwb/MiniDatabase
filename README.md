@@ -1,11 +1,18 @@
-# MiniDatabase
-
 <p align="center">
-  <img src="https://img.shields.io/github/v/release/privateMwb/MiniDatabase?style=for-the-badge&logo=github&color=yellow" alt="Version">
-  <img src="https://img.shields.io/badge/License-MIT-orange?style=for-the-badge" alt="License - MIT">
-  <img src="https://img.shields.io/badge/C%2B%2B-23-blue?style=for-the-badge&logo=c%2B%2B" alt="C++ - 23">
+  <img src=".github/assets/banner.svg" alt="MiniDatabase" width="100%">
 </p>
 
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/privateMwb/MiniDatabase?style=for-the-badge&logo=github&color=06B6D4&labelColor=070B18" alt="Version">
+  <img src="https://img.shields.io/badge/License-MIT-8B7FD0?style=for-the-badge&labelColor=070B18" alt="License - MIT">
+  <img src="https://img.shields.io/badge/C%2B%2B-23-EC4899?style=for-the-badge&labelColor=070B18" alt="C++ - 23">
+</p>
+
+<p align="center">
+  <img src=".github/assets/divider.svg" alt="" width="100%">
+</p>
+
+<p align="center"><sub><b>CI / CD</b></sub></p>
 <p align="center">
   <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/build.yml">
     <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/build.yml/badge.svg" alt="Build and Test">
@@ -13,6 +20,16 @@
   <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/benchmark.yml">
     <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/benchmark.yml/badge.svg" alt="Benchmarks">
   </a>
+  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/packaging.yml">
+    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/packaging.yml/badge.svg" alt="Packaging">
+  </a>
+  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/release.yml">
+    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/release.yml/badge.svg" alt="Release">
+  </a>
+</p>
+
+<p align="center"><sub><b>Code Quality &amp; Safety</b></sub></p>
+<p align="center">
   <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/coverage.yml">
     <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/coverage.yml/badge.svg" alt="Coverage">
   </a>
@@ -25,17 +42,29 @@
   <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/clang-format.yml">
     <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/clang-format.yml/badge.svg" alt="Clang Format">
   </a>
-  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/docs.yml">
-    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/docs.yml/badge.svg" alt="Documentation">
+  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/codeql.yml">
+    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/codeql.yml/badge.svg" alt="CodeQL">
   </a>
-  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/release.yml">
-    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/release.yml/badge.svg" alt="Release">
+  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/cflite_pr.yml">
+    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/cflite_pr.yml/badge.svg" alt="Fuzzing">
   </a>
-  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/packaging.yml">
-    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/packaging.yml/badge.svg" alt="Packaging">
+  <a href="https://www.bestpractices.dev/projects/14783">
+    <img src="https://www.bestpractices.dev/projects/14783/badge" alt="OpenSSF Best Practices">
   </a>
 </p>
 
+<p align="center"><sub><b>Documentation</b></sub></p>
+<p align="center">
+  <a href="https://github.com/privateMwb/MiniDatabase/actions/workflows/docs.yml">
+    <img src="https://github.com/privateMwb/MiniDatabase/actions/workflows/docs.yml/badge.svg" alt="Documentation">
+  </a>
+</p>
+
+<p align="center">
+  <img src=".github/assets/divider.svg" alt="" width="100%">
+</p>
+
+<p align="center"><sub><b>Compiler Support</b></sub></p>
 <p align="center">
   <img src="https://img.shields.io/badge/GCC-support-B46F1B?style=flat&logo=gnu" alt="GCC - support">
   <img src="https://img.shields.io/badge/Clang-support-045891?style=flat&logo=llvm" alt="Clang - support">
@@ -43,7 +72,13 @@
   <img src="https://img.shields.io/badge/AppleClang-support-000000?style=flat&logo=apple" alt="AppleClang - support">
 </p>
 
-MiniDB is an embedded, in-process C++ database engine — no server, no connection, no network protocol. Schema-validated records, a fixed-slot page storage engine with an LRU-backed buffer pool, atomic whole-database persistence with all-or-nothing load semantics, and a thread-pool-backed concurrent save/load/export path, built entirely on this author's own allocator, container, concurrency, and JSON libraries.
+<p align="center">
+  <img src=".github/assets/divider.svg" alt="" width="100%">
+</p>
+
+<p align="center">MiniDB is an embedded, in-process C++ database engine — no server, no connection, no network protocol. Schema-validated records, a fixed-slot page storage engine with an LRU-backed buffer pool, atomic whole-database persistence with all-or-nothing load semantics, and a thread-pool-backed concurrent save/load/export path, built entirely on this author's own allocator, container, concurrency, and JSON libraries.</p>
+
+<br>
 
 ## 📑 Table of Contents
 
@@ -55,10 +90,14 @@ MiniDB is an embedded, in-process C++ database engine — no server, no connecti
 - [Project Structure](#project-structure)
 - [Development](#development)
 - [Benchmarks](#benchmarks)
+- [Fuzzing](#fuzzing)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
 - [Changelog](#changelog)
+- [Security](#security)
 - [License](#license)
+
+<br>
 
 ## <a id="features"></a>✨ Features
 
@@ -70,11 +109,15 @@ MiniDB is an embedded, in-process C++ database engine — no server, no connecti
 - **Thread-pool-backed parallel batch operations** — `Concurrency` drives `saveAllTablesParallel()`, `loadAllTablesParallel()`, `rebuildAllIndexesParallel()`, and `exportAllTablesParallel()` across every table in a database on a shared pool, with one table's failure reported without rolling back another table's success.
 - **A real query engine** — `QueryEngine` supports predicate filtering (AND-combined via `std::span<const FilterPredicate>`), sorting, result limiting, and `count`/`sum`/`avg`/`max`/`min` aggregates, all operating directly over `Table`'s pages.
 
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
 ## <a id="requirements"></a>📋 Requirements
 
 - A C++23-conformant compiler (tested: GCC, Clang, MSVC, AppleClang)
 - CMake 3.20+
 - Git submodules initialized — unlike this author's other, dependency-free libraries, MiniDB is a consumer of 7 of them (see [Dependencies](#dependencies)) and needs their source present to build from source
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
 ## <a id="dependencies"></a>🔗 Dependencies
 
@@ -89,6 +132,8 @@ MiniDB is built entirely on this author's own libraries, vendored as git submodu
 | CachePro | `LRUCache<K,V>`, backing `StorageEngine`'s page buffer pool | [privateMwb/LRUCache](https://github.com/privateMwb/LRUCache) |
 | ArenaPro | `Arena<>`, scoped allocation for `QueryEngine` query execution | [privateMwb/ArenaAllocator](https://github.com/privateMwb/ArenaAllocator) |
 | ThreadPoolPro | `ThreadPool`, driving every parallel operation in `Concurrency` | [privateMwb/ThreadPoolPro](https://github.com/privateMwb/ThreadPoolPro) |
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
 ## <a id="installation"></a>📦 Installation
 
@@ -116,6 +161,8 @@ target_link_libraries(your_target PRIVATE MiniDB::MiniDB)
 > `packaging/recipes/minidb/`, port in `packaging/vcpkg/ports/minidb/`),
 > but not yet published to the public registries. This section will be
 > updated once they are.
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
 ## <a id="quick-start"></a>🚀 Quick Start
 
@@ -175,6 +222,8 @@ if (s != Status::OK) {
 }
 ```
 
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
 ## <a id="project-structure"></a>🗂️ Project Structure
 
 ```
@@ -219,17 +268,18 @@ MiniDatabase/
 │       └── ThreadPoolPro/
 │
 ├── tests/
-│   ├── support/
-│   ├── suite/
-│   ├── test_main.cpp
-│   └── CMakeLists.txt
+│   ├── custom/
+│   ├── google/
+│   ├── CMakeLists.txt
+│   └── README.md
 │
 ├── benchmarks/
-│   ├── support/
-│   ├── suite/
+│   ├── custom/
+│   ├── google/
 │   ├── baselines/
-│   ├── bench_main.cpp
-│   └── CMakeLists.txt
+│   ├── results/
+│   ├── CMakeLists.txt
+│   └── README.md
 │
 ├── examples/
 │   ├── support/
@@ -238,17 +288,26 @@ MiniDatabase/
 │   └── CMakeLists.txt
 │
 ├── regression/
-│   ├── support/
-│   ├── regression_main.cpp
-│   └── CMakeLists.txt
+│   ├── custom/
+│   ├── google/
+│   ├── results/
+│   ├── CMakeLists.txt
+│   └── README.md
+│
+├── fuzz/
+│   ├── fuzz_http_parser.cpp
+│   └── fuzz_path_matcher.cpp
+│
+├── .clusterfuzzlite/
+│   ├── Dockerfile
+│   ├── build.sh
+│   └── project.yaml
 │
 ├── packaging/
 │   ├── README.md
+│   ├── requirements-conan.txt
 │   ├── recipes/
-│   │   └── minidb/
 │   ├── vcpkg/
-│   │   └── ports/
-│   │       └── minidb/
 │   └── vcpkg-smoke-test/
 │
 ├── scripts/
@@ -265,11 +324,19 @@ MiniDatabase/
 │   ├── Doxyfile
 │   └── README.md
 │
+├── .clang-format
+├── .clang-tidy
 ├── .gitignore
 ├── CMakeLists.txt
 ├── README.md
+├── CONTRIBUTING.md
+├── CHANGELOG.md
+├── SECURITY.md
+├── FUZZING.md
 └── LICENSE
 ```
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
 ## <a id="development"></a>🛠️ Development
 
@@ -303,6 +370,8 @@ auto-names its output (`regression_v1.2.0_vs_current.md`/`.json`, etc.).
 
 See [packaging/README.md](packaging/README.md) for notes on verifying the vcpkg
 port and Conan recipe locally.
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
 ## <a id="benchmarks"></a>📊 Benchmarks
 
@@ -341,11 +410,30 @@ expected given `std::sort`'s O(n log n) versus a linear predicate scan,
 but worth knowing before sorting a large result set on a
 latency-sensitive path.
 
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
+## <a id="fuzzing"></a>🐛 Fuzzing
+
+MiniDB isn't continuously fuzzed yet — there is no fuzz harness or
+ClusterFuzzLite job in this repository today.
+
+The part of the API that consumes bytes it didn't produce is file
+loading: `Database::load()` and the `Serializer` import functions parse a
+JSON document from disk and report malformed input through `Status`
+(e.g. `PARSE_ERROR`) rather than throwing, and `load()` leaves the
+existing database untouched on failure. Those are the natural targets
+for a fuzz harness; until one exists, malformed-input handling (such as a
+corrupt slot length prefix in `FileIO`) is covered by the test suite.
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
 ## <a id="documentation"></a>📖 Documentation
 
 Full API reference, generated with Doxygen from `docs/Doxyfile`:
 
 **https://privateMwb.github.io/MiniDatabase/**
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
 ## <a id="contributing"></a>🤝 Contributing
 
@@ -355,11 +443,31 @@ Issues and pull requests are welcome. Before submitting a PR:
 - If you're changing a hot path, run `./build/regression` and mention
   the results in your PR description
 
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
 ## <a id="changelog"></a>📝 Changelog
 
 See the [Releases](https://github.com/privateMwb/MiniDatabase/releases)
 page for version history and release notes.
 
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
+## <a id="security"></a>🔒 Security
+
+Please don't report a suspected vulnerability in a public issue. Use
+GitHub's private reporting instead — this repository's **Security** tab,
+then **Report a vulnerability** — so it can be fixed before it's disclosed.
+
+<div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
+
 ## <a id="license"></a>📄 License
 
 MIT — see [LICENSE](LICENSE) for details.
+
+<p align="center">
+  <sub>Built with C++23</sub>
+</p>
+
+<p align="center">
+  <a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a>
+</p>

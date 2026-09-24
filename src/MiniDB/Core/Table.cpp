@@ -32,9 +32,7 @@ namespace MiniDB::Core {
 //  Section 1 — Constructors & Destructor
 // ============================================================
 Table::Table(std::string name, TableID id, Vector<ColumnDef> schema)
-    : name(std::move(name))
-    , id(id)
-    , schema(std::move(schema)) {}
+    : name(std::move(name)), id(id), schema(std::move(schema)) {}
 
 Table::~Table() {
     for (Page* p : pages) {
@@ -43,17 +41,11 @@ Table::~Table() {
 }
 
 Table::Table(Table&& other) noexcept
-    : name(std::move(other.name))
-    , id(other.id)
-    , schema(std::move(other.schema))
-    , pages(std::move(other.pages))
-    , index(std::move(other.index))
-    , pageIndex(std::move(other.pageIndex))
-    , nextPageId_(other.nextPageId_)
-    , dirty(other.dirty)
-{
-    other.id          = DBConstants::INVALID_TABLE_ID;
-    other.dirty       = false;
+    : name(std::move(other.name)), id(other.id), schema(std::move(other.schema)),
+      pages(std::move(other.pages)), index(std::move(other.index)),
+      pageIndex(std::move(other.pageIndex)), nextPageId_(other.nextPageId_), dirty(other.dirty) {
+    other.id = DBConstants::INVALID_TABLE_ID;
+    other.dirty = false;
     other.nextPageId_ = 0;
 }
 
@@ -63,38 +55,41 @@ Table& Table::operator=(Table&& other) noexcept {
             delete p;
         }
 
-        name        = std::move(other.name);
-        id          = other.id;
-        schema      = std::move(other.schema);
-        pages       = std::move(other.pages);
-        index       = std::move(other.index);
-        pageIndex   = std::move(other.pageIndex);
+        name = std::move(other.name);
+        id = other.id;
+        schema = std::move(other.schema);
+        pages = std::move(other.pages);
+        index = std::move(other.index);
+        pageIndex = std::move(other.pageIndex);
         nextPageId_ = other.nextPageId_;
-        dirty       = other.dirty;
+        dirty = other.dirty;
 
-        other.id          = DBConstants::INVALID_TABLE_ID;
-        other.dirty       = false;
+        other.id = DBConstants::INVALID_TABLE_ID;
+        other.dirty = false;
         other.nextPageId_ = 0;
     }
 
     return *this;
 }
 
-
 // ============================================================
 //  Section 2 — CRUD
 // ============================================================
 Status Table::insertRecord(const Record& record) {
     Status s = record.validate(schema);
-    if (s != Status::OK) return s;
+    if (s != Status::OK)
+        return s;
 
-    if (index.contains(record.getID())) return Status::DUPLICATE_KEY;
+    if (index.contains(record.getID()))
+        return Status::DUPLICATE_KEY;
 
     Page* page = findPageWithSlot();
-    if (!page) return Status::OUT_OF_MEMORY;
+    if (!page)
+        return Status::OUT_OF_MEMORY;
 
     s = page->addRecord(record);
-    if (s != Status::OK) return s;
+    if (s != Status::OK)
+        return s;
 
     index.insert(record.getID(), page->getID());
     dirty = true;
@@ -103,14 +98,17 @@ Status Table::insertRecord(const Record& record) {
 }
 
 Status Table::getRecord(RecordID id, Record& out) const {
-    if (!index.contains(id)) return Status::NOT_FOUND;
+    if (!index.contains(id))
+        return Status::NOT_FOUND;
 
     PageID pid = index.at(id);
     const Page* page = findPageByID(pid);
-    if (!page) return Status::NOT_FOUND;
+    if (!page)
+        return Status::NOT_FOUND;
 
     const Record* r = page->getRecord(id);
-    if (!r) return Status::NOT_FOUND;
+    if (!r)
+        return Status::NOT_FOUND;
 
     out = *r;
     return Status::OK;
@@ -118,36 +116,42 @@ Status Table::getRecord(RecordID id, Record& out) const {
 
 Status Table::updateRecord(const Record& record) {
     Status s = record.validate(schema);
-    if (s != Status::OK) return s;
+    if (s != Status::OK)
+        return s;
 
-    if (!index.contains(record.getID())) return Status::NOT_FOUND;
+    if (!index.contains(record.getID()))
+        return Status::NOT_FOUND;
 
     PageID pid = index.at(record.getID());
     Page* page = findPageByID(pid);
-    if (!page) return Status::NOT_FOUND;
+    if (!page)
+        return Status::NOT_FOUND;
 
     s = page->updateRecord(record);
-    if (s != Status::OK) return s;
+    if (s != Status::OK)
+        return s;
 
     dirty = true;
     return Status::OK;
 }
 
 Status Table::deleteRecord(RecordID id) {
-    if (!index.contains(id)) return Status::NOT_FOUND;
+    if (!index.contains(id))
+        return Status::NOT_FOUND;
 
     PageID pid = index.at(id);
     Page* page = findPageByID(pid);
-    if (!page) return Status::NOT_FOUND;
+    if (!page)
+        return Status::NOT_FOUND;
 
     Status s = page->deleteRecord(id);
-    if (s != Status::OK) return s;
+    if (s != Status::OK)
+        return s;
 
     (void)index.erase(id);
     dirty = true;
     return Status::OK;
 }
-
 
 // ============================================================
 //  Section 3 — Schema
@@ -158,12 +162,12 @@ const Vector<ColumnDef>& Table::getSchema() const noexcept {
 
 bool Table::hasColumn(const FieldName& name) const noexcept {
     for (const ColumnDef& col : schema) {
-        if (col.name == name) return true;
+        if (col.name == name)
+            return true;
     }
 
     return false;
 }
-
 
 // ============================================================
 //  Section 4 — Page Management
@@ -171,7 +175,8 @@ bool Table::hasColumn(const FieldName& name) const noexcept {
 Status Table::compact() {
     for (Page* p : pages) {
         Status s = p->compact();
-        if (s != Status::OK) return s;
+        if (s != Status::OK)
+            return s;
     }
 
     dirty = false;
@@ -181,7 +186,6 @@ Status Table::compact() {
 const Vector<Page*>& Table::getPages() const noexcept {
     return pages;
 }
-
 
 // ============================================================
 //  Section 5 — Index
@@ -203,21 +207,20 @@ Status Table::rebuildIndex() {
     return Status::OK;
 }
 
-
 // ============================================================
 //  Section 6 — Serialization
 // ============================================================
 Json Table::toJson() const {
     Json envelope(Json::ObjectType{});
-    envelope["__table_id___"]  = static_cast<int>(id);
-    envelope["__name__"]       = name;
+    envelope["__table_id___"] = static_cast<int>(id);
+    envelope["__name__"] = name;
 
     Json schemaArr = Json(Json::ArrayType{});
     for (const ColumnDef& col : schema) {
         Json colJson(Json::ObjectType{});
-        colJson["name"]      = col.name;
-        colJson["type"]      = static_cast<int>(col.type);
-        colJson["nullable"]  = col.nullable;
+        colJson["name"] = col.name;
+        colJson["type"] = static_cast<int>(col.type);
+        colJson["nullable"] = col.nullable;
 
         schemaArr.asArray().push_back(colJson);
     }
@@ -225,7 +228,7 @@ Json Table::toJson() const {
 
     Json pageArr = Json(Json::ArrayType{});
     for (const Page* p : pages) {
-        pageArr.asArray().push_back(p->toJson());   // was: Json::parse(p->serialize())
+        pageArr.asArray().push_back(p->toJson()); // was: Json::parse(p->serialize())
     }
     envelope["page"] = pageArr;
 
@@ -233,25 +236,26 @@ Json Table::toJson() const {
 }
 
 Status Table::fromJson(const Json& envelope) {
-    if (envelope.isNull()) return Status::PARSE_ERROR;
+    if (envelope.isNull())
+        return Status::PARSE_ERROR;
 
-    id    = static_cast<TableID>(envelope["__table_id___"].asNumber());
-    name  = envelope["__name__"].asString();
+    id = static_cast<TableID>(envelope["__table_id___"].asNumber());
+    name = envelope["__name__"].asString();
 
     schema = Vector<ColumnDef>{};
     for (const Json& col : envelope["schema"].asArray()) {
         ColumnDef def;
-        def.name      = col["name"].asString();
-        def.type      = static_cast<ColumnType>(static_cast<int>(col["type"].asNumber()));
-        def.nullable  = col["nullable"].asBool();
+        def.name = col["name"].asString();
+        def.type = static_cast<ColumnType>(static_cast<int>(col["type"].asNumber()));
+        def.nullable = col["nullable"].asBool();
 
         schema.push_back(def);
     }
 
     PageID maxPageId = 0;
     for (const Json& pageJson : envelope["page"].asArray()) {
-        Page* p   = new Page(DBConstants::INVALID_PAGE_ID);
-        Status s  = p->fromJson(pageJson);   // was: p->deserialize(pageJson.dump())
+        Page* p = new Page(DBConstants::INVALID_PAGE_ID);
+        Status s = p->fromJson(pageJson); // was: p->deserialize(pageJson.dump())
         if (s != Status::OK) {
             delete p;
             return s;
@@ -278,21 +282,29 @@ Status Table::deserialize(const std::string& raw) {
             return Status::PARSE_ERROR;
 
         return fromJson(envelope);
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception&) {
         return Status::PARSE_ERROR;
     }
 }
 
-
 // ============================================================
 //  Section 7 — Introspection
 // ============================================================
-std::string  Table::getName()    const noexcept { return name; }
-TableID      Table::getID()      const noexcept { return id; }
-bool         Table::isDirty()    const noexcept { return dirty; }
-bool         Table::isEmpty()    const noexcept { return pages.empty(); }
-std::size_t  Table::pageCount()  const noexcept { return pages.size(); }
+std::string Table::getName() const noexcept {
+    return name;
+}
+TableID Table::getID() const noexcept {
+    return id;
+}
+bool Table::isDirty() const noexcept {
+    return dirty;
+}
+bool Table::isEmpty() const noexcept {
+    return pages.empty();
+}
+std::size_t Table::pageCount() const noexcept {
+    return pages.size();
+}
 
 std::size_t Table::recordCount() const noexcept {
     std::size_t count = 0;
@@ -303,13 +315,13 @@ std::size_t Table::recordCount() const noexcept {
     return count;
 }
 
-
 // ============================================================
 //  Section 8 — Helper
 // ============================================================
 Page* Table::findPageWithSlot() noexcept {
     for (Page* p : pages) {
-        if (!p->isFull()) return p;
+        if (!p->isFull())
+            return p;
     }
 
     Page* newPage = new Page(nextPageID());
@@ -320,12 +332,14 @@ Page* Table::findPageWithSlot() noexcept {
 
 Page* Table::findPageByID(PageID id) noexcept {
     // O(1) via pageIndex instead of a linear scan over `pages`.
-    if (!pageIndex.contains(id)) return nullptr;
+    if (!pageIndex.contains(id))
+        return nullptr;
     return pageIndex.at(id);
 }
 
 const Page* Table::findPageByID(PageID id) const noexcept {
-    if (!pageIndex.contains(id)) return nullptr;
+    if (!pageIndex.contains(id))
+        return nullptr;
     return pageIndex.at(id);
 }
 

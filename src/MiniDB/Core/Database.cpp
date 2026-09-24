@@ -20,8 +20,8 @@
 //
 // ============================================================
 
-#include <MiniDB/Core/Database.h>
 #include <MiniDB/Common/FileIO.h>
+#include <MiniDB/Core/Database.h>
 
 #include <algorithm>
 
@@ -30,8 +30,7 @@ namespace MiniDB::Core {
 // ============================================================
 //  Section 1 — Constructors & Destructor
 // ============================================================
-Database::Database(std::string name)
-    : name(std::move(name)) {}
+Database::Database(std::string name) : name(std::move(name)) {}
 
 Database::~Database() {
     for (Table* t : tables) {
@@ -40,17 +39,13 @@ Database::~Database() {
 }
 
 Database::Database(Database&& other) noexcept
-    : name(std::move(other.name))
-    , tables(std::move(other.tables))
-    , index(std::move(other.index))
-    , tableIndex(std::move(other.tableIndex))
-    , nextTableId_(other.nextTableId_)
-    , dirty(other.dirty)
-{
+    : name(std::move(other.name)), tables(std::move(other.tables)), index(std::move(other.index)),
+      tableIndex(std::move(other.tableIndex)), nextTableId_(other.nextTableId_),
+      dirty(other.dirty) {
     other.tables.clear();
     other.index.clear();
     other.tableIndex.clear();
-    other.dirty        = false;
+    other.dirty = false;
     other.nextTableId_ = 0;
 }
 
@@ -60,30 +55,31 @@ Database& Database::operator=(Database&& other) noexcept {
             delete t;
         }
 
-        name         = std::move(other.name);
-        tables       = std::move(other.tables);
-        index        = std::move(other.index);
-        tableIndex   = std::move(other.tableIndex);
+        name = std::move(other.name);
+        tables = std::move(other.tables);
+        index = std::move(other.index);
+        tableIndex = std::move(other.tableIndex);
         nextTableId_ = other.nextTableId_;
-        dirty        = other.dirty;
+        dirty = other.dirty;
 
         other.tables.clear();
         other.index.clear();
         other.tableIndex.clear();
-        other.dirty        = false;
+        other.dirty = false;
         other.nextTableId_ = 0;
     }
 
     return *this;
 }
 
-
 // ============================================================
 //  Section 2 — Table Management
 // ============================================================
 Status Database::createTable(const std::string& name, Vector<ColumnDef> schema) {
-    if (tables.size() >= DBConstants::MAX_TABLES)  return Status::OUT_OF_MEMORY;
-    if (hasTable(name))                            return Status::TABLE_ALREADY_EXISTS;
+    if (tables.size() >= DBConstants::MAX_TABLES)
+        return Status::OUT_OF_MEMORY;
+    if (hasTable(name))
+        return Status::TABLE_ALREADY_EXISTS;
 
     TableID tid = nextTableID();
     Table* table = new Table(name, tid, std::move(schema));
@@ -97,7 +93,8 @@ Status Database::createTable(const std::string& name, Vector<ColumnDef> schema) 
 }
 
 Status Database::dropTable(const std::string& name) {
-    if (!hasTable(name)) return Status::TABLE_NOT_FOUND;
+    if (!hasTable(name))
+        return Status::TABLE_NOT_FOUND;
 
     TableID tid = index.at(name);
 
@@ -117,24 +114,27 @@ Status Database::dropTable(const std::string& name) {
 }
 
 Table* Database::getTable(const std::string& name) {
-    if (!hasTable(name)) return nullptr;
+    if (!hasTable(name))
+        return nullptr;
     // O(1) via tableIndex instead of a linear scan over `tables`.
     TableID tid = index.at(name);
-    if (!tableIndex.contains(tid)) return nullptr;
+    if (!tableIndex.contains(tid))
+        return nullptr;
     return tableIndex.at(tid);
 }
 
 const Table* Database::getTable(const std::string& name) const {
-    if (!hasTable(name)) return nullptr;
+    if (!hasTable(name))
+        return nullptr;
     TableID tid = index.at(name);
-    if (!tableIndex.contains(tid)) return nullptr;
+    if (!tableIndex.contains(tid))
+        return nullptr;
     return tableIndex.at(tid);
 }
 
 bool Database::hasTable(const std::string& name) const noexcept {
     return index.contains(name);
 }
-
 
 // ============================================================
 //  Section 3 — Serialization
@@ -145,7 +145,7 @@ Json Database::toJson() const {
 
     Json tableArr = Json(Json::ArrayType{});
     for (const Table* t : tables) {
-        tableArr.asArray().push_back(t->toJson());   // was: Json::parse(t->serialize())
+        tableArr.asArray().push_back(t->toJson()); // was: Json::parse(t->serialize())
     }
     envelope["tables"] = tableArr;
 
@@ -153,7 +153,8 @@ Json Database::toJson() const {
 }
 
 Status Database::fromJson(const Json& envelope) {
-    if (envelope.isNull()) return Status::PARSE_ERROR;
+    if (envelope.isNull())
+        return Status::PARSE_ERROR;
 
     if (envelope["tables"].asArray().size() > DBConstants::MAX_TABLES) {
         return Status::OUT_OF_MEMORY;
@@ -164,18 +165,19 @@ Status Database::fromJson(const Json& envelope) {
     // leaving the database in a partial, inconsistent state (previously
     // `tables` was cleared up front and populated in place, so a failure on
     // table K left tables 0..K-1 loaded and the rest missing).
-    Vector<Table*>                scratchTables;
+    Vector<Table*> scratchTables;
     HashMap<std::string, TableID> scratchIndex;
-    HashMap<TableID, Table*>      scratchTableIndex;
-    TableID                       maxTableId = 0;
+    HashMap<TableID, Table*> scratchTableIndex;
+    TableID maxTableId = 0;
 
     auto cleanup = [&scratchTables] {
-        for (Table* t : scratchTables) delete t;
+        for (Table* t : scratchTables)
+            delete t;
     };
 
     for (const Json& tableJson : envelope["tables"].asArray()) {
         Table* t = new Table("", DBConstants::INVALID_TABLE_ID, Vector<ColumnDef>{});
-        Status s = t->fromJson(tableJson);   // was: t->deserialize(tableJson.dump())
+        Status s = t->fromJson(tableJson); // was: t->deserialize(tableJson.dump())
         if (s != Status::OK) {
             delete t;
             cleanup();
@@ -188,18 +190,18 @@ Status Database::fromJson(const Json& envelope) {
     }
 
     // Success: replace live state.
-    for (Table* t : tables) delete t;
+    for (Table* t : tables)
+        delete t;
 
-    name         = envelope["__db_name__"].asString();
-    tables       = std::move(scratchTables);
-    index        = std::move(scratchIndex);
-    tableIndex   = std::move(scratchTableIndex);
+    name = envelope["__db_name__"].asString();
+    tables = std::move(scratchTables);
+    index = std::move(scratchIndex);
+    tableIndex = std::move(scratchTableIndex);
     nextTableId_ = tables.empty() ? 0 : static_cast<TableID>(maxTableId + 1);
-    dirty        = false;
+    dirty = false;
 
     return Status::OK;
 }
-
 
 // ============================================================
 //  Section 4 — Database Operations
@@ -224,8 +226,7 @@ Status Database::load(const std::string& path) {
             return Status::PARSE_ERROR;
 
         return fromJson(envelope);
-    }
-    catch (const std::exception&) {
+    } catch (const std::exception&) {
         return Status::PARSE_ERROR;
     }
 }
@@ -233,22 +234,32 @@ Status Database::load(const std::string& path) {
 Status Database::compact() {
     for (Table* t : tables) {
         Status s = t->compact();
-        if (s != Status::OK) return s;
+        if (s != Status::OK)
+            return s;
     }
 
     dirty = false;
     return Status::OK;
 }
 
-
 // ============================================================
 //  Section 5 — Introspection
 // ============================================================
-std::string Database::getName() const noexcept { return name; }
-std::size_t Database::tableCount() const noexcept { return tables.size(); }
-bool Database::isDirty() const noexcept { return dirty; }
-bool Database::isEmpty() const noexcept { return tables.empty(); }
-const Vector<Table*>& Database::getTables() const noexcept { return tables; }
+std::string Database::getName() const noexcept {
+    return name;
+}
+std::size_t Database::tableCount() const noexcept {
+    return tables.size();
+}
+bool Database::isDirty() const noexcept {
+    return dirty;
+}
+bool Database::isEmpty() const noexcept {
+    return tables.empty();
+}
+const Vector<Table*>& Database::getTables() const noexcept {
+    return tables;
+}
 
 std::size_t Database::recordCount() const noexcept {
     std::size_t count = 0;
@@ -257,7 +268,6 @@ std::size_t Database::recordCount() const noexcept {
     }
     return count;
 }
-
 
 // ============================================================
 //  Section 6 — Helper
