@@ -316,6 +316,10 @@ Status WriteAheadLog::open() {
             break; // frameLength claims more bytes than the file has: crash mid-append, stop here
         }
 
+        if (frameLength < INDEX_SIZE + TERM_SIZE + PAYLOAD_LENGTH_SIZE + CHECKSUM_SIZE) {
+            break; // too short to hold even the fixed fields: corrupt, stop before reading them
+        }
+
         std::vector<char> body(frameLength);
         const IoResult bodyRead = sysPread(fd_, body.data(), frameLength,
                                            static_cast<FileOffset>(pos + FRAME_LENGTH_SIZE));
@@ -354,6 +358,10 @@ Status WriteAheadLog::open() {
         Term entryTerm = 0;
         std::memcpy(&entryIndex, body.data(), INDEX_SIZE);
         std::memcpy(&entryTerm, body.data() + INDEX_SIZE, TERM_SIZE);
+
+        if (entryIndex != offsetIndex_.size() + 1) {
+            break; // valid checksum, out-of-sequence index: offsetIndex_ is keyed by index - 1
+        }
 
         offsetIndex_.push_back(pos);
         lastIndex_ = entryIndex;
