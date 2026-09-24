@@ -5,7 +5,7 @@
  *
  * @version         1.0.0
  *
- * @copyright       Copyright (c) 2026 MWB
+ * @copyright       Copyright (c) 2026 privateMWB
  *                  All rights reserved.
  *
  * @attention       This source is released under the MIT license

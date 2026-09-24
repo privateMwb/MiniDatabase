@@ -5,7 +5,7 @@
  *
  * @version         1.0.0
  *
- * @copyright       Copyright (c) 2026 MWB
+ * @copyright       Copyright (c) 2026 privateMWB
  *                  All rights reserved.
  *
  * @attention       This source is released under the MIT license
@@ -38,9 +38,10 @@
 // since a WAL is written and scanned sequentially rather than accessed by
 // random slot offset. Reuses FileIO's raw-POSIX-fd style (pread/pwrite/
 // fsync) rather than std::fstream, for the same true-random-access and
-// fsync-backed durability reasons FileIO itself documents. POSIX-only for
-// now (no std::fstream fallback like FileIO has) -- acceptable given the
-// current dev target; revisit if a non-POSIX build ever matters. Not
+// fsync-backed durability reasons FileIO itself documents. POSIX and
+// Windows are supported (the Windows side uses Win32 positional I/O behind
+// the same fd-style interface, see WriteAheadLog.cpp); other platforms
+// don't build. Not
 // Raft-specific: general enough for any "durable append log" consumer
 // (event sourcing, audit logs, transaction logs); Raft's replicated log
 // is simply the first concrete consumer.

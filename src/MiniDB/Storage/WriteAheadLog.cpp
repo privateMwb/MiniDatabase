@@ -28,7 +28,152 @@
 #include <utility>
 #include <vector>
 
+// Windows: included after every project header on purpose, so windows.h's
+// macros can't leak into them. NOMINMAX/NOGDI keep min/max/ERROR out.
+#if defined(_WIN32)
+#include <filesystem> // std::filesystem::path (wide-char path for CreateFileW)
+
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+#ifndef NOGDI
+#define NOGDI
+#endif
+// clang-format off
+#include <windows.h>
+#include <fcntl.h> // _O_RDWR, _O_BINARY
+#include <io.h>    // _open_osfhandle, _get_osfhandle, _close, _chsize_s
+// clang-format on
+#elif !(defined(__unix__) || defined(__APPLE__))
+#error "WriteAheadLog: unsupported platform (need POSIX or Windows)"
+#endif
+
 namespace MiniDB::Storage {
+
+// ============================================================
+//  Platform layer
+//
+//  Every OS-specific call the log makes goes through the seven sys*()
+//  helpers below, so the recovery/append/truncate logic further down is
+//  identical on every platform. The POSIX versions are thin pass-throughs
+//  to exactly the calls this file always made; the Windows versions give
+//  the same semantics:
+//    - positional read/write (ReadFile/WriteFile + OVERLAPPED offset), so
+//      no seek-then-read race and no reliance on the file position;
+//    - opened with FILE_SHARE_DELETE, so the file can be removed while the
+//      log still has it open, as on POSIX (the test suite relies on this);
+//    - binary mode, so the CRT never translates \r\n inside a frame;
+//    - fsync == FlushFileBuffers, a real durability barrier.
+// ============================================================
+namespace {
+
+#if defined(_WIN32)
+
+using FileOffset = std::int64_t;
+using IoResult = std::int64_t;
+
+// Largest single ReadFile/WriteFile request; larger buffers are returned
+// as a short count and the caller's existing loop / short-read handling
+// deals with it, exactly as it would for a POSIX short read.
+constexpr std::size_t MAX_IO_BYTES = std::size_t{1} << 30;
+
+HANDLE handleOf(int fd) noexcept {
+    return reinterpret_cast<HANDLE>(::_get_osfhandle(fd));
+}
+
+OVERLAPPED overlappedAt(FileOffset offset) noexcept {
+    OVERLAPPED ov{};
+    const auto u = static_cast<std::uint64_t>(offset);
+    ov.Offset = static_cast<DWORD>(u & 0xFFFFFFFFull);
+    ov.OffsetHigh = static_cast<DWORD>(u >> 32);
+    return ov;
+}
+
+int sysOpen(const char* path) noexcept {
+    const HANDLE h =
+        ::CreateFileW(std::filesystem::path(path).c_str(), GENERIC_READ | GENERIC_WRITE,
+                      FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_ALWAYS,
+                      FILE_ATTRIBUTE_NORMAL, nullptr);
+    if (h == INVALID_HANDLE_VALUE)
+        return -1;
+
+    const int fd = ::_open_osfhandle(reinterpret_cast<intptr_t>(h), _O_RDWR | _O_BINARY);
+    if (fd < 0)
+        ::CloseHandle(h); // the CRT didn't take ownership of the handle
+    return fd;
+}
+
+int sysClose(int fd) noexcept {
+    return ::_close(fd); // also closes the underlying OS handle
+}
+
+FileOffset sysFileSize(int fd) noexcept {
+    LARGE_INTEGER size{};
+    if (!::GetFileSizeEx(handleOf(fd), &size))
+        return -1;
+    return static_cast<FileOffset>(size.QuadPart);
+}
+
+IoResult sysPread(int fd, void* buf, std::size_t count, FileOffset offset) noexcept {
+    OVERLAPPED ov = overlappedAt(offset);
+    const auto want = static_cast<DWORD>(count < MAX_IO_BYTES ? count : MAX_IO_BYTES);
+    DWORD got = 0;
+    if (!::ReadFile(handleOf(fd), buf, want, &got, &ov)) {
+        return ::GetLastError() == ERROR_HANDLE_EOF ? 0 : -1; // reading at/after EOF: 0 bytes
+    }
+    return static_cast<IoResult>(got);
+}
+
+IoResult sysPwrite(int fd, const void* buf, std::size_t count, FileOffset offset) noexcept {
+    OVERLAPPED ov = overlappedAt(offset);
+    const auto want = static_cast<DWORD>(count < MAX_IO_BYTES ? count : MAX_IO_BYTES);
+    DWORD put = 0;
+    if (!::WriteFile(handleOf(fd), buf, want, &put, &ov))
+        return -1;
+    return static_cast<IoResult>(put);
+}
+
+int sysFsync(int fd) noexcept {
+    return ::FlushFileBuffers(handleOf(fd)) ? 0 : -1;
+}
+
+int sysFtruncate(int fd, FileOffset size) noexcept {
+    return ::_chsize_s(fd, size) == 0 ? 0 : -1; // _chsize_s returns an errno code, not -1
+}
+
+#else // POSIX
+
+using FileOffset = off_t;
+using IoResult = ssize_t;
+
+int sysOpen(const char* path) noexcept {
+    return ::open(path, O_RDWR | O_CREAT, 0644);
+}
+int sysClose(int fd) noexcept {
+    return ::close(fd);
+}
+FileOffset sysFileSize(int fd) noexcept {
+    return ::lseek(fd, 0, SEEK_END);
+}
+IoResult sysPread(int fd, void* buf, std::size_t count, FileOffset offset) noexcept {
+    return ::pread(fd, buf, count, offset);
+}
+IoResult sysPwrite(int fd, const void* buf, std::size_t count, FileOffset offset) noexcept {
+    return ::pwrite(fd, buf, count, offset);
+}
+int sysFsync(int fd) noexcept {
+    return ::fsync(fd);
+}
+int sysFtruncate(int fd, FileOffset size) noexcept {
+    return ::ftruncate(fd, size);
+}
+
+#endif
+
+} // namespace
 
 // -----------------------------------------------------------------------
 // Design note
@@ -91,7 +236,7 @@ WriteAheadLog::WriteAheadLog(std::string path) : path_(std::move(path)) {}
 
 WriteAheadLog::~WriteAheadLog() {
     if (fd_ >= 0)
-        ::close(fd_);
+        sysClose(fd_);
 }
 
 WriteAheadLog::WriteAheadLog(WriteAheadLog&& other) noexcept
@@ -107,7 +252,7 @@ WriteAheadLog::WriteAheadLog(WriteAheadLog&& other) noexcept
 WriteAheadLog& WriteAheadLog::operator=(WriteAheadLog&& other) noexcept {
     if (this != &other) {
         if (fd_ >= 0)
-            ::close(fd_);
+            sysClose(fd_);
 
         path_ = std::move(other.path_);
         fd_ = other.fd_;
@@ -131,11 +276,11 @@ WriteAheadLog& WriteAheadLog::operator=(WriteAheadLog&& other) noexcept {
 // ============================================================
 Status WriteAheadLog::open() {
     if (fd_ >= 0) {
-        ::close(fd_);
+        sysClose(fd_);
         fd_ = -1;
     }
 
-    fd_ = ::open(path_.c_str(), O_RDWR | O_CREAT, 0644);
+    fd_ = sysOpen(path_.c_str());
     if (fd_ < 0)
         return Status::IO_ERROR;
 
@@ -144,9 +289,9 @@ Status WriteAheadLog::open() {
     lastTerm_ = INVALID_TERM;
     writeOffset_ = 0;
 
-    const off_t fileSize = ::lseek(fd_, 0, SEEK_END);
+    const FileOffset fileSize = sysFileSize(fd_);
     if (fileSize < 0) {
-        ::close(fd_);
+        sysClose(fd_);
         fd_ = -1;
         return Status::IO_ERROR;
     }
@@ -156,10 +301,10 @@ Status WriteAheadLog::open() {
 
     while (pos + FRAME_LENGTH_SIZE <= totalSize) {
         std::uint32_t frameLength = 0;
-        const ssize_t lenRead =
-            ::pread(fd_, &frameLength, FRAME_LENGTH_SIZE, static_cast<off_t>(pos));
+        const IoResult lenRead =
+            sysPread(fd_, &frameLength, FRAME_LENGTH_SIZE, static_cast<FileOffset>(pos));
         if (lenRead < 0) {
-            ::close(fd_);
+            sysClose(fd_);
             fd_ = -1;
             return Status::IO_ERROR;
         }
@@ -172,10 +317,10 @@ Status WriteAheadLog::open() {
         }
 
         std::vector<char> body(frameLength);
-        const ssize_t bodyRead =
-            ::pread(fd_, body.data(), frameLength, static_cast<off_t>(pos + FRAME_LENGTH_SIZE));
+        const IoResult bodyRead = sysPread(fd_, body.data(), frameLength,
+                                           static_cast<FileOffset>(pos + FRAME_LENGTH_SIZE));
         if (bodyRead < 0) {
-            ::close(fd_);
+            sysClose(fd_);
             fd_ = -1;
             return Status::IO_ERROR;
         }
@@ -221,8 +366,8 @@ Status WriteAheadLog::open() {
     // discarded from the file itself, not just skipped in memory -- otherwise
     // a later append() would leave that garbage stranded between two valid
     // records instead of overwriting it.
-    if (pos != totalSize && ::ftruncate(fd_, static_cast<off_t>(pos)) != 0) {
-        ::close(fd_);
+    if (pos != totalSize && sysFtruncate(fd_, static_cast<FileOffset>(pos)) != 0) {
+        sysClose(fd_);
         fd_ = -1;
         return Status::IO_ERROR;
     }
@@ -260,14 +405,14 @@ Status WriteAheadLog::append(Term term, const std::string& payload, LogIndex& ou
 
     std::size_t written = 0;
     while (written < buf.size()) {
-        const ssize_t n = ::pwrite(fd_, buf.data() + written, buf.size() - written,
-                                   static_cast<off_t>(writeOffset_ + written));
+        const IoResult n = sysPwrite(fd_, buf.data() + written, buf.size() - written,
+                                     static_cast<FileOffset>(writeOffset_ + written));
         if (n < 0)
             return Status::IO_ERROR; // in-memory state untouched: append() had no effect
         written += static_cast<std::size_t>(n);
     }
 
-    if (::fsync(fd_) != 0)
+    if (sysFsync(fd_) != 0)
         return Status::IO_ERROR;
 
     offsetIndex_.push_back(writeOffset_);
@@ -284,15 +429,15 @@ Status WriteAheadLog::append(Term term, const std::string& payload, LogIndex& ou
 // ============================================================
 Status WriteAheadLog::readFrameAt(std::uint64_t fileOffset, LogEntry& out) const {
     std::uint32_t frameLength = 0;
-    const ssize_t lenRead =
-        ::pread(fd_, &frameLength, FRAME_LENGTH_SIZE, static_cast<off_t>(fileOffset));
+    const IoResult lenRead =
+        sysPread(fd_, &frameLength, FRAME_LENGTH_SIZE, static_cast<FileOffset>(fileOffset));
     if (lenRead < 0 || static_cast<std::size_t>(lenRead) < FRAME_LENGTH_SIZE) {
         return Status::IO_ERROR; // fileOffset only ever comes from offsetIndex_: a short read here
     } // means the on-disk file shrank out from under us, not corruption.
 
     std::vector<char> body(frameLength);
-    const ssize_t bodyRead =
-        ::pread(fd_, body.data(), frameLength, static_cast<off_t>(fileOffset + FRAME_LENGTH_SIZE));
+    const IoResult bodyRead = sysPread(fd_, body.data(), frameLength,
+                                       static_cast<FileOffset>(fileOffset + FRAME_LENGTH_SIZE));
     if (bodyRead < 0 || static_cast<std::size_t>(bodyRead) < frameLength) {
         return Status::IO_ERROR;
     }
@@ -340,7 +485,7 @@ Status WriteAheadLog::truncateFrom(LogIndex index) {
         return Status::IO_ERROR;
 
     if (index == INVALID_LOG_INDEX) {
-        if (::ftruncate(fd_, 0) != 0)
+        if (sysFtruncate(fd_, 0) != 0)
             return Status::IO_ERROR;
         offsetIndex_.clear();
         lastIndex_ = INVALID_LOG_INDEX;
@@ -369,7 +514,7 @@ Status WriteAheadLog::truncateFrom(LogIndex index) {
         newLastTerm = tailEntry.term;
     }
 
-    if (::ftruncate(fd_, static_cast<off_t>(cutOffset)) != 0)
+    if (sysFtruncate(fd_, static_cast<FileOffset>(cutOffset)) != 0)
         return Status::IO_ERROR;
 
     // Rebuilt via push_back into a fresh Vector rather than resize/pop_back/

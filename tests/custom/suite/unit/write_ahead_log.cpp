@@ -334,9 +334,7 @@ static void recovery_discards_checksum() {
 static void recovery_empty_file() {
     std::string path = tempPath("recovery_empty");
     std::filesystem::remove(path);
-    {
-        std::ofstream f(path, std::ios::binary);
-    } // zero-byte file, deliberately
+    { std::ofstream f(path, std::ios::binary); } // zero-byte file, deliberately
 
     WriteAheadLog log(path);
     CHK(log.open() == Status::OK);

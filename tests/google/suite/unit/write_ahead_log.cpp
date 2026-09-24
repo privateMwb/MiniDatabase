@@ -334,9 +334,7 @@ TEST(WriteAheadLog, RecoveryDiscardsChecksumMismatchedTrailingRecord) {
 TEST(WriteAheadLog, RecoveryOfEmptyFileSucceeds) {
     std::string path = tempPath("recovery_empty");
     std::filesystem::remove(path);
-    {
-        std::ofstream f(path, std::ios::binary);
-    } // zero-byte file, deliberately
+    { std::ofstream f(path, std::ios::binary); } // zero-byte file, deliberately
 
     WriteAheadLog log(path);
     ASSERT_EQ(log.open(), Status::OK);
