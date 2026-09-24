@@ -295,8 +295,8 @@ MiniDatabase/
 │   └── README.md
 │
 ├── fuzz/
-│   ├── fuzz_http_parser.cpp
-│   └── fuzz_path_matcher.cpp
+│   ├── fuzz_record_deserialize.cpp
+│   └── fuzz_wal_recovery.cpp
 │
 ├── .clusterfuzzlite/
 │   ├── Dockerfile
@@ -369,7 +369,8 @@ correctly outranks `v1.9.0`), not alphabetical filename order, and
 auto-names its output (`regression_v1.2.0_vs_current.md`/`.json`, etc.).
 
 See [packaging/README.md](packaging/README.md) for notes on verifying the vcpkg
-port and Conan recipe locally.
+port and Conan recipe locally, and [FUZZING.md](FUZZING.md) for running the
+fuzz harnesses locally.
 
 <div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
@@ -414,16 +415,32 @@ latency-sensitive path.
 
 ## <a id="fuzzing"></a>🐛 Fuzzing
 
-MiniDB isn't continuously fuzzed yet — there is no fuzz harness or
-ClusterFuzzLite job in this repository today.
+`Record::deserialize()` and `WriteAheadLog::open()`'s recovery scan are
+fuzzed via [ClusterFuzzLite](https://google.github.io/clusterfuzzlite/),
+under AddressSanitizer and UndefinedBehaviorSanitizer. A 5-minute pass
+runs on every PR touching a fuzzed source file; a one-hour batch pass
+runs nightly.
 
-The part of the API that consumes bytes it didn't produce is file
-loading: `Database::load()` and the `Serializer` import functions parse a
-JSON document from disk and report malformed input through `Status`
-(e.g. `PARSE_ERROR`) rather than throwing, and `load()` leaves the
-existing database untouched on failure. Those are the natural targets
-for a fuzz harness; until one exists, malformed-input handling (such as a
-corrupt slot length prefix in `FileIO`) is covered by the test suite.
+Neither is a differential fuzzer — there's no shadow-model JSON parser
+or log reader to compare against. `fuzz_record_deserialize` treats
+`deserialize()`'s documented `Status::PARSE_ERROR` on malformed input as
+an expected outcome and, on a successful parse, exercises every `Record`
+accessor, `validate()`, and the `toJson()`/`serialize()` round trip, so a
+crash is the only finding that counts. `fuzz_wal_recovery` fuzzes the
+on-disk log file directly — arbitrary corruption at any offset, the kind a
+crash mid-write leaves behind — and checks the one invariant recovery
+implies: whatever `lastIndex()` `open()` settles on, every entry from 1
+through it must read back cleanly via `range()`.
+
+`Page`/`Table` deserialization, `Database`'s JSON path, `QueryEngine`,
+and `Concurrency` are deliberately not fuzzed — they either wrap the same
+`Record`-level parsing already covered or operate on developer-written
+arguments rather than untrusted bytes. `FileIO::readSlot()`'s
+length-prefix parsing has a fixed regression test but no dedicated
+harness yet.
+
+See [FUZZING.md](FUZZING.md) for running the harnesses locally and
+reproducing a failing input.
 
 <div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
@@ -442,6 +459,9 @@ Issues and pull requests are welcome. Before submitting a PR:
 - Run the test suite (`ctest --test-dir build`)
 - If you're changing a hot path, run `./build/regression` and mention
   the results in your PR description
+- If you're changing `Record::deserialize()` or `WriteAheadLog`, a quick
+  local fuzz pass (see [FUZZING.md](FUZZING.md)) before pushing catches most
+  malformed-input regressions before CI does
 
 <div align="right"><a href="#-table-of-contents"><img src=".github/assets/back-to-top.svg" alt="Back to top" height="28"></a></div>
 
