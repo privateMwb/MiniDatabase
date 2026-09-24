@@ -1,156 +1,387 @@
-#CacheProRegression Report
+#MiniDBRegression Report
 
-## Element Access
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| get() hit | 10K | 6 ns | 1 ns | -73.0% |
-| get() hit | 100K | 5 ns | 2 ns | -58.9% |
-| get() hit | 1M | 5 ns | 2 ns | -65.2% |
-| peek() hit | 10K | 4 ns | 1 ns | -67.0% |
-| peek() hit | 100K | 5 ns | 1 ns | -82.5% |
-| peek() hit | 1M | 4 ns | 1 ns | -70.4% |
-
-## Iteration
+## Page Access
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| keys() traversal | 10K | 410 ns | 131 ns | -68.0% |
-| keys() traversal | 100K | 387 ns | 136 ns | -65.0% |
-| keys() traversal | 1M | 381 ns | 135 ns | -64.6% |
+| get record last slot | 10K | 0 ns | 204 ns | +inf% |
+| get record last slot | 100K | 0 ns | 204 ns | +inf% |
+| get record last slot | 1M | 0 ns | 218 ns | +inf% |
+| get record at last slot | 10K | 0 ns | 2 ns | +inf% |
+| get record at last slot | 100K | 0 ns | 2 ns | +inf% |
+| get record at last slot | 1M | 0 ns | 2 ns | +inf% |
+| get record id miss | 10K | 0 ns | 206 ns | +inf% |
+| get record id miss | 100K | 0 ns | 208 ns | +inf% |
+| get record id miss | 1M | 0 ns | 213 ns | +inf% |
+| get record at oor | 10K | 0 ns | 2 ns | +inf% |
+| get record at oor | 100K | 0 ns | 2 ns | +inf% |
+| get record at oor | 1M | 0 ns | 2 ns | +inf% |
 
-## Search
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| contains() miss | 10K | 3 ns | 2 ns | -15.8% |
-| contains() miss | 100K | 3 ns | 2 ns | -36.5% |
-| contains() miss | 1M | 3 ns | 2 ns | -30.4% |
-| get() miss | 10K | 3 ns | 2 ns | -28.0% |
-| get() miss | 100K | 3 ns | 2 ns | -42.9% |
-| get() miss | 1M | 3 ns | 2 ns | -39.9% |
-
-## Emplace
+## Query Engine Select
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| emplace() insert | 10K | 321 ns | 24 ns | -92.4% |
-| emplace() insert | 100K | 305 ns | 27 ns | -91.2% |
-| emplace() insert | 1M | 509 ns | 27 ns | -94.8% |
+| QueryEngine selectAll | 1M | 0 ns | 507.42 us | +inf% |
+| QueryEngine selectAll | 1M | 0 ns | 496.33 us | +inf% |
+| QueryEngine selectAll | 10K | 0 ns | 493.36 us | +inf% |
+| QueryEngine select(eq) | 1M | 0 ns | 160.65 us | +inf% |
+| QueryEngine select(eq) | 1M | 0 ns | 160.30 us | +inf% |
+| QueryEngine select(eq) | 10K | 0 ns | 160.39 us | +inf% |
+| QueryEngine select(sort) | 1M | 0 ns | 2.66 ms | +inf% |
+| QueryEngine select(sort) | 1M | 0 ns | 2.65 ms | +inf% |
+| QueryEngine select(sort) | 10K | 0 ns | 2.65 ms | +inf% |
 
-## Erase
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| erase() existing | 10K | 789 ns | 38 ns | -95.2% |
-| erase() existing | 100K | 713 ns | 37 ns | -94.9% |
-| erase() existing | 1M | 557 ns | 24 ns | -95.7% |
-
-## Insert
+## Storage Engine Cache
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| put() insert | 10K | 467 ns | 19 ns | -95.8% |
-| put() insert | 100K | 368 ns | 27 ns | -92.6% |
-| put() insert | 1M | 259 ns | 21 ns | -91.8% |
+| fetch page hit | 10K | 0 ns | 56 ns | +inf% |
+| fetch page hit | 100K | 0 ns | 57 ns | +inf% |
+| fetch page hit | 1M | 0 ns | 59 ns | +inf% |
+| fetch page miss | 10K | 0 ns | 5.16 us | +inf% |
+| fetch page miss | 100K | 0 ns | 5.17 us | +inf% |
+| fetch page miss | 1M | 0 ns | 5.18 us | +inf% |
+| get cached page | 10K | 0 ns | 45 ns | +inf% |
+| get cached page | 100K | 0 ns | 49 ns | +inf% |
+| get cached page | 1M | 0 ns | 48 ns | +inf% |
 
-## Pop Clear
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| clear() + refill | 10K | 3.14 us | 632 ns | -79.9% |
-| clear() + refill | 100K | 3.14 us | 615 ns | -80.4% |
-| clear() + refill | 1M | 3.52 us | 634 ns | -82.0% |
-
-## Push Back
+## Table Access
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| put() insert (evicting) | 10K | 121 ns | 44 ns | -63.3% |
-| put() insert (evicting) | 100K | 121 ns | 44 ns | -64.0% |
-| put() insert (evicting) | 1M | 120 ns | 43 ns | -64.2% |
+| getRecord (single page) | 10K | 0 ns | 67 ns | +inf% |
+| getRecord (single page) | 100K | 0 ns | 68 ns | +inf% |
+| getRecord (single page) | 1M | 0 ns | 68 ns | +inf% |
+| getRecord (multi page) | 10K | 0 ns | 23 ns | +inf% |
+| getRecord (multi page) | 100K | 0 ns | 22 ns | +inf% |
+| getRecord (multi page) | 1M | 0 ns | 23 ns | +inf% |
+| getRecord (miss) | 10K | 0 ns | 2 ns | +inf% |
+| getRecord (miss) | 100K | 0 ns | 2 ns | +inf% |
+| getRecord (miss) | 1M | 0 ns | 2 ns | +inf% |
 
-## Construction
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| construct empty | 10K | 15.64 us | 2.10 us | -86.5% |
-| construct empty | 100K | 15.57 us | 2.10 us | -86.5% |
-| construct empty | 1M | 15.87 us | 2.09 us | -86.8% |
-
-## Move
+## Database Table Ops
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| move-assign | 10K | 64 ns | 6 ns | -90.3% |
-| move-assign | 100K | 64 ns | 8 ns | -88.3% |
-| move-assign | 1M | 65 ns | 7 ns | -89.7% |
-| move-construct | 10K | 7.74 us | 832 ns | -89.2% |
-| move-construct | 100K | 7.55 us | 796 ns | -89.5% |
-| move-construct | 1M | 7.54 us | 797 ns | -89.4% |
+| Database createTable | 10K | 0 ns | 296 ns | +inf% |
+| Database createTable | 100K | 0 ns | 289 ns | +inf% |
+| Database createTable | 1M | 0 ns | 289 ns | +inf% |
+| Database dropTable | 10K | 0 ns | 301 ns | +inf% |
+| Database dropTable | 100K | 0 ns | 301 ns | +inf% |
+| Database dropTable | 1M | 0 ns | 300 ns | +inf% |
+| Database getTable | 10K | 0 ns | 29 ns | +inf% |
+| Database getTable | 100K | 0 ns | 28 ns | +inf% |
+| Database getTable | 1M | 0 ns | 28 ns | +inf% |
+| Database hasTable | 10K | 0 ns | 15 ns | +inf% |
+| Database hasTable | 100K | 0 ns | 16 ns | +inf% |
+| Database hasTable | 1M | 0 ns | 15 ns | +inf% |
 
-## Reallocation
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| resize() grow | 10K | 631 ns | 35 ns | -94.5% |
-| resize() grow | 100K | 484 ns | 43 ns | -91.0% |
-| resize() grow | 1M | 323 ns | 39 ns | -87.9% |
-
-## Reserve
+## Page Mutation
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| reserve() | 10K | 13 ns | 1 ns | -93.1% |
-| reserve() | 100K | 13 ns | 0 ns | -97.6% |
-| reserve() | 1M | 14 ns | 1 ns | -94.8% |
+| addRecord(fill page) | 10K | 0 ns | 3.63 us | +inf% |
+| addRecord(fill page) | 100K | 0 ns | 3.64 us | +inf% |
+| addRecord(fill page) | 1M | 0 ns | 3.64 us | +inf% |
+| updateRecord | 10K | 0 ns | 32 ns | +inf% |
+| updateRecord | 100K | 0 ns | 31 ns | +inf% |
+| updateRecord | 1M | 0 ns | 32 ns | +inf% |
+| deleteRecord | 10K | 0 ns | 131 ns | +inf% |
+| deleteRecord | 100K | 0 ns | 130 ns | +inf% |
+| deleteRecord | 1M | 0 ns | 130 ns | +inf% |
+| compact(half deleted) | 10K | 0 ns | 6.34 us | +inf% |
+| compact(half deleted) | 100K | 0 ns | 6.34 us | +inf% |
+| compact(half deleted) | 1M | 0 ns | 6.35 us | +inf% |
 
-## Shrink To Fit
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| shrink_to_fit() | 10K | 9.28 us | 966 ns | -89.6% |
-| shrink_to_fit() | 100K | 8.97 us | 987 ns | -89.0% |
-| shrink_to_fit() | 1M | 9.12 us | 960 ns | -89.5% |
-
-## Observer
-
-| Test | Iteration | Current | v1.0.0 | Δ |
-|---|---|---|---|---|
-| hitCount() | 10K | 1 ns | 0 ns | -76.8% |
-| hitCount() | 100K | 2 ns | 0 ns | -84.3% |
-| hitCount() | 1M | 1 ns | 0 ns | -62.6% |
-| missCount() | 10K | 2 ns | 1 ns | -62.6% |
-| missCount() | 100K | 1 ns | 1 ns | -52.8% |
-| missCount() | 1M | 1 ns | 1 ns | -59.2% |
-| hitRate() | 10K | 14 ns | 2 ns | -89.4% |
-| hitRate() | 100K | 14 ns | 2 ns | -89.3% |
-| hitRate() | 1M | 15 ns | 1 ns | -90.7% |
-| mostRecentKey() | 10K | 3 ns | 0 ns | -90.6% |
-| mostRecentKey() | 100K | 3 ns | 1 ns | -76.9% |
-| mostRecentKey() | 1M | 3 ns | 0 ns | -90.8% |
-| leastRecentKey() | 10K | 3 ns | 0 ns | -90.6% |
-| leastRecentKey() | 100K | 3 ns | 0 ns | -90.6% |
-| leastRecentKey() | 1M | 3 ns | 1 ns | -81.8% |
-
-## State
+## Record Field
 
 | Test | Iteration | Current | v1.0.0 | Δ |
 |---|---|---|---|---|
-| size() | 10K | 2 ns | 0 ns | -81.4% |
-| size() | 100K | 1 ns | 0 ns | -71.5% |
-| size() | 1M | 1 ns | 1 ns | -58.1% |
-| empty() | 10K | 2 ns | 1 ns | -52.0% |
-| empty() | 100K | 2 ns | 1 ns | -61.4% |
-| empty() | 1M | 2 ns | 1 ns | -77.2% |
-| capacity() | 10K | 2 ns | 0 ns | -84.5% |
-| capacity() | 100K | 2 ns | 0 ns | -84.3% |
-| capacity() | 1M | 2 ns | 0 ns | -84.7% |
+| setField | 10K | 0 ns | 30 ns | +inf% |
+| setField | 100K | 0 ns | 30 ns | +inf% |
+| setField | 1M | 0 ns | 30 ns | +inf% |
+| getField | 10K | 0 ns | 34 ns | +inf% |
+| getField | 100K | 0 ns | 33 ns | +inf% |
+| getField | 1M | 0 ns | 33 ns | +inf% |
+| getFieldRef | 10K | 0 ns | 28 ns | +inf% |
+| getFieldRef | 100K | 0 ns | 29 ns | +inf% |
+| getFieldRef | 1M | 0 ns | 29 ns | +inf% |
+| hasField | 10K | 0 ns | 17 ns | +inf% |
+| hasField | 100K | 0 ns | 23 ns | +inf% |
+| hasField | 1M | 0 ns | 14 ns | +inf% |
+| removeField | 10K | 0 ns | 123 ns | +inf% |
+| removeField | 100K | 0 ns | 121 ns | +inf% |
+| removeField | 1M | 0 ns | 121 ns | +inf% |
+
+## Table Mutation
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| Table insertRecord | 1M | 0 ns | 109 ns | +inf% |
+| Table insertRecord | 1M | 0 ns | 128 ns | +inf% |
+| Table insertRecord | 10K | 0 ns | 288 ns | +inf% |
+| Table updateRecord | 10K | 0 ns | 41 ns | +inf% |
+| Table updateRecord | 100K | 0 ns | 42 ns | +inf% |
+| Table updateRecord | 1M | 0 ns | 41 ns | +inf% |
+| Table deleteRecord | 10K | 0 ns | 7 ns | +inf% |
+| Table deleteRecord | 100K | 0 ns | 2 ns | +inf% |
+| Table deleteRecord | 1M | 0 ns | 2 ns | +inf% |
+| Table rebuildIndex | 1M | 0 ns | 17.01 us | +inf% |
+| Table rebuildIndex | 1M | 0 ns | 17.05 us | +inf% |
+| Table rebuildIndex | 10K | 0 ns | 17.03 us | +inf% |
+
+## Database
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| db ctor | 10K | 0 ns | 61 ns | +inf% |
+| db ctor | 100K | 0 ns | 79 ns | +inf% |
+| db ctor | 1M | 0 ns | 62 ns | +inf% |
+| db move ctor(empty) | 10K | 0 ns | 70 ns | +inf% |
+| db move ctor(empty) | 100K | 0 ns | 71 ns | +inf% |
+| db move ctor(empty) | 1M | 0 ns | 71 ns | +inf% |
+| db move ctor(50 tables) | 10K | 0 ns | 12.84 us | +inf% |
+| db move ctor(50 tables) | 100K | 0 ns | 12.84 us | +inf% |
+| db move ctor(50 tables) | 1M | 0 ns | 12.85 us | +inf% |
+
+## Page
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| Page default ctor | 10K | 0 ns | 49 ns | +inf% |
+| Page default ctor | 100K | 0 ns | 48 ns | +inf% |
+| Page default ctor | 1M | 0 ns | 48 ns | +inf% |
+| Page id ctor | 10K | 0 ns | 47 ns | +inf% |
+| Page id ctor | 100K | 0 ns | 48 ns | +inf% |
+| Page id ctor | 1M | 0 ns | 48 ns | +inf% |
+| Page move ctor (empty) | 10K | 0 ns | 58 ns | +inf% |
+| Page move ctor (empty) | 100K | 0 ns | 56 ns | +inf% |
+| Page move ctor (empty) | 1M | 0 ns | 56 ns | +inf% |
+| Page move ctor(full) | 10K | 0 ns | 3.64 us | +inf% |
+| Page move ctor(full) | 100K | 0 ns | 3.71 us | +inf% |
+| Page move ctor(full) | 1M | 0 ns | 3.81 us | +inf% |
+
+## Record
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| Record default ctor | 10K | 0 ns | 20 ns | +inf% |
+| Record default ctor | 100K | 0 ns | 21 ns | +inf% |
+| Record default ctor | 1M | 0 ns | 21 ns | +inf% |
+| Record id ctor | 10K | 0 ns | 21 ns | +inf% |
+| Record id ctor | 100K | 0 ns | 21 ns | +inf% |
+| Record id ctor | 1M | 0 ns | 21 ns | +inf% |
+| Record id+data ctor | 10K | 0 ns | 131 ns | +inf% |
+| Record id+data ctor | 100K | 0 ns | 137 ns | +inf% |
+| Record id+data ctor | 1M | 0 ns | 133 ns | +inf% |
+| Record copy ctor | 10K | 0 ns | 110 ns | +inf% |
+| Record copy ctor | 100K | 0 ns | 111 ns | +inf% |
+| Record copy ctor | 1M | 0 ns | 110 ns | +inf% |
+| Record move ctor | 10K | 0 ns | 264 ns | +inf% |
+| Record move ctor | 100K | 0 ns | 264 ns | +inf% |
+| Record move ctor | 1M | 0 ns | 261 ns | +inf% |
+
+## Table
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| ctor(empty schema) | 10K | 0 ns | 69 ns | +inf% |
+| ctor(empty schema) | 100K | 0 ns | 86 ns | +inf% |
+| ctor(empty schema) | 1M | 0 ns | 69 ns | +inf% |
+| ctor(20-col schema) | 10K | 0 ns | 226 ns | +inf% |
+| ctor(20-col schema) | 100K | 0 ns | 220 ns | +inf% |
+| ctor(20-col schema) | 1M | 0 ns | 220 ns | +inf% |
+| move ctor(empty) | 10K | 0 ns | 76 ns | +inf% |
+| move ctor(empty) | 100K | 0 ns | 76 ns | +inf% |
+| move ctor(empty) | 1M | 0 ns | 77 ns | +inf% |
+| move ctor(populated) | 1M | 0 ns | 38.99 us | +inf% |
+| move ctor(populated) | 1M | 0 ns | 38.40 us | +inf% |
+| move ctor(populated) | 10K | 0 ns | 38.51 us | +inf% |
+
+## Concurrency Scaling
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| rebuild(2 tables) | 1M | 0 ns | 11.78 us | +inf% |
+| rebuild(2 tables) | 1M | 0 ns | 7.13 us | +inf% |
+| rebuild(2 tables) | 10K | 0 ns | 7.12 us | +inf% |
+| rebuild(4 tables) | 1M | 0 ns | 11.00 us | +inf% |
+| rebuild(4 tables) | 1M | 0 ns | 13.06 us | +inf% |
+| rebuild(4 tables) | 10K | 0 ns | 11.58 us | +inf% |
+| rebuild(16 tables) | 1M | 0 ns | 37.83 us | +inf% |
+| rebuild(16 tables) | 1M | 0 ns | 39.44 us | +inf% |
+| rebuild(16 tables) | 10K | 0 ns | 38.39 us | +inf% |
+| rebuild(64 tables) | 1M | 0 ns | 172.10 us | +inf% |
+| rebuild(64 tables) | 1M | 0 ns | 143.00 us | +inf% |
+| rebuild(64 tables) | 10K | 0 ns | 142.89 us | +inf% |
+
+## Database Scaling
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| db createTable(10) | 10K | 0 ns | 212 ns | +inf% |
+| db createTable(10) | 100K | 0 ns | 210 ns | +inf% |
+| db createTable(10) | 1M | 0 ns | 210 ns | +inf% |
+| db createTable(100) | 10K | 0 ns | 437 ns | +inf% |
+| db createTable(100) | 100K | 0 ns | 436 ns | +inf% |
+| db createTable(100) | 1M | 0 ns | 436 ns | +inf% |
+| db createTable(200) | 10K | 0 ns | 633 ns | +inf% |
+| db createTable(200) | 100K | 0 ns | 632 ns | +inf% |
+| db createTable(200) | 1M | 0 ns | 633 ns | +inf% |
+| db getTable(10) | 10K | 0 ns | 27 ns | +inf% |
+| db getTable(10) | 100K | 0 ns | 27 ns | +inf% |
+| db getTable(10) | 1M | 0 ns | 27 ns | +inf% |
+| db getTable(100) | 10K | 0 ns | 21 ns | +inf% |
+| db getTable(100) | 100K | 0 ns | 21 ns | +inf% |
+| db getTable(100) | 1M | 0 ns | 21 ns | +inf% |
+| db getTable(200) | 10K | 0 ns | 21 ns | +inf% |
+| db getTable(200) | 100K | 0 ns | 22 ns | +inf% |
+| db getTable(200) | 1M | 0 ns | 21 ns | +inf% |
+
+## QueryEngine
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| qe select eq(1) | 1M | 0 ns | 3.27 us | +inf% |
+| qe select eq(1) | 1M | 0 ns | 3.21 us | +inf% |
+| qe select eq(1) | 10K | 0 ns | 3.19 us | +inf% |
+| qe select eq(100) | 1M | 0 ns | 322.31 us | +inf% |
+| qe select eq(100) | 1M | 0 ns | 322.45 us | +inf% |
+| qe select eq(100) | 10K | 0 ns | 322.58 us | +inf% |
+| qe select eq(1000) | 1M | 0 ns | 3.56 ms | +inf% |
+| qe select eq(1000) | 1M | 0 ns | 3.55 ms | +inf% |
+| qe select eq(1000) | 10K | 0 ns | 3.59 ms | +inf% |
+| qe select sorted(1) | 1M | 0 ns | 30.83 us | +inf% |
+| qe select sorted(1) | 1M | 0 ns | 30.05 us | +inf% |
+| qe select sorted(1) | 10K | 0 ns | 30.07 us | +inf% |
+| qe select sorted(100) | 1M | 0 ns | 5.67 ms | +inf% |
+| qe select sorted(100) | 1M | 0 ns | 5.74 ms | +inf% |
+| qe select sorted(100) | 10K | 0 ns | 5.67 ms | +inf% |
+| qe select sorted(1000) | 1M | 0 ns | 69.21 ms | +inf% |
+| qe select sorted(1000) | 1M | 0 ns | 68.84 ms | +inf% |
+| qe select sorted(1000) | 10K | 0 ns | 68.73 ms | +inf% |
+
+## Table Scaling
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| insertRecord(1 page) | 1M | 0 ns | 105 ns | +inf% |
+| insertRecord(1 page) | 1M | 0 ns | 110 ns | +inf% |
+| insertRecord(1 page) | 10K | 0 ns | 273 ns | +inf% |
+| insertRecord(100 pages) | 1M | 0 ns | 278 ns | +inf% |
+| insertRecord(100 pages) | 1M | 0 ns | 290 ns | +inf% |
+| insertRecord(100 pages) | 10K | 0 ns | 460 ns | +inf% |
+| insertRecord(1000 pages) | 1M | 0 ns | 1.98 us | +inf% |
+| insertRecord(1000 pages) | 1M | 0 ns | 1.98 us | +inf% |
+| insertRecord(1000 pages) | 10K | 0 ns | 2.14 us | +inf% |
+| getRecord(1 page) | 10K | 0 ns | 23 ns | +inf% |
+| getRecord(1 page) | 100K | 0 ns | 22 ns | +inf% |
+| getRecord(1 page) | 1M | 0 ns | 23 ns | +inf% |
+| getRecord(100 pages) | 10K | 0 ns | 23 ns | +inf% |
+| getRecord(100 pages) | 100K | 0 ns | 22 ns | +inf% |
+| getRecord(100 pages) | 1M | 0 ns | 22 ns | +inf% |
+| getRecord(1000 pages) | 10K | 0 ns | 22 ns | +inf% |
+| getRecord(1000 pages) | 100K | 0 ns | 22 ns | +inf% |
+| getRecord(1000 pages) | 1M | 0 ns | 22 ns | +inf% |
+
+## Concurrency
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| saveAllTablesParallel | 1M | 0 ns | 1.95 ms | +inf% |
+| saveAllTablesParallel | 1M | 0 ns | 1.85 ms | +inf% |
+| saveAllTablesParallel | 10K | 0 ns | 1.82 ms | +inf% |
+| loadAllTablesParallel | 1M | 0 ns | 279.21 us | +inf% |
+| loadAllTablesParallel | 1M | 0 ns | 281.52 us | +inf% |
+| loadAllTablesParallel | 10K | 0 ns | 285.11 us | +inf% |
+| rebuildAllIndexesParallel | 1M | 0 ns | 19.76 us | +inf% |
+| rebuildAllIndexesParallel | 1M | 0 ns | 19.42 us | +inf% |
+| rebuildAllIndexesParallel | 10K | 0 ns | 20.58 us | +inf% |
+| exportAllTablesParallel | 1M | 0 ns | 1.80 ms | +inf% |
+| exportAllTablesParallel | 1M | 0 ns | 1.80 ms | +inf% |
+| exportAllTablesParallel | 10K | 0 ns | 1.80 ms | +inf% |
+
+## File IO
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| FileIO writeSlot | 10K | 0 ns | 4.14 us | +inf% |
+| FileIO writeSlot | 100K | 0 ns | 4.13 us | +inf% |
+| FileIO writeSlot | 1M | 0 ns | 4.14 us | +inf% |
+| FileIO readSlot | 10K | 0 ns | 3.64 us | +inf% |
+| FileIO readSlot | 100K | 0 ns | 3.62 us | +inf% |
+| FileIO readSlot | 1M | 0 ns | 3.62 us | +inf% |
+| FileIO writeFileAtomic | 1M | 0 ns | 392.30 us | +inf% |
+| FileIO writeFileAtomic | 1M | 0 ns | 386.63 us | +inf% |
+| FileIO writeFileAtomic | 10K | 0 ns | 393.01 us | +inf% |
+| FileIO readFile | 10K | 0 ns | 6.11 us | +inf% |
+| FileIO readFile | 100K | 0 ns | 6.01 us | +inf% |
+| FileIO readFile | 1M | 0 ns | 6.00 us | +inf% |
+
+## Json Round Trip
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| Record to/fromJson | 10K | 0 ns | 667 ns | +inf% |
+| Record to/fromJson | 100K | 0 ns | 664 ns | +inf% |
+| Record to/fromJson | 1M | 0 ns | 665 ns | +inf% |
+| Record serial/deserial | 10K | 0 ns | 2.23 us | +inf% |
+| Record serial/deserial | 100K | 0 ns | 2.23 us | +inf% |
+| Record serial/deserial | 1M | 0 ns | 2.23 us | +inf% |
+| Page to/fromJson | 1M | 0 ns | 58.38 us | +inf% |
+| Page to/fromJson | 1M | 0 ns | 57.56 us | +inf% |
+| Page to/fromJson | 10K | 0 ns | 57.51 us | +inf% |
+| Page serial/deserial | 1M | 0 ns | 121.37 us | +inf% |
+| Page serial/deserial | 1M | 0 ns | 120.99 us | +inf% |
+| Page serial/deserial | 10K | 0 ns | 121.24 us | +inf% |
+| Table to/fromJson | 1M | 0 ns | 419.21 us | +inf% |
+| Table to/fromJson | 1M | 0 ns | 419.32 us | +inf% |
+| Table to/fromJson | 10K | 0 ns | 419.65 us | +inf% |
+| Table serial/deserial | 1M | 0 ns | 751.10 us | +inf% |
+| Table serial/deserial | 1M | 0 ns | 749.68 us | +inf% |
+| Table serial/deserial | 10K | 0 ns | 749.65 us | +inf% |
+
+## Serializer
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| exportTableToFile | 1M | 0 ns | 741.04 us | +inf% |
+| exportTableToFile | 1M | 0 ns | 743.04 us | +inf% |
+| exportTableToFile | 10K | 0 ns | 765.06 us | +inf% |
+| importTableFromFile | 1M | 0 ns | 422.04 us | +inf% |
+| importTableFromFile | 1M | 0 ns | 422.84 us | +inf% |
+| importTableFromFile | 10K | 0 ns | 420.59 us | +inf% |
+| exportDatabaseToJson | 1M | 0 ns | 864.41 us | +inf% |
+| exportDatabaseToJson | 1M | 0 ns | 932.79 us | +inf% |
+| exportDatabaseToJson | 10K | 0 ns | 875.31 us | +inf% |
+| importDatabaseFromJson | 1M | 0 ns | 428.71 us | +inf% |
+| importDatabaseFromJson | 1M | 0 ns | 429.14 us | +inf% |
+| importDatabaseFromJson | 10K | 0 ns | 430.08 us | +inf% |
+
+## Write Ahead Log
+
+| Test | Iteration | Current | v1.0.0 | Δ |
+|---|---|---|---|---|
+| wal append | 1M | 0 ns | 285.85 us | +inf% |
+| wal append | 1M | 0 ns | 242.21 us | +inf% |
+| wal append | 10K | 0 ns | 223.13 us | +inf% |
+| wal entryAt | 10K | 0 ns | 1.23 us | +inf% |
+| wal entryAt | 100K | 0 ns | 1.23 us | +inf% |
+| wal entryAt | 1M | 0 ns | 1.23 us | +inf% |
+| wal range(100) | 10K | 0 ns | 126.89 us | +inf% |
+| wal range(100) | 100K | 0 ns | 126.88 us | +inf% |
+| wal range(100) | 1M | 0 ns | 127.26 us | +inf% |
+| wal open(1000-entry scan) | 1M | 0 ns | 1.34 ms | +inf% |
+| wal open(1000-entry scan) | 1M | 0 ns | 1.34 ms | +inf% |
+| wal open(1000-entry scan) | 10K | 0 ns | 1.34 ms | +inf% |
+| wal append+truncateFrom | 1M | 0 ns | 427.70 us | +inf% |
+| wal append+truncateFrom | 1M | 0 ns | 438.91 us | +inf% |
+| wal append+truncateFrom | 10K | 0 ns | 367.36 us | +inf% |
 
 ## Summary
 
 | Result | Count |
 |---|---|
-| Current faster | 0 (0%) |
-| v1.0.0 faster | 72 (100%) |
+| Current faster | 273 (100%) |
+| v1.0.0 faster | 0 (0%) |
 | Tie | 0 (0%) |

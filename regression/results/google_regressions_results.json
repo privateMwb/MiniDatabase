@@ -1,548 +1,548 @@
 [
   {
     "name": "get_record_hit",
-    "baseline_ns": 290.42,
+    "baseline_ns": 205.97,
     "current_ns": 290.42,
-    "pct_change": 0.00
+    "pct_change": -29.08
   },
   {
     "name": "get_record_miss",
-    "baseline_ns": 560.02,
+    "baseline_ns": 206.06,
     "current_ns": 560.02,
-    "pct_change": 0.00
+    "pct_change": -63.21
   },
   {
     "name": "get_at_hit",
-    "baseline_ns": 6.48,
+    "baseline_ns": 1.88,
     "current_ns": 6.48,
-    "pct_change": 0.00
+    "pct_change": -71.05
   },
   {
     "name": "get_at_miss",
-    "baseline_ns": 4.71,
+    "baseline_ns": 1.87,
     "current_ns": 4.71,
-    "pct_change": 0.00
+    "pct_change": -60.32
   },
   {
     "name": "qe_select_all",
-    "baseline_ns": 8896507.30,
+    "baseline_ns": 484877.84,
     "current_ns": 8896507.30,
-    "pct_change": 0.00
+    "pct_change": -94.55
   },
   {
     "name": "qe_select_eq",
-    "baseline_ns": 66447286.15,
+    "baseline_ns": 159504.76,
     "current_ns": 66447286.15,
-    "pct_change": 0.00
+    "pct_change": -99.76
   },
   {
     "name": "qe_select_sort",
-    "baseline_ns": 10134981.32,
+    "baseline_ns": 2600563.12,
     "current_ns": 10134981.32,
-    "pct_change": 0.00
+    "pct_change": -74.34
   },
   {
     "name": "fetch_hit",
-    "baseline_ns": 204.37,
+    "baseline_ns": 54.37,
     "current_ns": 204.37,
-    "pct_change": 0.00
+    "pct_change": -73.40
   },
   {
     "name": "fetch_miss",
-    "baseline_ns": 18655.15,
+    "baseline_ns": 5152.49,
     "current_ns": 18655.15,
-    "pct_change": 0.00
+    "pct_change": -72.38
   },
   {
     "name": "peek_cache",
-    "baseline_ns": 126.34,
+    "baseline_ns": 44.53,
     "current_ns": 126.34,
-    "pct_change": 0.00
+    "pct_change": -64.76
   },
   {
     "name": "getRecord_hit_small",
-    "baseline_ns": 114.90,
+    "baseline_ns": 71.65,
     "current_ns": 114.90,
-    "pct_change": 0.00
+    "pct_change": -37.64
   },
   {
     "name": "getRecord_hit_large",
-    "baseline_ns": 57.99,
+    "baseline_ns": 21.83,
     "current_ns": 57.99,
-    "pct_change": 0.00
+    "pct_change": -62.35
   },
   {
     "name": "getRecord_miss",
-    "baseline_ns": 5.94,
+    "baseline_ns": 1.87,
     "current_ns": 5.94,
-    "pct_change": 0.00
+    "pct_change": -68.50
   },
   {
     "name": "db_table_create",
-    "baseline_ns": 1897.47,
+    "baseline_ns": 299.92,
     "current_ns": 1897.47,
-    "pct_change": 0.00
+    "pct_change": -84.19
   },
   {
     "name": "db_table_drop",
-    "baseline_ns": 1594.72,
+    "baseline_ns": 311.84,
     "current_ns": 1594.72,
-    "pct_change": 0.00
+    "pct_change": -80.45
   },
   {
     "name": "db_table_get",
-    "baseline_ns": 67.07,
+    "baseline_ns": 26.81,
     "current_ns": 67.07,
-    "pct_change": 0.00
+    "pct_change": -60.03
   },
   {
     "name": "db_table_has",
-    "baseline_ns": 42.61,
+    "baseline_ns": 15.56,
     "current_ns": 42.61,
-    "pct_change": 0.00
+    "pct_change": -63.49
   },
   {
     "name": "record_add",
-    "baseline_ns": 12294.59,
+    "baseline_ns": 3573.40,
     "current_ns": 12294.59,
-    "pct_change": 0.00
+    "pct_change": -70.94
   },
   {
     "name": "record_update",
-    "baseline_ns": 114.78,
+    "baseline_ns": 32.12,
     "current_ns": 114.78,
-    "pct_change": 0.00
+    "pct_change": -72.01
   },
   {
     "name": "record_delete",
-    "baseline_ns": 508.74,
+    "baseline_ns": 129.60,
     "current_ns": 508.74,
-    "pct_change": 0.00
+    "pct_change": -74.53
   },
   {
     "name": "compact",
-    "baseline_ns": 32970.70,
+    "baseline_ns": 6284.39,
     "current_ns": 32970.70,
-    "pct_change": 0.00
+    "pct_change": -80.94
   },
   {
     "name": "field_set",
-    "baseline_ns": 178.11,
+    "baseline_ns": 30.54,
     "current_ns": 178.11,
-    "pct_change": 0.00
+    "pct_change": -82.86
   },
   {
     "name": "field_get",
-    "baseline_ns": 193.96,
+    "baseline_ns": 33.14,
     "current_ns": 193.96,
-    "pct_change": 0.00
+    "pct_change": -82.92
   },
   {
     "name": "field_getref",
-    "baseline_ns": 207.59,
+    "baseline_ns": 28.23,
     "current_ns": 207.59,
-    "pct_change": 0.00
+    "pct_change": -86.40
   },
   {
     "name": "field_has",
-    "baseline_ns": 97.21,
+    "baseline_ns": 12.96,
     "current_ns": 97.21,
-    "pct_change": 0.00
+    "pct_change": -86.67
   },
   {
     "name": "field_remove",
-    "baseline_ns": 1136.07,
+    "baseline_ns": 119.02,
     "current_ns": 1136.07,
-    "pct_change": 0.00
+    "pct_change": -89.52
   },
   {
     "name": "table_record_insert",
-    "baseline_ns": 14705.89,
+    "baseline_ns": 9516.27,
     "current_ns": 14705.89,
-    "pct_change": 0.00
+    "pct_change": -35.29
   },
   {
     "name": "table_record_update",
-    "baseline_ns": 309.51,
+    "baseline_ns": 44.50,
     "current_ns": 309.51,
-    "pct_change": 0.00
+    "pct_change": -85.62
   },
   {
     "name": "table_record_delete",
-    "baseline_ns": 14.43,
+    "baseline_ns": 2.18,
     "current_ns": 14.43,
-    "pct_change": 0.00
+    "pct_change": -84.88
   },
   {
     "name": "rebuild_index",
-    "baseline_ns": 276495.64,
+    "baseline_ns": 17679.20,
     "current_ns": 276495.64,
-    "pct_change": 0.00
+    "pct_change": -93.61
   },
   {
     "name": "db_ctor",
-    "baseline_ns": 848.47,
+    "baseline_ns": 62.09,
     "current_ns": 848.47,
-    "pct_change": 0.00
+    "pct_change": -92.68
   },
   {
     "name": "db_move_empty",
-    "baseline_ns": 921.22,
+    "baseline_ns": 74.53,
     "current_ns": 921.22,
-    "pct_change": 0.00
+    "pct_change": -91.91
   },
   {
     "name": "db_move_populated",
-    "baseline_ns": 140064.43,
+    "baseline_ns": 12727.49,
     "current_ns": 140064.43,
-    "pct_change": 0.00
+    "pct_change": -90.91
   },
   {
     "name": "page_ctor_default",
-    "baseline_ns": 931.52,
+    "baseline_ns": 46.86,
     "current_ns": 931.52,
-    "pct_change": 0.00
+    "pct_change": -94.97
   },
   {
     "name": "page_ctor_id",
-    "baseline_ns": 898.04,
+    "baseline_ns": 46.86,
     "current_ns": 898.04,
-    "pct_change": 0.00
+    "pct_change": -94.78
   },
   {
     "name": "page_move_empty",
-    "baseline_ns": 964.91,
+    "baseline_ns": 54.92,
     "current_ns": 964.91,
-    "pct_change": 0.00
+    "pct_change": -94.31
   },
   {
     "name": "page_move_full",
-    "baseline_ns": 23609.99,
+    "baseline_ns": 3588.78,
     "current_ns": 23609.99,
-    "pct_change": 0.00
+    "pct_change": -84.80
   },
   {
     "name": "record_ctor_default",
-    "baseline_ns": 93.40,
+    "baseline_ns": 20.26,
     "current_ns": 93.40,
-    "pct_change": 0.00
+    "pct_change": -78.31
   },
   {
     "name": "record_ctor_id",
-    "baseline_ns": 115.74,
+    "baseline_ns": 20.32,
     "current_ns": 115.74,
-    "pct_change": 0.00
+    "pct_change": -82.44
   },
   {
     "name": "record_ctor_data",
-    "baseline_ns": 1961.30,
+    "baseline_ns": 126.18,
     "current_ns": 1961.30,
-    "pct_change": 0.00
+    "pct_change": -93.57
   },
   {
     "name": "record_copy",
-    "baseline_ns": 915.75,
+    "baseline_ns": 105.37,
     "current_ns": 915.75,
-    "pct_change": 0.00
+    "pct_change": -88.49
   },
   {
     "name": "record_move",
-    "baseline_ns": 1712.86,
+    "baseline_ns": 248.43,
     "current_ns": 1712.86,
-    "pct_change": 0.00
+    "pct_change": -85.50
   },
   {
     "name": "ctor_schema_empty",
-    "baseline_ns": 896.70,
+    "baseline_ns": 74.03,
     "current_ns": 896.70,
-    "pct_change": 0.00
+    "pct_change": -91.74
   },
   {
     "name": "ctor_schema_wide",
-    "baseline_ns": 1597.20,
+    "baseline_ns": 225.99,
     "current_ns": 1597.20,
-    "pct_change": 0.00
+    "pct_change": -85.85
   },
   {
     "name": "table_move_empty",
-    "baseline_ns": 912.85,
+    "baseline_ns": 80.16,
     "current_ns": 912.85,
-    "pct_change": 0.00
+    "pct_change": -91.22
   },
   {
     "name": "table_move_populated",
-    "baseline_ns": 311336.30,
+    "baseline_ns": 37582.05,
     "current_ns": 311336.30,
-    "pct_change": 0.00
+    "pct_change": -87.93
   },
   {
     "name": "rebuild_pool_below",
-    "baseline_ns": 1245755.17,
+    "baseline_ns": 6586.71,
     "current_ns": 1245755.17,
-    "pct_change": 0.00
+    "pct_change": -99.47
   },
   {
     "name": "rebuild_pool_at",
-    "baseline_ns": 228458.90,
+    "baseline_ns": 12482.40,
     "current_ns": 228458.90,
-    "pct_change": 0.00
+    "pct_change": -94.54
   },
   {
     "name": "rebuild_pool_above",
-    "baseline_ns": 457943.40,
+    "baseline_ns": 38417.84,
     "current_ns": 457943.40,
-    "pct_change": 0.00
+    "pct_change": -91.61
   },
   {
     "name": "rebuild_pool_wellabove",
-    "baseline_ns": 1849065.79,
+    "baseline_ns": 147585.96,
     "current_ns": 1849065.79,
-    "pct_change": 0.00
+    "pct_change": -92.02
   },
   {
     "name": "db_create_10",
-    "baseline_ns": 2061.60,
+    "baseline_ns": 218.41,
     "current_ns": 2061.60,
-    "pct_change": 0.00
+    "pct_change": -89.41
   },
   {
     "name": "db_create_100",
-    "baseline_ns": 2831.35,
+    "baseline_ns": 420.96,
     "current_ns": 2831.35,
-    "pct_change": 0.00
+    "pct_change": -85.13
   },
   {
     "name": "db_create_200",
-    "baseline_ns": 3576.00,
+    "baseline_ns": 636.63,
     "current_ns": 3576.00,
-    "pct_change": 0.00
+    "pct_change": -82.20
   },
   {
     "name": "db_get_10",
-    "baseline_ns": 117.11,
+    "baseline_ns": 26.19,
     "current_ns": 117.11,
-    "pct_change": 0.00
+    "pct_change": -77.64
   },
   {
     "name": "db_get_100",
-    "baseline_ns": 122.68,
+    "baseline_ns": 19.96,
     "current_ns": 122.68,
-    "pct_change": 0.00
+    "pct_change": -83.73
   },
   {
     "name": "db_get_200",
-    "baseline_ns": 119.27,
+    "baseline_ns": 20.88,
     "current_ns": 119.27,
-    "pct_change": 0.00
+    "pct_change": -82.49
   },
   {
     "name": "select_eq_pages_1",
-    "baseline_ns": 17977.38,
+    "baseline_ns": 3177.62,
     "current_ns": 17977.38,
-    "pct_change": 0.00
+    "pct_change": -82.32
   },
   {
     "name": "select_eq_pages_100",
-    "baseline_ns": 5666948.52,
+    "baseline_ns": 318167.16,
     "current_ns": 5666948.52,
-    "pct_change": 0.00
+    "pct_change": -94.39
   },
   {
     "name": "select_eq_pages_1000",
-    "baseline_ns": 52759485.18,
+    "baseline_ns": 3550364.99,
     "current_ns": 52759485.18,
-    "pct_change": 0.00
+    "pct_change": -93.27
   },
   {
     "name": "select_sort_pages_1",
-    "baseline_ns": 159535.00,
+    "baseline_ns": 29594.16,
     "current_ns": 159535.00,
-    "pct_change": 0.00
+    "pct_change": -81.45
   },
   {
     "name": "select_sort_pages_100",
-    "baseline_ns": 35251219.80,
+    "baseline_ns": 5700671.52,
     "current_ns": 35251219.80,
-    "pct_change": 0.00
+    "pct_change": -83.83
   },
   {
     "name": "select_sort_pages_1000",
-    "baseline_ns": 390642885.12,
+    "baseline_ns": 68727328.33,
     "current_ns": 390642885.12,
-    "pct_change": 0.00
+    "pct_change": -82.41
   },
   {
     "name": "insertRecord_pages_1",
-    "baseline_ns": 11340.26,
+    "baseline_ns": 9383.18,
     "current_ns": 11340.26,
-    "pct_change": 0.00
+    "pct_change": -17.26
   },
   {
     "name": "insertRecord_pages_100",
-    "baseline_ns": 13308.31,
+    "baseline_ns": 8525.66,
     "current_ns": 13308.31,
-    "pct_change": 0.00
+    "pct_change": -35.94
   },
   {
     "name": "insertRecord_pages_1000",
-    "baseline_ns": 27032.84,
+    "baseline_ns": 5621.43,
     "current_ns": 27032.84,
-    "pct_change": 0.00
+    "pct_change": -79.21
   },
   {
     "name": "getRecord_pages_1",
-    "baseline_ns": 134.52,
+    "baseline_ns": 21.81,
     "current_ns": 134.52,
-    "pct_change": 0.00
+    "pct_change": -83.79
   },
   {
     "name": "getRecord_pages_100",
-    "baseline_ns": 109.78,
+    "baseline_ns": 21.82,
     "current_ns": 109.78,
-    "pct_change": 0.00
+    "pct_change": -80.13
   },
   {
     "name": "getRecord_pages_1000",
-    "baseline_ns": 108.50,
+    "baseline_ns": 21.81,
     "current_ns": 108.50,
-    "pct_change": 0.00
+    "pct_change": -79.90
   },
   {
     "name": "all_save",
-    "baseline_ns": 5898144.69,
+    "baseline_ns": 1814126.08,
     "current_ns": 5898144.69,
-    "pct_change": 0.00
+    "pct_change": -69.24
   },
   {
     "name": "all_load",
-    "baseline_ns": 2949431.55,
+    "baseline_ns": 280749.86,
     "current_ns": 2949431.55,
-    "pct_change": 0.00
+    "pct_change": -90.48
   },
   {
     "name": "all_rebuild",
-    "baseline_ns": 322948.27,
+    "baseline_ns": 20958.76,
     "current_ns": 322948.27,
-    "pct_change": 0.00
+    "pct_change": -93.51
   },
   {
     "name": "all_export",
-    "baseline_ns": 5220380.31,
+    "baseline_ns": 1813258.73,
     "current_ns": 5220380.31,
-    "pct_change": 0.00
+    "pct_change": -65.27
   },
   {
     "name": "write_slot",
-    "baseline_ns": 14042.70,
+    "baseline_ns": 4340.37,
     "current_ns": 14042.70,
-    "pct_change": 0.00
+    "pct_change": -69.09
   },
   {
     "name": "write_atomic",
-    "baseline_ns": 1147357.87,
+    "baseline_ns": 397826.64,
     "current_ns": 1147357.87,
-    "pct_change": 0.00
+    "pct_change": -65.33
   },
   {
     "name": "read_slot",
-    "baseline_ns": 8485.87,
+    "baseline_ns": 3649.46,
     "current_ns": 8485.87,
-    "pct_change": 0.00
+    "pct_change": -56.99
   },
   {
     "name": "read_file",
-    "baseline_ns": 17595.35,
+    "baseline_ns": 5979.09,
     "current_ns": 17595.35,
-    "pct_change": 0.00
+    "pct_change": -66.02
   },
   {
     "name": "record_roundtrip_tree",
-    "baseline_ns": 5058.90,
+    "baseline_ns": 647.11,
     "current_ns": 5058.90,
-    "pct_change": 0.00
+    "pct_change": -87.21
   },
   {
     "name": "record_roundtrip_str",
-    "baseline_ns": 13328.41,
+    "baseline_ns": 2223.96,
     "current_ns": 13328.41,
-    "pct_change": 0.00
+    "pct_change": -83.31
   },
   {
     "name": "page_roundtrip_tree",
-    "baseline_ns": 271063.00,
+    "baseline_ns": 57485.69,
     "current_ns": 271063.00,
-    "pct_change": 0.00
+    "pct_change": -78.79
   },
   {
     "name": "page_roundtrip_str",
-    "baseline_ns": 589002.32,
+    "baseline_ns": 121466.03,
     "current_ns": 589002.32,
-    "pct_change": 0.00
+    "pct_change": -79.38
   },
   {
     "name": "table_roundtrip_tree",
-    "baseline_ns": 2382602.37,
+    "baseline_ns": 419917.63,
     "current_ns": 2382602.37,
-    "pct_change": 0.00
+    "pct_change": -82.38
   },
   {
     "name": "table_roundtrip_str",
-    "baseline_ns": 4192393.41,
+    "baseline_ns": 745486.01,
     "current_ns": 4192393.41,
-    "pct_change": 0.00
+    "pct_change": -82.22
   },
   {
     "name": "table_export",
-    "baseline_ns": 3836001.16,
+    "baseline_ns": 735287.65,
     "current_ns": 3836001.16,
-    "pct_change": 0.00
+    "pct_change": -80.83
   },
   {
     "name": "table_import",
-    "baseline_ns": 3119118.79,
+    "baseline_ns": 421946.56,
     "current_ns": 3119118.79,
-    "pct_change": 0.00
+    "pct_change": -86.47
   },
   {
     "name": "database_export",
-    "baseline_ns": 4674799.37,
+    "baseline_ns": 848047.20,
     "current_ns": 4674799.37,
-    "pct_change": 0.00
+    "pct_change": -81.86
   },
   {
     "name": "database_import",
-    "baseline_ns": 4048110.82,
+    "baseline_ns": 432599.05,
     "current_ns": 4048110.82,
-    "pct_change": 0.00
+    "pct_change": -89.31
   },
   {
     "name": "wal_append",
-    "baseline_ns": 923112.63,
+    "baseline_ns": 229246.20,
     "current_ns": 923112.63,
-    "pct_change": 0.00
+    "pct_change": -75.17
   },
   {
     "name": "wal_entryAt",
-    "baseline_ns": 3664.58,
+    "baseline_ns": 1215.80,
     "current_ns": 3664.58,
-    "pct_change": 0.00
+    "pct_change": -66.82
   },
   {
     "name": "wal_range",
-    "baseline_ns": 298413.27,
+    "baseline_ns": 127139.22,
     "current_ns": 298413.27,
-    "pct_change": 0.00
+    "pct_change": -57.39
   },
   {
     "name": "wal_openRecoveryScan",
-    "baseline_ns": 4229015.15,
+    "baseline_ns": 1330810.59,
     "current_ns": 4229015.15,
-    "pct_change": 0.00
+    "pct_change": -68.53
   },
   {
     "name": "wal_truncateFrom",
-    "baseline_ns": 623767.78,
+    "baseline_ns": 361728.86,
     "current_ns": 623767.78,
-    "pct_change": 0.00
+    "pct_change": -42.01
   }
 ]
