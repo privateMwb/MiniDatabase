@@ -203,6 +203,28 @@ constexpr std::uint32_t bodySize(std::uint32_t payloadLength) noexcept {
     return static_cast<std::uint32_t>(INDEX_SIZE + TERM_SIZE + PAYLOAD_LENGTH_SIZE) +
            payloadLength + static_cast<std::uint32_t>(CHECKSUM_SIZE);
 }
+
+// Written once at byte offset 0 of every file this class creates, and
+// required (not just expected) of every existing file it's asked to
+// open. Without this, open() had no way to tell "a WAL that's merely
+// corrupted at the very first record" apart from "a file this class
+// has never touched" -- and treated both identically: truncate
+// forward from position 0, i.e. wipe the file. A caller pointing this
+// class at the wrong path (misconfiguration, typo) got that file
+// silently destroyed with Status::OK, no warning. This magic prefix
+// closes that gap: a non-empty file without it is refused up front,
+// completely untouched, via Status::PARSE_ERROR.
+constexpr std::array<char, 8> MAGIC = {'M', 'D', 'B', 'W', 'A', 'L', '\x01', '\0'};
+
+// bodySize()'s arithmetic is std::uint32_t (matching the on-disk
+// frameLength field's width, per the file-level design note above).
+// MAX_PAYLOAD_SIZE (declared in WriteAheadLog.h, used by append()
+// below) keeps every real payload well clear of that type's ~4.29
+// billion ceiling -- without it, a payload near that ceiling wraps
+// frameLen to a small value, and append() would allocate a too-small
+// buffer and memcpy the real, far larger payload into it: heap
+// corruption, not a clean rejection.
+
 } // namespace
 
 // ============================================================
@@ -296,8 +318,48 @@ Status WriteAheadLog::open() {
         return Status::IO_ERROR;
     }
 
-    std::uint64_t pos = 0;
-    const auto totalSize = static_cast<std::uint64_t>(fileSize);
+    if (fileSize == 0) {
+        // Brand new file: stamp it as one of ours before anything else
+        // touches it, so a future open() can tell it apart from a file
+        // this class has never seen.
+        const IoResult written = sysPwrite(fd_, MAGIC.data(), MAGIC.size(), 0);
+        if (written < 0 || static_cast<std::size_t>(written) < MAGIC.size()) {
+            sysClose(fd_);
+            fd_ = -1;
+            return Status::IO_ERROR;
+        }
+        if (sysFsync(fd_) != 0) {
+            sysClose(fd_);
+            fd_ = -1;
+            return Status::IO_ERROR;
+        }
+    } else {
+        // Existing, non-empty file: the magic prefix must already be
+        // there. If it isn't, this is not a file this class created --
+        // refuse it outright, before the recovery scan below gets any
+        // chance to truncate it. See MAGIC's own doc comment.
+        if (static_cast<std::uint64_t>(fileSize) < MAGIC.size()) {
+            sysClose(fd_);
+            fd_ = -1;
+            return Status::PARSE_ERROR;
+        }
+
+        std::array<char, MAGIC.size()> header{};
+        const IoResult headerRead = sysPread(fd_, header.data(), header.size(), 0);
+        if (headerRead < 0 || static_cast<std::size_t>(headerRead) < header.size()) {
+            sysClose(fd_);
+            fd_ = -1;
+            return Status::IO_ERROR;
+        }
+        if (header != MAGIC) {
+            sysClose(fd_);
+            fd_ = -1;
+            return Status::PARSE_ERROR; // Not one of ours -- left completely untouched.
+        }
+    }
+
+    std::uint64_t pos = MAGIC.size();
+    const auto totalSize = static_cast<std::uint64_t>(fileSize == 0 ? MAGIC.size() : fileSize);
 
     while (pos + FRAME_LENGTH_SIZE <= totalSize) {
         std::uint32_t frameLength = 0;
@@ -390,6 +452,15 @@ Status WriteAheadLog::open() {
 Status WriteAheadLog::append(Term term, const std::string& payload, LogIndex& outIndex) {
     if (fd_ < 0)
         return Status::IO_ERROR;
+
+    // Checked as size_t, before any narrowing -- see MAX_PAYLOAD_SIZE's
+    // doc comment for why this specific bound and what it prevents.
+    // Status::INVALID_TYPE is an imperfect fit (there's no dedicated
+    // "argument too large" code in MiniDB::Common::Status); it's the
+    // closest existing value to "this input doesn't conform to what's
+    // accepted" without introducing a new enum member unilaterally.
+    if (payload.size() > MAX_PAYLOAD_SIZE)
+        return Status::INVALID_TYPE;
 
     const auto payloadLength = static_cast<std::uint32_t>(payload.size());
     const std::uint32_t frameLen = bodySize(payloadLength);
@@ -493,12 +564,18 @@ Status WriteAheadLog::truncateFrom(LogIndex index) {
         return Status::IO_ERROR;
 
     if (index == INVALID_LOG_INDEX) {
-        if (sysFtruncate(fd_, 0) != 0)
+        // Truncate to MAGIC.size(), not 0 -- the file must stay a
+        // recognized, valid (empty) WAL, not regress to the
+        // "unstamped" state open() only expects for a genuinely new
+        // file. Truncating to 0 here would let a subsequent append()
+        // in this same process (no intervening open()) overwrite the
+        // magic bytes with real log-entry data.
+        if (sysFtruncate(fd_, static_cast<FileOffset>(MAGIC.size())) != 0)
             return Status::IO_ERROR;
         offsetIndex_.clear();
         lastIndex_ = INVALID_LOG_INDEX;
         lastTerm_ = INVALID_TERM;
-        writeOffset_ = 0;
+        writeOffset_ = MAGIC.size();
         return Status::OK;
     }
 

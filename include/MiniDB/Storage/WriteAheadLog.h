@@ -80,6 +80,13 @@ constexpr LogIndex INVALID_LOG_INDEX = 0;
 /// @brief Sentinel for "no term recorded yet".
 constexpr Term INVALID_TERM = 0;
 
+/// @brief Largest single entry `append()` will accept, in bytes.
+/// Comfortably below the on-disk frame-length field's `uint32_t`
+/// ceiling (see WriteAheadLog.cpp's design note) -- exposed publicly
+/// so a caller can check a payload before calling `append()`, rather
+/// than only discovering the limit via a returned error.
+constexpr std::size_t MAX_PAYLOAD_SIZE = 64ull * 1024 * 1024;
+
 /// @brief One durable log entry as returned by read operations (Phase 2).
 struct LogEntry {
     LogIndex index = INVALID_LOG_INDEX;
@@ -162,19 +169,25 @@ class WriteAheadLog {
      * @return `Status::OK` on success; `Status::IO_ERROR` if the file
      * can't be opened/created, or a read fails outright (as opposed to
      * simply running out of bytes, which is the ordinary crash-recovery
-     * case -- see class-level details).
+     * case -- see class-level details); `Status::PARSE_ERROR` if the
+     * file is non-empty but doesn't begin with this class's magic
+     * header -- i.e. it's not a file this class ever created. That
+     * file is left completely untouched in this case; nothing is
+     * truncated or overwritten.
      */
     [[nodiscard]] Status open();
 
     /**
      * @brief Durably appends one entry.
      * @param term Caller-supplied term/version tag, stored verbatim.
-     * @param payload Opaque entry data.
+     * @param payload Opaque entry data. Rejected if larger than
+     * `MAX_PAYLOAD_SIZE`.
      * @param outIndex Set to the newly assigned index on success.
-     * @return `Status::OK` on success; `Status::IO_ERROR` if the log
-     * isn't open, or on write/`fsync` failure. On failure, the log's
-     * in-memory state is left exactly as it was before the call -- a
-     * failed append never advances `lastIndex()`.
+     * @return `Status::OK` on success; `Status::INVALID_TYPE` if
+     * `payload.size() > MAX_PAYLOAD_SIZE`; `Status::IO_ERROR` if the
+     * log isn't open, or on write/`fsync` failure. On any failure, the
+     * log's in-memory state is left exactly as it was before the call
+     * -- a failed append never advances `lastIndex()`.
      * @details Every call `fsync`s before returning. The roadmap's
      * fsync-batching question is deferred, not decided against --
      * every-write is the safe default until reasoned through against the

@@ -207,14 +207,21 @@ TEST(WriteAheadLog, TruncateThenAppendLandsAtTruncatedIndexNotOldEnd) {
     std::filesystem::remove(path);
 }
 
-// Verifies truncateFrom(0) wipes the entire log and the log remains
-// usable afterward.
+// Verifies truncateFrom(0) wipes every entry and the log remains
+// usable afterward. The file itself does NOT go to 0 bytes -- it's
+// truncated back to exactly its freshly-opened, zero-entry size (the
+// magic header alone), not an unrecognized empty file. See
+// WriteAheadLog.cpp's MAGIC doc comment: truncating all the way to 0
+// would regress the file out of the "stamped, recognized WAL" state
+// this class's open() now requires of any non-empty file.
 TEST(WriteAheadLog, TruncateFromZeroWipesEntireLog) {
     std::string path = tempPath("truncate_zero");
     std::filesystem::remove(path);
 
     WriteAheadLog log(path);
     ASSERT_EQ(log.open(), Status::OK);
+    const auto emptyLogSize = std::filesystem::file_size(path); // header-only baseline
+
     LogIndex idx = INVALID_LOG_INDEX;
     ASSERT_EQ(log.append(1, "a", idx), Status::OK);
     ASSERT_EQ(log.append(1, "b", idx), Status::OK);
@@ -222,7 +229,7 @@ TEST(WriteAheadLog, TruncateFromZeroWipesEntireLog) {
     ASSERT_EQ(log.truncateFrom(INVALID_LOG_INDEX), Status::OK);
     EXPECT_EQ(log.lastIndex(), INVALID_LOG_INDEX);
     EXPECT_EQ(log.lastTerm(), INVALID_TERM);
-    EXPECT_EQ(std::filesystem::file_size(path), 0u);
+    EXPECT_EQ(std::filesystem::file_size(path), emptyLogSize);
 
     ASSERT_EQ(log.append(2, "fresh", idx), Status::OK);
     EXPECT_EQ(idx, 1u);
@@ -379,6 +386,96 @@ TEST(WriteAheadLog, SingleEntryLogRoundTripsAndReportsCorrectLastTerm) {
     ASSERT_EQ(log.range(1, 1, out), Status::OK);
     ASSERT_EQ(out.size(), 1u);
     EXPECT_EQ(out[0].payload, "solo");
+
+    std::filesystem::remove(path);
+}
+
+// Verifies open() refuses a non-empty file that was never created by
+// this class (no magic header), leaving it byte-for-byte untouched --
+// rather than treating "unrecognized file" the same as "corrupted
+// WAL" and truncating it, as an earlier version of this class did.
+TEST(WriteAheadLog, OpenRefusesForeignFileWithoutTruncatingIt) {
+    std::string path = tempPath("foreign_file");
+    std::filesystem::remove(path);
+
+    const std::string originalContents = "This file belongs to something else entirely.";
+    {
+        std::ofstream out(path, std::ios::binary);
+        out << originalContents;
+    }
+
+    WriteAheadLog log(path);
+    EXPECT_EQ(log.open(), Status::PARSE_ERROR);
+
+    std::ifstream in(path, std::ios::binary);
+    std::string afterOpen((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    EXPECT_EQ(afterOpen, originalContents); // completely untouched, not truncated
+
+    std::filesystem::remove(path);
+}
+
+// Verifies open() also refuses a file that's shorter than the magic
+// header itself (a degenerate case of "not one of ours"), without
+// touching it.
+TEST(WriteAheadLog, OpenRefusesFileShorterThanMagicHeader) {
+    std::string path = tempPath("too_short");
+    std::filesystem::remove(path);
+
+    {
+        std::ofstream out(path, std::ios::binary);
+        out << "hi"; // shorter than the 8-byte magic header
+    }
+
+    WriteAheadLog log(path);
+    EXPECT_EQ(log.open(), Status::PARSE_ERROR);
+    EXPECT_EQ(std::filesystem::file_size(path), 2u);
+
+    std::filesystem::remove(path);
+}
+
+// Verifies append() rejects a payload over MAX_PAYLOAD_SIZE instead of
+// silently wrapping the on-disk uint32_t frame-length field and
+// writing past the buffer it allocates for the (wrongly small) wrapped
+// size.
+TEST(WriteAheadLog, AppendRejectsPayloadOverMaxSize) {
+    std::string path = tempPath("oversized_payload");
+    std::filesystem::remove(path);
+
+    WriteAheadLog log(path);
+    ASSERT_EQ(log.open(), Status::OK);
+
+    std::string oversized(MAX_PAYLOAD_SIZE + 1, 'x');
+    LogIndex idx = INVALID_LOG_INDEX;
+    EXPECT_EQ(log.append(1, oversized, idx), Status::INVALID_TYPE);
+    EXPECT_EQ(log.lastIndex(), INVALID_LOG_INDEX); // rejected before anything was written
+
+    // The log is still perfectly usable after a rejected oversized append.
+    ASSERT_EQ(log.append(1, "normal entry", idx), Status::OK);
+    EXPECT_EQ(idx, 1u);
+
+    std::filesystem::remove(path);
+}
+
+// Verifies a full truncateFrom(0) leaves the file at its recognized,
+// freshly-opened (header-only) size, not 0 bytes -- so an in-process
+// append() right afterward (no intervening open()) can't land on top
+// of the magic header. Companion to TruncateFromZeroWipesEntireLog
+// above, focused specifically on the file staying open()-recognizable.
+TEST(WriteAheadLog, TruncateFromZeroKeepsFileRecognizedByReopen) {
+    std::string path = tempPath("truncate_zero_reopen");
+    std::filesystem::remove(path);
+
+    {
+        WriteAheadLog log(path);
+        ASSERT_EQ(log.open(), Status::OK);
+        LogIndex idx = INVALID_LOG_INDEX;
+        ASSERT_EQ(log.append(1, "a", idx), Status::OK);
+        ASSERT_EQ(log.truncateFrom(INVALID_LOG_INDEX), Status::OK);
+    } // WriteAheadLog destructs here -- next open() is a genuinely fresh process-level reopen.
+
+    WriteAheadLog reopened(path);
+    EXPECT_EQ(reopened.open(), Status::OK); // not PARSE_ERROR -- still a recognized WAL
+    EXPECT_EQ(reopened.lastIndex(), INVALID_LOG_INDEX);
 
     std::filesystem::remove(path);
 }

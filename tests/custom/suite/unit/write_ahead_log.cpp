@@ -207,14 +207,21 @@ static void truncate_append_lands_index() {
     std::filesystem::remove(path);
 }
 
-// Verifies truncateFrom(0) wipes the entire log and the log remains
-// usable afterward.
+// Verifies truncateFrom(0) wipes every entry and the log remains
+// usable afterward. The file itself does NOT go to 0 bytes -- it's
+// truncated back to exactly its freshly-opened, zero-entry size (the
+// magic header alone), not an unrecognized empty file. See
+// WriteAheadLog.cpp's MAGIC doc comment: truncating all the way to 0
+// would regress the file out of the "stamped, recognized WAL" state
+// this class's open() now requires of any non-empty file.
 static void truncate_zero_wipes_log() {
     std::string path = tempPath("truncate_zero");
     std::filesystem::remove(path);
 
     WriteAheadLog log(path);
     CHK(log.open() == Status::OK);
+    const auto emptyLogSize = std::filesystem::file_size(path); // header-only baseline
+
     LogIndex idx = INVALID_LOG_INDEX;
     CHK(log.append(1, "a", idx) == Status::OK);
     CHK(log.append(1, "b", idx) == Status::OK);
@@ -222,7 +229,7 @@ static void truncate_zero_wipes_log() {
     CHK(log.truncateFrom(INVALID_LOG_INDEX) == Status::OK);
     CHK(log.lastIndex() == INVALID_LOG_INDEX);
     CHK(log.lastTerm() == INVALID_TERM);
-    CHK(std::filesystem::file_size(path) == 0u);
+    CHK(std::filesystem::file_size(path) == emptyLogSize);
 
     CHK(log.append(2, "fresh", idx) == Status::OK);
     CHK(idx == 1u);
@@ -383,6 +390,90 @@ static void single_entry_round_trip() {
     std::filesystem::remove(path);
 }
 
+// Verifies open() refuses a non-empty file that was never created by
+// this class (no magic header), leaving it byte-for-byte untouched --
+// rather than treating "unrecognized file" the same as "corrupted
+// WAL" and truncating it, as an earlier version of this class did.
+static void open_refuses_foreign_file() {
+    std::string path = tempPath("foreign_file");
+    std::filesystem::remove(path);
+
+    const std::string originalContents = "This file belongs to something else entirely.";
+    {
+        std::ofstream out(path, std::ios::binary);
+        out << originalContents;
+    }
+
+    WriteAheadLog log(path);
+    CHK(log.open() == Status::PARSE_ERROR);
+
+    std::ifstream in(path, std::ios::binary);
+    std::string afterOpen((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+    CHK(afterOpen == originalContents); // completely untouched, not truncated
+
+    std::filesystem::remove(path);
+}
+
+// Verifies open() also refuses a file shorter than the magic header
+// itself, without touching it.
+static void open_refuses_too_short_file() {
+    std::string path = tempPath("too_short");
+    std::filesystem::remove(path);
+
+    {
+        std::ofstream out(path, std::ios::binary);
+        out << "hi"; // shorter than the 8-byte magic header
+    }
+
+    WriteAheadLog log(path);
+    CHK(log.open() == Status::PARSE_ERROR);
+    CHK(std::filesystem::file_size(path) == 2u);
+
+    std::filesystem::remove(path);
+}
+
+// Verifies append() rejects a payload over MAX_PAYLOAD_SIZE instead of
+// silently wrapping the on-disk uint32_t frame-length field.
+static void append_rejects_oversized_payload() {
+    std::string path = tempPath("oversized_payload");
+    std::filesystem::remove(path);
+
+    WriteAheadLog log(path);
+    CHK(log.open() == Status::OK);
+
+    std::string oversized(MAX_PAYLOAD_SIZE + 1, 'x');
+    LogIndex idx = INVALID_LOG_INDEX;
+    CHK(log.append(1, oversized, idx) == Status::INVALID_TYPE);
+    CHK(log.lastIndex() == INVALID_LOG_INDEX); // rejected before anything was written
+
+    CHK(log.append(1, "normal entry", idx) == Status::OK);
+    CHK(idx == 1u);
+
+    std::filesystem::remove(path);
+}
+
+// Verifies a full truncateFrom(0) leaves the file at its recognized,
+// freshly-opened (header-only) size, not 0 bytes -- so a later,
+// genuinely fresh open() still recognizes it as a WAL.
+static void truncate_zero_keeps_file_reopenable() {
+    std::string path = tempPath("truncate_zero_reopen");
+    std::filesystem::remove(path);
+
+    {
+        WriteAheadLog log(path);
+        CHK(log.open() == Status::OK);
+        LogIndex idx = INVALID_LOG_INDEX;
+        CHK(log.append(1, "a", idx) == Status::OK);
+        CHK(log.truncateFrom(INVALID_LOG_INDEX) == Status::OK);
+    }
+
+    WriteAheadLog reopened(path);
+    CHK(reopened.open() == Status::OK); // not PARSE_ERROR -- still a recognized WAL
+    CHK(reopened.lastIndex() == INVALID_LOG_INDEX);
+
+    std::filesystem::remove(path);
+}
+
 // Executes all WriteAheadLog test cases.
 static void run_tests() {
     RUN(open_creates_empty);
@@ -399,6 +490,10 @@ static void run_tests() {
     RUN(recovery_empty_file);
     RUN(entry_at_invalid_range);
     RUN(single_entry_round_trip);
+    RUN(open_refuses_foreign_file);
+    RUN(open_refuses_too_short_file);
+    RUN(append_rejects_oversized_payload);
+    RUN(truncate_zero_keeps_file_reopenable);
 }
 
 REGISTER_TEST_SUITE();
