@@ -1,7 +1,8 @@
 # ============================================================
 # .github/workflows/update.yml
 # Bumps the version and source hash in the Conan recipe, vcpkg
-# port, and root CMakeLists.txt for a given v* tag.
+# port, and root CMakeLists.txt for a given v* tag, and opens an
+# auto-merging pull request with the result (main is protected).
 # ============================================================
 
 name: Update Package Recipes
@@ -49,6 +50,7 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.repository.default_branch }}
+          persist-credentials: false # the push below must use the PAT, not GITHUB_TOKEN
 
       - name: Determine source branch
         id: branch
@@ -79,7 +81,7 @@ jobs:
         run: |
           SHA=$(git rev-list -n 1 "${{ steps.tag.outputs.tag }}")
           echo "sha=$SHA" >> "$GITHUB_OUTPUT"
-          curl -L \
+          curl -fL \
             -o source.tar.gz \
             "https://github.com/${{ env.REPOSITORY }}/archive/${SHA}.tar.gz"
 
@@ -109,7 +111,7 @@ jobs:
               MISSING+=("$NAME")
               continue
             fi
-            curl -L -o "${NAME}.tar.gz" "https://github.com/${REPO}/archive/${SUB_SHA}.tar.gz"
+            curl -fL -o "${NAME}.tar.gz" "https://github.com/${REPO}/archive/${SUB_SHA}.tar.gz"
             ARGS+=("--submodule" "${NAME}=${REPO}:${SUB_SHA}:${NAME}.tar.gz")
           done
 
@@ -142,10 +144,20 @@ jobs:
             --vcpkg-dir "$VCPKG_PORT_DIR" \
             ${{ steps.submodules.outputs.args }}
 
-      - name: Commit changes
+      - name: Commit changes and open PR
+        env:
+          GH_TOKEN: ${{ secrets.BASELINE_PUSH_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          TAG="${{ steps.tag.outputs.tag }}"
+          BASE="${{ steps.branch.outputs.branch }}"
+          BRANCH="update-package-recipes-${TAG}"
+
+          # -B: disposable branch, regenerated fresh on every run (a
+          # re-run for the same tag must not fail on a stale ref).
+          git checkout -B "$BRANCH"
 
           git add \
             "$ROOT_DIR/CMakeLists.txt" \
@@ -159,5 +171,24 @@ jobs:
             exit 0
           fi
 
-          git commit -m "Update package recipes for ${{ steps.tag.outputs.tag }}"
-          git push origin HEAD:${{ steps.branch.outputs.branch }}
+          git commit -m "Update package recipes for ${TAG}"
+
+          # A PAT is required here, not the default GITHUB_TOKEN: main
+          # only accepts changes through a pull request with all
+          # required status checks passing, and pushes/PRs made with
+          # GITHUB_TOKEN don't trigger other workflows (GitHub's loop
+          # prevention), so those checks would never run and the PR
+          # would sit stuck. Same secret and approach as benchmark.yml.
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          git push origin "$BRANCH" --force
+
+          # A PR from a previous run for this tag may still be open.
+          if [ -z "$(gh pr list --head "$BRANCH" --base "$BASE" --state open --json number --jq '.[0].number')" ]; then
+            gh pr create \
+              --title "Update package recipes for ${TAG}" \
+              --body "Automated version and source-hash bump from the update workflow." \
+              --base "$BASE" \
+              --head "$BRANCH"
+          fi
+
+          gh pr merge "$BRANCH" --auto --squash
