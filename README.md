@@ -238,11 +238,13 @@ MiniDatabase/
 │       │   ├── Page.h
 │       │   ├── Table.h
 │       │   └── Database.h
-│       └── Engine/
-│           ├── QueryEngine.h
-│           ├── Concurrency.h
-│           ├── Serializer.h
-│           └── StorageEngine.h
+│       ├── Engine/
+│       │   ├── QueryEngine.h
+│       │   ├── Concurrency.h
+│       │   ├── Serializer.h
+│       │   └── StorageEngine.h
+│       └── Storage/
+│           └── WriteAheadLog.h
 │
 ├── src/
 │   └── MiniDB/
@@ -251,11 +253,13 @@ MiniDatabase/
 │       │   ├── Page.cpp
 │       │   ├── Table.cpp
 │       │   └── Database.cpp
-│       └── Engine/
-│           ├── QueryEngine.cpp
-│           ├── Concurrency.cpp
-│           ├── Serializer.cpp
-│           └── StorageEngine.cpp
+│       ├── Engine/
+│       │   ├── QueryEngine.cpp
+│       │   ├── Concurrency.cpp
+│       │   ├── Serializer.cpp
+│       │   └── StorageEngine.cpp
+│       └── Storage/
+│           └── WriteAheadLog.cpp
 │
 ├── libs/
 │   └── internal/
